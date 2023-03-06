@@ -1,6 +1,6 @@
 ﻿using MouseControllerThing.Utils;
 
-namespace MouseControllerThing;
+namespace MouseControllerThing.Core;
 
 public class Connection {
 	private EdgeSpan a;

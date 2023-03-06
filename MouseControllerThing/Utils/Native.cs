@@ -4,50 +4,57 @@ using System.Runtime.InteropServices;
 namespace MouseControllerThing.Utils;
 
 public static class Native {
-    public const int MONITOR_DEFAULTTOPRIMERTY = 0x00000001;
-    public const int MONITOR_DEFAULTTONEAREST = 0x00000002;
+	public const int MONITOR_DEFAULTTOPRIMERTY = 0x00000001;
+	public const int MONITOR_DEFAULTTONEAREST = 0x00000002;
+	public const int SW_HIDE = 0;
+	public const int SW_SHOW = 5;
 
-    public delegate bool EnumMonitorsDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
+	public delegate bool EnumMonitorsDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
 
-    [DllImport("user32.dll")]
-    public static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, EnumMonitorsDelegate lpfnEnum, IntPtr dwData);
+	[DllImport("user32.dll")]
+	public static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, EnumMonitorsDelegate lpfnEnum, IntPtr dwData);
 
-    [DllImport("user32.dll")]
-    public static extern IntPtr MonitorFromWindow(IntPtr handle, int flags);
+	[DllImport("user32.dll")]
+	public static extern IntPtr MonitorFromWindow(IntPtr handle, int flags);
 
-    [DllImport("user32.dll")]
-    public static extern bool GetMonitorInfo(IntPtr hMonitor, MonitorInfo lpmi);
+	[DllImport("user32.dll")]
+	public static extern bool GetMonitorInfo(IntPtr hMonitor, MonitorInfo lpmi);
 
-    [DllImport("user32.dll")]
-    public static extern bool SetCursorPos(int X, int Y);
+	[DllImport("user32.dll")]
+	public static extern bool SetCursorPos(int X, int Y);
 
-    [DllImport("user32.dll")]
-    public static extern bool GetCursorPos(out Point pos);
+	[DllImport("user32.dll")]
+	public static extern bool GetCursorPos(out Point pos);
+	[DllImport("kernel32.dll")]
+	public static extern IntPtr GetConsoleWindow();
 
-    [Serializable, StructLayout(LayoutKind.Sequential)]
-    public struct Rect {
-        public int Left;
-        public int Top;
-        public int Right;
-        public int Bottom;
+	[DllImport("user32.dll")]
+	public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-        public Rect(int left, int top, int right, int bottom) {
-            Left = left;
-            Top = top;
-            Right = right;
-            Bottom = bottom;
-        }
+	[Serializable, StructLayout(LayoutKind.Sequential)]
+	public struct Rect {
+		public int Left;
+		public int Top;
+		public int Right;
+		public int Bottom;
 
-        public override string ToString() {
-            return $"[X:{Left},Y:{Top},W:{Right - Left},H:{Bottom - Top}]";
-        }
-    }
+		public Rect(int left, int top, int right, int bottom) {
+			Left = left;
+			Top = top;
+			Right = right;
+			Bottom = bottom;
+		}
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    public sealed class MonitorInfo {
-        public int Size = Marshal.SizeOf(typeof(MonitorInfo));
-        public Rect Monitor;
-        public Rect Work;
-        public int Flags;
-    }
+		public override string ToString() {
+			return $"[X:{Left},Y:{Top},W:{Right - Left},H:{Bottom - Top}]";
+		}
+	}
+
+	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+	public sealed class MonitorInfo {
+		public int Size = Marshal.SizeOf(typeof(MonitorInfo));
+		public Rect Monitor;
+		public Rect Work;
+		public int Flags;
+	}
 }

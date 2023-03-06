@@ -1,4 +1,4 @@
-﻿namespace MouseControllerThing;
+﻿namespace MouseControllerThing.Core;
 
 public struct Range {
 	public int begin;

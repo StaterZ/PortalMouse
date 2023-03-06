@@ -1,6 +1,6 @@
 ﻿using MouseControllerThing.Utils;
 
-namespace MouseControllerThing;
+namespace MouseControllerThing.Core;
 
 public sealed class Screen {
 	public readonly V2I pos;

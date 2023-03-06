@@ -1,7 +1,6 @@
-﻿namespace MouseControllerThing;
+﻿namespace MouseControllerThing.Core;
 
 public enum Side {
-	Invalid,
 	Left,
 	Right,
 	Top,

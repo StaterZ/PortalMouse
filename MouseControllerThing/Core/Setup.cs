@@ -1,6 +1,6 @@
 ﻿using MouseControllerThing.Utils;
 
-namespace MouseControllerThing;
+namespace MouseControllerThing.Core;
 
 public sealed class Setup {
 	public List<Screen> screens = new();
