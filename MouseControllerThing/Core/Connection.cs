@@ -3,17 +3,17 @@
 namespace MouseControllerThing.Core;
 
 public class Connection {
-	private EdgeSpan a;
-	private EdgeSpan b;
+	private EdgeSpan m_a;
+	private EdgeSpan m_b;
 
 	public Connection(EdgeSpan a, EdgeSpan b) {
-		this.a = a;
-		this.b = b;
+		m_a = a;
+		m_b = b;
 	}
 
 	private (EdgeSpan self, EdgeSpan other) GetSelfOther(Edge edge) {
-		if (edge == a.edge) return (a, b);
-		if (edge == b.edge) return (b, a);
+		if (edge == m_a.edge) return (m_a, m_b);
+		if (edge == m_b.edge) return (m_b, m_a);
 		throw new ArgumentOutOfRangeException();
 	}
 

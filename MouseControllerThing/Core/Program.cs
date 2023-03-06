@@ -1,29 +1,70 @@
 ﻿using MouseControllerThing.Utils;
-using System.Drawing;
-using System.Reflection.Metadata.Ecma335;
+using System.IO;
 using System.Text.Json;
 
 namespace MouseControllerThing.Core;
 
 public static class Program {
+	private static bool m_isRunning;
+
+	[STAThread]
 	public static void Main(string[] args) {
+		NativeWrapper.ShowConsole(true);
+
+		NotifyIcon tray = new();
+		tray.Icon = Resources.trayIcon;
+		tray.Visible = true;
+		tray.Text = Application.ProductName;
+		tray.ContextMenuStrip = new ContextMenuStrip();
+		tray.ContextMenuStrip.Items.Add("Show", null, (sender, args) => NativeWrapper.ShowConsole(true));
+		tray.ContextMenuStrip.Items.Add("Hide", null, (sender, args) => NativeWrapper.ShowConsole(false));
+		tray.ContextMenuStrip.Items.Add("Halt", null, (sender, args) => m_isRunning = false);
+
+		Thread trayThread = new Thread(() => GuardedMain(args));
+		trayThread.Start();
+
+		Application.Run();
+		trayThread.Join();
+		tray.Dispose();
+	}
+
+	private static void GuardedMain(string[] args) {
+		NativeWrapper.ShowConsole(true);
+
 		while (true) {
 			try {
-				GuradedMain(args);
-			} catch(Exception ex) {
-				ConsoleColor prevColor = Console.ForegroundColor;
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex);
-				Console.ForegroundColor = prevColor;
+				Run(args);
+			} catch (Exception ex) {
+				m_isRunning = false;
+				using (new FgScope(ConsoleColor.Red)) {
+					Console.WriteLine(ex);
+				}
 			}
+
 			NativeWrapper.ShowConsole(true);
-			Console.WriteLine("Program has halted! (Enter to reboot)");
-			Console.ReadLine();
-			Console.WriteLine();
+			Console.WriteLine("Program has halted! (reboot? [y/n])");
+			if (!ReadYN()) {
+				break;
+			}
+		}
+		Application.Exit();
+	}
+
+	private static bool ReadYN() {
+		while (true) {
+			switch (Console.ReadKey().Key) {
+				case ConsoleKey.Y:
+					return true;
+				case ConsoleKey.N:
+					return false;
+			}
 		}
 	}
 
-	private static void GuradedMain(string[] args) {
+	private static void Run(string[] args){
+		m_isRunning = true;
+		Console.Clear();
+
 		Setup setup = new();
 		Console.WriteLine("Screens:");
 		foreach ((int i, Native.MonitorInfo display) in NativeWrapper.GetDisplays().ZipIndex())
@@ -40,12 +81,14 @@ public static class Program {
 		Console.WriteLine("Config Loaded!");
 		Console.WriteLine();
 
-		Console.WriteLine("Entering Runtime...");
-		Thread.Sleep(1000);
+		using (new FgScope(ConsoleColor.Green)) {
+			Console.WriteLine("Entering Runtime...");
+		}
+		Thread.Sleep(500);
 		NativeWrapper.ShowConsole(false);
 
 		V2I? prevP = null;
-		while (true)
+		while (m_isRunning)
 		{
 			Native.GetCursorPos(out Point point);
 			V2I p = new(point);
@@ -61,15 +104,26 @@ public static class Program {
 	private static bool LoadMappings(Setup setup) {
 		const string configPath = "config.json";
 		if (!File.Exists(configPath)) {
-			Console.WriteLine($"'{configPath}' not found, aborting");
+			using (new FgScope(ConsoleColor.Red)) {
+				Console.WriteLine($"'{configPath}' not found, aborting");
+			}
 			return false;
 		}
 
 		string configText = File.ReadAllText(configPath);
 		Config? config = JsonSerializer.Deserialize<Config>(configText);
 		if (config == null) {
-			Console.WriteLine("Failed to parse config, aborting");
+			using (new FgScope(ConsoleColor.Red)) {
+				Console.WriteLine("Failed to parse config, aborting");
+			}
 			return false;
+		}
+
+		if (config.mappings.Length <= 0) {
+			using (new FgScope(ConsoleColor.Yellow)) {
+				Console.WriteLine("No mappings present in config!");
+			}
+			return true;
 		}
 
 		foreach (Config.Mapping mapping in config.mappings) {
@@ -78,7 +132,9 @@ public static class Program {
 					screen = setup.screens[screenIndex];
 					return true;
 				} else {
-					Console.WriteLine($"Screen index out of range. '{screenIndex}' supplied, but range is 0-{setup.screens.Count - 1}, aborting");
+					using (new FgScope(ConsoleColor.Red)) {
+						Console.WriteLine($"Screen index out of range. '{screenIndex}' supplied, but range is 0-{setup.screens.Count - 1}, aborting");
+					}
 					screen = default!;
 					return false;
 				}
@@ -91,7 +147,9 @@ public static class Program {
 					range = new Range(begin, end);
 					return true;
 				} else {
-					Console.WriteLine($"edgeRange is out of range. '{edgeRange.begin.ToString() ?? $"({begin})"}-{edgeRange.end.ToString() ?? $"({end})"}' supplied, but range is 0-{edge.Length}, aborting");
+					using (new FgScope(ConsoleColor.Red)) {
+						Console.WriteLine($"EdgeRange is out of range. '{edgeRange.begin.ToString() ?? $"({begin})"}-{edgeRange.end.ToString() ?? $"({end})"}' supplied, but range is 0-{edge.Length}, aborting");
+					}
 					range = default!;
 					return false;
 				}
@@ -105,6 +163,7 @@ public static class Program {
 			Edge bEdge = bScreen.GetEdge(mapping.b.side);
 			if (!TryParseRange(mapping.b, bEdge, out Range bRange)) return false;
 
+			Console.WriteLine($"Binding 'screen{mapping.a.screen}_{aEdge.Side}[{aRange.begin}-{aRange.end}]' to 'screen{mapping.b.screen}_{bEdge.Side}[{bRange.begin}-{bRange.end}]'");
 			Connection.Bind(
 				new EdgeSpan(aEdge, aRange),
 				new EdgeSpan(bEdge, bRange)

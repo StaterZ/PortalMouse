@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,9 @@ namespace MouseControllerThing.Utils;
 public static class NativeWrapper {
 	public static void ShowConsole(bool shouldShow) {
 		Native.ShowWindow(Native.GetConsoleWindow(), shouldShow ? Native.SW_SHOW : Native.SW_HIDE);
+	}
+	public static void ShowConsole(IntPtr hWnd, bool shouldShow) {
+		Native.ShowWindow(hWnd, shouldShow ? Native.SW_SHOW : Native.SW_HIDE);
 	}
 
 	//http://pinvoke.net/default.aspx/user32/EnumDisplayMonitors.html
