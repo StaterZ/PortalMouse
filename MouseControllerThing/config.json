@@ -1,0 +1,24 @@
+{
+	"mappings": [
+		{
+			"a": {
+				"screen": 1,
+				"side": "Left"
+			},
+			"b": {
+				"screen": 2,
+				"side": "Right"
+			}
+		},
+		{
+			"a": {
+				"screen": 1,
+				"side": "Right"
+			},
+			"b": {
+				"screen": 0,
+				"side": "Left"
+			}
+		}
+	]
+}
