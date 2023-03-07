@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace MouseControllerThing.Core;
 
 public static class Program {
-	private static bool m_isRunning;
+	private static RunningState m_runningState = RunningState.Halted;
 
 	[STAThread]
 	public static void Main(string[] args) {
@@ -18,7 +18,8 @@ public static class Program {
 		tray.ContextMenuStrip = new ContextMenuStrip();
 		tray.ContextMenuStrip.Items.Add("Show", null, (sender, args) => NativeWrapper.ShowConsole(true));
 		tray.ContextMenuStrip.Items.Add("Hide", null, (sender, args) => NativeWrapper.ShowConsole(false));
-		tray.ContextMenuStrip.Items.Add("Halt", null, (sender, args) => m_isRunning = false);
+		tray.ContextMenuStrip.Items.Add("Reload", null, (sender, args) => m_runningState = RunningState.Restart);
+		tray.ContextMenuStrip.Items.Add("Exit", null, (sender, args) => m_runningState = RunningState.Exit);
 
 		Thread trayThread = new Thread(() => GuardedMain(args));
 		trayThread.Start();
@@ -29,22 +30,22 @@ public static class Program {
 	}
 
 	private static void GuardedMain(string[] args) {
-		NativeWrapper.ShowConsole(true);
-
-		while (true) {
+		while (m_runningState != RunningState.Exit) {
+			NativeWrapper.ShowConsole(true);
+			m_runningState = RunningState.Running;
 			try {
 				Run(args);
 			} catch (Exception ex) {
-				m_isRunning = false;
+				m_runningState = RunningState.Halted;
 				using (new FgScope(ConsoleColor.Red)) {
 					Console.WriteLine(ex);
 				}
 			}
 
-			NativeWrapper.ShowConsole(true);
-			Console.WriteLine("Program has halted! (reboot? [y/n])");
-			if (!ReadYN()) {
-				break;
+			if (m_runningState == RunningState.Halted) {
+				NativeWrapper.ShowConsole(true);
+				Console.WriteLine("Program has halted! (restart? [y/n])");
+				m_runningState = ReadYN() ? RunningState.Restart : RunningState.Exit;
 			}
 		}
 		Application.Exit();
@@ -62,22 +63,22 @@ public static class Program {
 	}
 
 	private static void Run(string[] args){
-		m_isRunning = true;
 		Console.Clear();
 
 		Setup setup = new();
 		Console.WriteLine("Screens:");
-		foreach ((int i, Native.MonitorInfo display) in NativeWrapper.GetDisplays().ZipIndex())
-		{
-			Console.WriteLine($"    {i}: {display.Monitor}");
+		foreach ((int i, Native.MonitorInfo monitor) in NativeWrapper.GetDisplays().ZipIndex()) {
+			Console.WriteLine($"    {i}: {monitor.Monitor}");
 
-			Screen screen = new(display);
+			Screen screen = new(monitor);
 			setup.screens.Add(screen);
 		}
 		Console.WriteLine();
 
 		Console.WriteLine("Loading Config...");
-		if (!LoadMappings(setup)) return;
+		Config? config = LoadConfig();
+		if (config == null) return;
+		if (!LoadMappings(config, setup)) return;
 		Console.WriteLine("Config Loaded!");
 		Console.WriteLine();
 
@@ -88,37 +89,23 @@ public static class Program {
 		NativeWrapper.ShowConsole(false);
 
 		V2I? prevP = null;
-		while (m_isRunning)
-		{
+		while (m_runningState == RunningState.Running) {
 			Native.GetCursorPos(out Point point);
 			V2I p = new(point);
 			if (p == prevP) continue;
+
+			V2I? movedP = setup.Handle(p);
+			if (movedP.HasValue) {
+				Native.SetCursorPos(movedP.Value.x, movedP.Value.y);
+				Console.WriteLine($"Moved: {p} -> {movedP.Value}");
+				p = movedP.Value;
+			}
+
 			prevP = p;
-			V2I? result = setup.Handle(p);
-			if (!result.HasValue) continue;
-			Console.WriteLine($"Moved: {p} -> {result.Value}");
-			Native.SetCursorPos(result.Value.x, result.Value.y);
 		}
 	}
 
-	private static bool LoadMappings(Setup setup) {
-		const string configPath = "config.json";
-		if (!File.Exists(configPath)) {
-			using (new FgScope(ConsoleColor.Red)) {
-				Console.WriteLine($"'{configPath}' not found, aborting");
-			}
-			return false;
-		}
-
-		string configText = File.ReadAllText(configPath);
-		Config? config = JsonSerializer.Deserialize<Config>(configText);
-		if (config == null) {
-			using (new FgScope(ConsoleColor.Red)) {
-				Console.WriteLine("Failed to parse config, aborting");
-			}
-			return false;
-		}
-
+	private static bool LoadMappings(Config config, Setup setup) {
 		if (config.mappings.Length <= 0) {
 			using (new FgScope(ConsoleColor.Yellow)) {
 				Console.WriteLine("No mappings present in config!");
@@ -127,7 +114,7 @@ public static class Program {
 		}
 
 		foreach (Config.Mapping mapping in config.mappings) {
-			bool TryGetScreen(int screenIndex, out Screen screen) {
+			bool TryParseScreen(int screenIndex, out Screen screen) {
 				if (screenIndex >= 0 && screenIndex < setup.screens.Count) {
 					screen = setup.screens[screenIndex];
 					return true;
@@ -155,11 +142,11 @@ public static class Program {
 				}
 			}
 
-			if (!TryGetScreen(mapping.a.screen, out Screen aScreen)) return false;
+			if (!TryParseScreen(mapping.a.screen, out Screen aScreen)) return false;
 			Edge aEdge = aScreen.GetEdge(mapping.a.side);
 			if (!TryParseRange(mapping.a, aEdge, out Range aRange)) return false;
 
-			if (!TryGetScreen(mapping.b.screen, out Screen bScreen)) return false;
+			if (!TryParseScreen(mapping.b.screen, out Screen bScreen)) return false;
 			Edge bEdge = bScreen.GetEdge(mapping.b.side);
 			if (!TryParseRange(mapping.b, bEdge, out Range bRange)) return false;
 
@@ -170,5 +157,30 @@ public static class Program {
 			);
 		}
 		return true;
+	}
+
+	private static Config? LoadConfig() {
+		const string configPath = "config.json";
+		if (!File.Exists(configPath))
+		{
+			using (new FgScope(ConsoleColor.Red))
+			{
+				Console.WriteLine($"'{configPath}' not found, aborting");
+			}
+			return null;
+		}
+
+		string configText = File.ReadAllText(configPath);
+		Config? config = JsonSerializer.Deserialize<Config>(configText);
+		if (config == null)
+		{
+			using (new FgScope(ConsoleColor.Red))
+			{
+				Console.WriteLine("Failed to parse config, aborting");
+			}
+			return null;
+		}
+
+		return config;
 	}
 }

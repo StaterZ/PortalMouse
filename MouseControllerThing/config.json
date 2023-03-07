@@ -1,4 +1,14 @@
 {
 	"mappings": [
+		{
+			"a": {
+				"screen": 0,
+				"side": "Right"
+			},
+			"b": {
+				"screen": 1,
+				"side": "Left"
+			}
+		}
 	]
 }
