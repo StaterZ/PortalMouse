@@ -32,7 +32,7 @@ public sealed class Screen {
 			p.y >= 0 && p.y < size.y;
 
 		V2I? result = null;
-		if (isOnScreen || m_wasOnScreen) {
+		if (m_wasOnScreen) {
 			if (p.x <= 0) result ??= m_left.Handle(p.y);
 			if (p.x >= size.x - 1) result ??= m_right.Handle(p.y);
 			if (p.y <= 0) result ??= m_top.Handle(p.x);
