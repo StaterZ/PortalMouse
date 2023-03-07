@@ -102,7 +102,7 @@ public static class Program {
 			Native.GetCursorPos(out Point point);
 			V2I p = new(point);
 			if (p == prevP) continue;
-			//Console.WriteLine($"{prevP} ===========> {p}");
+			Console.WriteLine($"{prevP} ===========> {p}");
 
 			V2I? movedP = setup.Handle(p);
 			if (movedP.HasValue) {

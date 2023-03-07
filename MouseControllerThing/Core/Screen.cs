@@ -22,8 +22,6 @@ public sealed class Screen {
 	}
 
 	public V2I? Handle(V2I p) {
-		bool isOnScreen = PhysicalRect.Contains(p);
-
 		p -= PhysicalRect.Pos;
 
 		V2I? result = null;
@@ -45,11 +43,8 @@ public sealed class Screen {
 		};
 	}
 
-	public V2I FromPhysicalToLogicalSpace(V2I p) {
-		return MyMath.Map(p, PhysicalRect, LogicalRect);
-	}
-
-	public V2I FromLogicalToPhysicalSpace(V2I p) {
-		return MyMath.Map(p, LogicalRect, PhysicalRect);
-	}
+	public V2I FromPhysicalToLogicalSpace_Pos(V2I p) => MyMath.Map(p, PhysicalRect, LogicalRect);
+	public V2I FromLogicalToPhysicalSpace_Pos(V2I p) => MyMath.Map(p, LogicalRect, PhysicalRect);
+	public V2I FromPhysicalToLogicalSpace_Vec(V2I p) => MyMath.MapVec(p, PhysicalRect, LogicalRect);
+	public V2I FromLogicalToPhysicalSpace_Vec(V2I p) => MyMath.MapVec(p, LogicalRect, PhysicalRect);
 }

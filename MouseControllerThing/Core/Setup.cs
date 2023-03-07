@@ -10,13 +10,14 @@ public sealed class Setup {
 		Screen? screen = FindCursorScreen(p);
 		if (screen == null) return null;
 
-		p = screen.FromLogicalToPhysicalSpace(p);
+		p = screen.FromLogicalToPhysicalSpace_Pos(p);
 		V2I? result = (m_prevScreen ?? screen).Handle(p);
 		m_prevScreen = screen;
 		if (!result.HasValue) return null;
 
 		m_prevScreen = null;
-		return screen.FromPhysicalToLogicalSpace(result.Value);
+		//return screen.FromPhysicalToLogicalSpace(result.Value);
+		return result.Value;
 	}
 
 	private Screen? FindCursorScreen(V2I cur) {
