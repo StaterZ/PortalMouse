@@ -7,7 +7,7 @@ public class Edge {
 	public readonly Side Side;
 	private readonly Screen m_screen;
 
-	public V2I Pos => m_screen.pos + m_screen.size * Side switch {
+	private V2I Pos => m_screen.pos + (m_screen.size - V2I.One) * Side switch {
 		Side.Left => new V2I(0, 0),
 		Side.Right => new V2I(1, 0),
 		Side.Top => new V2I(0, 0),
@@ -28,19 +28,20 @@ public class Edge {
 		Side = side;
 	}
 
-	public V2I GetOutPoint(int p) {
+	public V2I GetLandingSite(int p, int overStep) {
+		overStep = Math.Min(overStep, 1);
 		return Pos + Side switch {
-			Side.Left => new V2I(1, p),
-			Side.Right => new V2I(-2, p),
-			Side.Top => new V2I(p, 1),
-			Side.Bottom => new V2I(p, -2),
+			Side.Left => new V2I(overStep, p),
+			Side.Right => new V2I(-overStep, p),
+			Side.Top => new V2I(p, overStep),
+			Side.Bottom => new V2I(p, -overStep),
 			_ => throw new ArgumentOutOfRangeException()
 		};
 	}
 
-	public V2I? Handle(int p) {
+	public V2I? Handle(int p, int overStep) {
 		foreach (Connection connection in Connections) {
-			V2I? result = connection.TryRemap(this, p);
+			V2I? result = connection.TryRemap(this, p, overStep);
 			if (result.HasValue) return result.Value;
 		}
 		return null;

@@ -2,11 +2,11 @@
 	"mappings": [
 		{
 			"a": {
-				"screen": 0,
+				"screen": 1,
 				"side": "Right"
 			},
 			"b": {
-				"screen": 1,
+				"screen": 0,
 				"side": "Left"
 			}
 		}

@@ -33,10 +33,10 @@ public sealed class Screen {
 
 		V2I? result = null;
 		if (m_wasOnScreen) {
-			if (p.x <= 0) result ??= m_left.Handle(p.y);
-			if (p.x >= size.x - 1) result ??= m_right.Handle(p.y);
-			if (p.y <= 0) result ??= m_top.Handle(p.x);
-			if (p.y >= size.y - 1) result ??= m_bottom.Handle(p.x);
+			if (p.x <= 0) result ??= m_left.Handle(p.y, -p.x);
+			if (p.x >= size.x - 1) result ??= m_right.Handle(p.y, p.x - (size.x - 1));
+			if (p.y <= 0) result ??= m_top.Handle(p.x, -p.y);
+			if (p.y >= size.y - 1) result ??= m_bottom.Handle(p.x, p.y - (size.y - 1));
 		}
 
 		m_wasOnScreen = isOnScreen && result == null;

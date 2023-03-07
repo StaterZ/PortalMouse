@@ -17,7 +17,7 @@ public class Connection {
 		throw new ArgumentOutOfRangeException();
 	}
 
-	public V2I? TryRemap(Edge edge, int p) {
+	public V2I? TryRemap(Edge edge, int p, int overStep) {
 		(EdgeSpan self, EdgeSpan other) = GetSelfOther(edge);
 		if (p < self.range.begin || p >= self.range.end) return null;
 
@@ -26,7 +26,7 @@ public class Connection {
 		result /= self.range.end - self.range.begin;
 		result *= other.range.end - other.range.begin;
 		result += other.range.begin;
-		return other.edge.GetOutPoint((int)result);
+		return other.edge.GetLandingSite((int)result, overStep);
 	}
 
 	public static Connection Bind(EdgeSpan a, EdgeSpan b) {

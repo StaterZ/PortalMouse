@@ -11,6 +11,9 @@ public struct V2I {
 		this.y = y;
 	}
 
+	public static V2I Zero => new V2I(0, 0);
+	public static V2I One => new V2I(1, 1);
+
 	public V2I(Point point) : this(point.X, point.Y) { }
 
 	public override string ToString() => $"[{x},{y}]";
@@ -32,5 +35,7 @@ public struct V2I {
 	public static V2I operator +(V2I lhs, V2I rhs) => new(lhs.x + rhs.x, lhs.y + rhs.y);
 	public static V2I operator -(V2I lhs, V2I rhs) => new(lhs.x - rhs.x, lhs.y - rhs.y);
 	public static V2I operator *(V2I lhs, V2I rhs) => new(lhs.x * rhs.x, lhs.y * rhs.y);
+	public static V2I operator *(V2I lhs, int rhs) => new(lhs.x * rhs, lhs.y * rhs);
 	public static V2I operator /(V2I lhs, V2I rhs) => new(lhs.x / rhs.x, lhs.y / rhs.y);
+	public static V2I operator /(V2I lhs, int rhs) => new(lhs.x / rhs, lhs.y / rhs);
 }
