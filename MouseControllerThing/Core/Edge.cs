@@ -40,10 +40,8 @@ public class Edge {
 	}
 
 	public V2I? Handle(int p, int overStep) {
-		foreach (Connection connection in Connections) {
-			V2I? result = connection.TryRemap(this, p, overStep);
-			if (result.HasValue) return result.Value;
-		}
-		return null;
+		return Connections
+			.Select(c => c.TryRemap(this, p, overStep))
+			.FirstOrDefault(result => result.HasValue);
 	}
 }

@@ -20,10 +20,6 @@ public sealed class Setup {
 	}
 
 	private Screen? FindCursorScreen(V2I cur) {
-		foreach (Screen screen in screens) {
-			if (!screen.LogicalRect.Contains(cur)) continue;
-			return screen;
-		}
-		return null;
+		return screens.FirstOrDefault(screen => screen.LogicalRect.Contains(cur));
 	}
 }

@@ -1,5 +1,4 @@
 ﻿using MouseControllerThing.Utils;
-using System.Windows.Forms;
 
 namespace MouseControllerThing.Core;
 
@@ -22,15 +21,13 @@ public sealed class Screen {
 	}
 
 	public V2I? Handle(V2I p) {
-		bool isOnScreen = PhysicalRect.Contains(p);
-
 		p -= PhysicalRect.Pos;
 
 		V2I? result = null;
 		if (p.x <= 0) result ??= m_left.Handle(p.y, -p.x);
-		if (p.x >= (PhysicalRect.Size.x - 1)) result ??= m_right.Handle(p.y, p.x - (PhysicalRect.Size.x - 1));
+		if (p.x >= PhysicalRect.Size.x - 1) result ??= m_right.Handle(p.y, p.x - (PhysicalRect.Size.x - 1));
 		if (p.y <= 0) result ??= m_top.Handle(p.x, -p.y);
-		if (p.y >= (PhysicalRect.Size.y - 1)) result ??= m_bottom.Handle(p.x, p.y - (PhysicalRect.Size.y - 1));
+		if (p.y >= PhysicalRect.Size.y - 1) result ??= m_bottom.Handle(p.x, p.y - (PhysicalRect.Size.y - 1));
 
 		return result;
 	}

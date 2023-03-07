@@ -16,12 +16,12 @@ public static class Program {
 		tray.Visible = true;
 		tray.Text = Application.ProductName;
 		tray.ContextMenuStrip = new ContextMenuStrip();
-		tray.ContextMenuStrip.Items.Add("Show", null, (sender, args) => NativeWrapper.ShowConsole(true));
-		tray.ContextMenuStrip.Items.Add("Hide", null, (sender, args) => NativeWrapper.ShowConsole(false));
-		tray.ContextMenuStrip.Items.Add("Reload", null, (sender, args) => m_runningState = RunningState.Restart);
-		tray.ContextMenuStrip.Items.Add("Exit", null, (sender, args) => m_runningState = RunningState.Exit);
+		tray.ContextMenuStrip.Items.Add("Show", null, (sender, eventArgs) => NativeWrapper.ShowConsole(true));
+		tray.ContextMenuStrip.Items.Add("Hide", null, (sender, eventArgs) => NativeWrapper.ShowConsole(false));
+		tray.ContextMenuStrip.Items.Add("Reload", null, (sender, eventArgs) => m_runningState = RunningState.Restart);
+		tray.ContextMenuStrip.Items.Add("Exit", null, (sender, eventArgs) => m_runningState = RunningState.Exit);
 
-		Thread trayThread = new Thread(() => GuardedMain(args));
+		Thread trayThread = new(() => GuardedMain(args));
 		trayThread.Start();
 
 		Application.Run();
@@ -62,7 +62,7 @@ public static class Program {
 		}
 	}
 
-	private static void Run(string[] args){
+	private static void Run(string[] args) {
 		Console.Clear();
 
 		Setup setup = new();
@@ -99,6 +99,7 @@ public static class Program {
 
 		V2I? prevP = null;
 		while (m_runningState == RunningState.Running) {
+			Thread.Sleep(1);
 			Native.GetCursorPos(out Point point);
 			V2I p = new(point);
 			if (p == prevP) continue;
@@ -125,31 +126,29 @@ public static class Program {
 
 		foreach (Config.Mapping mapping in config.mappings) {
 			bool TryParseScreen(int screenIndex, out Screen screen) {
-				if (screenIndex >= 0 && screenIndex < setup.screens.Count) {
-					screen = setup.screens[screenIndex];
-					return true;
-				} else {
+				if (screenIndex < 0 && screenIndex >= setup.screens.Count) {
 					using (new FgScope(ConsoleColor.Red)) {
 						Console.WriteLine($"Screen index out of range. '{screenIndex}' supplied, but range is 0-{setup.screens.Count - 1}, aborting");
 					}
 					screen = default!;
 					return false;
 				}
+				screen = setup.screens[screenIndex];
+				return true;
 			}
 
 			bool TryParseRange(Config.EdgeRange edgeRange, Edge edge, out R1I range) {
 				int begin = edgeRange.begin ?? 0;
 				int end = edgeRange.end ?? edge.Length;
-				if (begin >= 0 && end <= edge.Length) {
-					range = new R1I(begin, end);
-					return true;
-				} else {
+				if (begin < 0 && end > edge.Length) {
 					using (new FgScope(ConsoleColor.Red)) {
 						Console.WriteLine($"EdgeRange is out of range. '{edgeRange.begin.ToString() ?? $"({begin})"}-{edgeRange.end.ToString() ?? $"({end})"}' supplied, but range is 0-{edge.Length}, aborting");
 					}
 					range = default!;
 					return false;
 				}
+				range = new R1I(begin, end);
+				return true;
 			}
 
 			if (!TryParseScreen(mapping.a.screen, out Screen aScreen)) return false;
@@ -171,10 +170,8 @@ public static class Program {
 
 	private static Config? LoadConfig() {
 		const string configPath = "config.json";
-		if (!File.Exists(configPath))
-		{
-			using (new FgScope(ConsoleColor.Red))
-			{
+		if (!File.Exists(configPath)) {
+			using (new FgScope(ConsoleColor.Red)) {
 				Console.WriteLine($"'{configPath}' not found, aborting");
 			}
 			return null;
@@ -182,10 +179,8 @@ public static class Program {
 
 		string configText = File.ReadAllText(configPath);
 		Config? config = JsonSerializer.Deserialize<Config>(configText);
-		if (config == null)
-		{
-			using (new FgScope(ConsoleColor.Red))
-			{
+		if (config == null) {
+			using (new FgScope(ConsoleColor.Red)) {
 				Console.WriteLine("Failed to parse config, aborting");
 			}
 			return null;

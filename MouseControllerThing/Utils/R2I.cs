@@ -1,6 +1,4 @@
-﻿using System.Windows.Media.Media3D;
-
-namespace MouseControllerThing.Utils;
+﻿namespace MouseControllerThing.Utils;
 
 public struct R2I {
 	public V2I Pos;
@@ -16,7 +14,7 @@ public struct R2I {
 		new V2I(rect.Right - rect.Left, rect.Bottom - rect.Top)
 	) { }
 
-	public bool Contains(V2I p) {
+	public readonly bool Contains(V2I p) {
 		p -= Pos;
 		return
 			p.x >= 0 && p.x < Size.x &&

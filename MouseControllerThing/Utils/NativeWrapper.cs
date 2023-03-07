@@ -1,6 +1,5 @@
 ﻿using MouseControllerThing.Core;
-using System;
-using System.Collections.Generic;
+
 namespace MouseControllerThing.Utils;
 
 public static class NativeWrapper {
