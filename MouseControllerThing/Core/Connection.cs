@@ -12,27 +12,23 @@ public class Connection {
 	}
 
 	private (EdgeSpan self, EdgeSpan other) GetSelfOther(Edge edge) {
-		if (edge == m_a.edge) return (m_a, m_b);
-		if (edge == m_b.edge) return (m_b, m_a);
+		if (edge == m_a.Edge) return (m_a, m_b);
+		if (edge == m_b.Edge) return (m_b, m_a);
 		throw new ArgumentOutOfRangeException();
 	}
 
 	public V2I? TryRemap(Edge edge, int p, int overStep) {
 		(EdgeSpan self, EdgeSpan other) = GetSelfOther(edge);
-		if (p < self.range.begin || p >= self.range.end) return null;
+		if (p < self.Range.Begin || p >= self.Range.End) return null;
 
-		float result = p;
-		result -= self.range.begin;
-		result /= self.range.end - self.range.begin;
-		result *= other.range.end - other.range.begin;
-		result += other.range.begin;
-		return other.edge.GetLandingSite((int)result, overStep);
+		int result = MyMath.Map(p, self.Range, other.Range);
+		return other.Edge.GetLandingSite(result, overStep);
 	}
 
 	public static Connection Bind(EdgeSpan a, EdgeSpan b) {
 		Connection connection = new(a, b);
-		a.edge.Connections.Add(connection);
-		b.edge.Connections.Add(connection);
+		a.Edge.Connections.Add(connection);
+		b.Edge.Connections.Add(connection);
 		return connection;
 	}
 }

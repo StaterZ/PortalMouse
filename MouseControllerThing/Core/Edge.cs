@@ -7,7 +7,7 @@ public class Edge {
 	public readonly Side Side;
 	private readonly Screen m_screen;
 
-	private V2I Pos => m_screen.pos + (m_screen.size - V2I.One) * Side switch {
+	private V2I Pos => m_screen.PhysicalRect.Pos + (m_screen.PhysicalRect.Size - V2I.One) * Side switch {
 		Side.Left => new V2I(0, 0),
 		Side.Right => new V2I(1, 0),
 		Side.Top => new V2I(0, 0),
@@ -16,10 +16,10 @@ public class Edge {
 	};
 
 	public int Length => Side switch {
-		Side.Left => m_screen.size.y,
-		Side.Right => m_screen.size.y,
-		Side.Top => m_screen.size.x,
-		Side.Bottom => m_screen.size.x,
+		Side.Left => m_screen.PhysicalRect.Size.y,
+		Side.Right => m_screen.PhysicalRect.Size.y,
+		Side.Top => m_screen.PhysicalRect.Size.x,
+		Side.Bottom => m_screen.PhysicalRect.Size.x,
 		_ => throw new ArgumentOutOfRangeException()
 	};
 
@@ -29,7 +29,7 @@ public class Edge {
 	}
 
 	public V2I GetLandingSite(int p, int overStep) {
-		overStep = Math.Min(overStep, 1);
+		overStep = Math.Max(overStep - 1, 1);
 		return Pos + Side switch {
 			Side.Left => new V2I(overStep, p),
 			Side.Right => new V2I(-overStep, p),

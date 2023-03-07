@@ -1,22 +1,19 @@
 ﻿using MouseControllerThing.Utils;
+using System.Windows.Forms;
 
 namespace MouseControllerThing.Core;
 
 public sealed class Screen {
-	public readonly V2I pos;
-	public readonly V2I size;
+	public readonly R2I PhysicalRect;
+	public readonly R2I LogicalRect;
 	private readonly Edge m_left;
 	private readonly Edge m_right;
 	private readonly Edge m_top;
 	private readonly Edge m_bottom;
-	private bool m_wasOnScreen;
 
-	public Screen(Native.MonitorInfo monitorInfo) {
-		pos = new V2I(monitorInfo.Monitor.Left, monitorInfo.Monitor.Top);
-		size = new V2I(
-			monitorInfo.Monitor.Right - monitorInfo.Monitor.Left,
-			monitorInfo.Monitor.Bottom - monitorInfo.Monitor.Top
-		);
+	public Screen(ScreenInfo monitorInfo) {
+		PhysicalRect = new R2I(monitorInfo.PhysicalRect);
+		LogicalRect = new R2I(monitorInfo.LogicalRect);
 
 		m_left = new Edge(this, Side.Left);
 		m_right = new Edge(this, Side.Right);
@@ -25,21 +22,16 @@ public sealed class Screen {
 	}
 
 	public V2I? Handle(V2I p) {
-		p -= pos;
+		bool isOnScreen = PhysicalRect.Contains(p);
 
-		bool isOnScreen =
-			p.x >= 0 && p.x < size.x &&
-			p.y >= 0 && p.y < size.y;
+		p -= PhysicalRect.Pos;
 
 		V2I? result = null;
-		if (m_wasOnScreen) {
-			if (p.x <= 0) result ??= m_left.Handle(p.y, -p.x);
-			if (p.x >= size.x - 1) result ??= m_right.Handle(p.y, p.x - (size.x - 1));
-			if (p.y <= 0) result ??= m_top.Handle(p.x, -p.y);
-			if (p.y >= size.y - 1) result ??= m_bottom.Handle(p.x, p.y - (size.y - 1));
-		}
+		if (p.x <= 0) result ??= m_left.Handle(p.y, -p.x);
+		if (p.x >= (PhysicalRect.Size.x - 1)) result ??= m_right.Handle(p.y, p.x - (PhysicalRect.Size.x - 1));
+		if (p.y <= 0) result ??= m_top.Handle(p.x, -p.y);
+		if (p.y >= (PhysicalRect.Size.y - 1)) result ??= m_bottom.Handle(p.x, p.y - (PhysicalRect.Size.y - 1));
 
-		m_wasOnScreen = isOnScreen && result == null;
 		return result;
 	}
 
@@ -51,5 +43,13 @@ public sealed class Screen {
 			Side.Bottom => m_bottom,
 			_ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
 		};
+	}
+
+	public V2I FromPhysicalToLogicalSpace(V2I p) {
+		return MyMath.Map(p, PhysicalRect, LogicalRect);
+	}
+
+	public V2I FromLogicalToPhysicalSpace(V2I p) {
+		return MyMath.Map(p, LogicalRect, PhysicalRect);
 	}
 }

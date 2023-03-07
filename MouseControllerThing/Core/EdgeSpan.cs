@@ -1,3 +1,5 @@
-﻿namespace MouseControllerThing.Core;
+﻿using MouseControllerThing.Utils;
 
-public record EdgeSpan(Edge edge, Range range);
+namespace MouseControllerThing.Core;
+
+public record EdgeSpan(Edge Edge, R1I Range);

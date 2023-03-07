@@ -1,10 +1,6 @@
-﻿using System;
+﻿using MouseControllerThing.Core;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace MouseControllerThing.Utils;
 
 public static class NativeWrapper {
@@ -16,19 +12,31 @@ public static class NativeWrapper {
 	}
 
 	//http://pinvoke.net/default.aspx/user32/EnumDisplayMonitors.html
-	public static List<Native.MonitorInfo> GetDisplays() {
-		List<Native.MonitorInfo> result = new();
+	public static List<ScreenInfo> GetDisplays() {
+		List<ScreenInfo> result = new();
 
-		Native.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero,
+		Graphics g = Graphics.FromHwnd(IntPtr.Zero);
+		IntPtr desktop = g.GetHdc();
+		Native.EnumDisplayMonitors(desktop, IntPtr.Zero,
 			(IntPtr hMonitor, IntPtr hdcMonitor, ref Native.Rect lprcMonitor, IntPtr dwData) => {
 				Native.MonitorInfo mi = new();
 				if (Native.GetMonitorInfo(hMonitor, mi)) {
-					result.Add(mi);
+					float scale = GetScalingFactor(hdcMonitor);
+					result.Add(new ScreenInfo(mi, scale));
 				}
 				return true;
 			}, IntPtr.Zero
 		);
 
 		return result;
+	}
+
+	public static float GetScalingFactor(IntPtr hdc) {
+		int LogicalScreenHeight = Native.GetDeviceCaps(hdc, (int)Native.DeviceCap.VERTRES);
+		int PhysicalScreenHeight = Native.GetDeviceCaps(hdc, (int)Native.DeviceCap.DESKTOPVERTRES);
+
+		float ScreenScalingFactor = (float)PhysicalScreenHeight / (float)LogicalScreenHeight;
+
+		return ScreenScalingFactor;
 	}
 }

@@ -67,8 +67,15 @@ public static class Program {
 
 		Setup setup = new();
 		Console.WriteLine("Screens:");
-		foreach ((int i, Native.MonitorInfo monitor) in NativeWrapper.GetDisplays().ZipIndex()) {
-			Console.WriteLine($"    {i}: {monitor.Monitor}");
+		foreach ((int i, ScreenInfo monitor) in NativeWrapper.GetDisplays().ZipIndex()) {
+			Console.Write($"    {i}: {monitor.PhysicalRect}");
+			if (monitor.Scale != 1) {
+				Console.Write($" @ {monitor.Scale * 100}%");
+#if DEBUG
+				Console.Write($" -> Logical:{monitor.LogicalRect}");
+#endif
+			}
+			Console.WriteLine();
 
 			Screen screen = new(monitor);
 			setup.screens.Add(screen);
@@ -85,14 +92,17 @@ public static class Program {
 		using (new FgScope(ConsoleColor.Green)) {
 			Console.WriteLine("Entering Runtime...");
 		}
+#if !DEBUG
 		Thread.Sleep(500);
 		NativeWrapper.ShowConsole(false);
+#endif
 
 		V2I? prevP = null;
 		while (m_runningState == RunningState.Running) {
 			Native.GetCursorPos(out Point point);
 			V2I p = new(point);
 			if (p == prevP) continue;
+			//Console.WriteLine($"{prevP} ===========> {p}");
 
 			V2I? movedP = setup.Handle(p);
 			if (movedP.HasValue) {
@@ -127,11 +137,11 @@ public static class Program {
 				}
 			}
 
-			bool TryParseRange(Config.EdgeRange edgeRange, Edge edge, out Range range) {
+			bool TryParseRange(Config.EdgeRange edgeRange, Edge edge, out R1I range) {
 				int begin = edgeRange.begin ?? 0;
 				int end = edgeRange.end ?? edge.Length;
 				if (begin >= 0 && end <= edge.Length) {
-					range = new Range(begin, end);
+					range = new R1I(begin, end);
 					return true;
 				} else {
 					using (new FgScope(ConsoleColor.Red)) {
@@ -144,13 +154,13 @@ public static class Program {
 
 			if (!TryParseScreen(mapping.a.screen, out Screen aScreen)) return false;
 			Edge aEdge = aScreen.GetEdge(mapping.a.side);
-			if (!TryParseRange(mapping.a, aEdge, out Range aRange)) return false;
+			if (!TryParseRange(mapping.a, aEdge, out R1I aRange)) return false;
 
 			if (!TryParseScreen(mapping.b.screen, out Screen bScreen)) return false;
 			Edge bEdge = bScreen.GetEdge(mapping.b.side);
-			if (!TryParseRange(mapping.b, bEdge, out Range bRange)) return false;
+			if (!TryParseRange(mapping.b, bEdge, out R1I bRange)) return false;
 
-			Console.WriteLine($"Binding 'screen{mapping.a.screen}_{aEdge.Side}[{aRange.begin}-{aRange.end}]' to 'screen{mapping.b.screen}_{bEdge.Side}[{bRange.begin}-{bRange.end}]'");
+			Console.WriteLine($"Binding 'screen{mapping.a.screen}_{aEdge.Side}[{aRange.Begin}-{aRange.End}]' to 'screen{mapping.b.screen}_{bEdge.Side}[{bRange.Begin}-{bRange.End}]'");
 			Connection.Bind(
 				new EdgeSpan(aEdge, aRange),
 				new EdgeSpan(bEdge, bRange)

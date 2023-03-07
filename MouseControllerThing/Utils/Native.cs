@@ -30,6 +30,16 @@ public static class Native {
 	[DllImport("user32.dll")]
 	public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
+	[DllImport("gdi32.dll")]
+	public static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+
+	public enum DeviceCap {
+		VERTRES = 10,
+		DESKTOPVERTRES = 117,
+
+		// http://pinvoke.net/default.aspx/gdi32/GetDeviceCaps.html
+	}
+
 	[Serializable, StructLayout(LayoutKind.Sequential)]
 	public struct Rect {
 		public int Left;
