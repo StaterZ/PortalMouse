@@ -1,4 +1,5 @@
 ﻿using MouseControllerThing.Utils;
+using System.Windows.Forms;
 
 namespace MouseControllerThing.Core;
 
@@ -29,14 +30,22 @@ public class Edge {
 	}
 
 	public V2I GetLandingSite(int p, int overStep) {
-		overStep = Math.Max(overStep - 1, 1);
-		return Pos + Side switch {
-			Side.Left => new V2I(overStep, p),
-			Side.Right => new V2I(-overStep, p),
-			Side.Top => new V2I(p, overStep),
-			Side.Bottom => new V2I(p, -overStep),
+		V2I mappedPos = m_screen.FromPhysicalToLogicalSpace_Pos(Pos + Side switch {
+			Side.Left => new V2I(0, p),
+			Side.Right => new V2I(0, p),
+			Side.Top => new V2I(p, 0),
+			Side.Bottom => new V2I(p, 0),
 			_ => throw new ArgumentOutOfRangeException()
-		};
+		});
+		int inset = Math.Max(overStep, 2) - 1;
+		V2I insetVec = V2I.Round(m_screen.FromPhysicalToLogicalSpace_Vec(Side switch {
+			Side.Left => new V2F(inset, 0),
+			Side.Right => new V2F(-inset, 0),
+			Side.Top => new V2F(0, inset),
+			Side.Bottom => new V2F(0, -inset),
+			_ => throw new ArgumentOutOfRangeException()
+		}).EnsureMag(1));
+		return mappedPos + insetVec;
 	}
 
 	public V2I? Handle(int p, int overStep) {

@@ -42,11 +42,8 @@ public sealed class Screen {
 		};
 	}
 
-	public V2I FromPhysicalToLogicalSpace(V2I p) {
-		return MyMath.Map(p, PhysicalRect, LogicalRect);
-	}
-
-	public V2I FromLogicalToPhysicalSpace(V2I p) {
-		return MyMath.Map(p, LogicalRect, PhysicalRect);
-	}
+	public V2I FromPhysicalToLogicalSpace_Pos(V2I p) => MyMath.Map(p, PhysicalRect, LogicalRect);
+	public V2I FromLogicalToPhysicalSpace_Pos(V2I p) => MyMath.Map(p, LogicalRect, PhysicalRect);
+	public V2F FromPhysicalToLogicalSpace_Vec(V2F p) => MyMath.MapVec(p, PhysicalRect, LogicalRect);
+	public V2F FromLogicalToPhysicalSpace_Vec(V2F p) => MyMath.MapVec(p, LogicalRect, PhysicalRect);
 }

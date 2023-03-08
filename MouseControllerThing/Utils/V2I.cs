@@ -14,6 +14,17 @@ public struct V2I {
 
 	public V2I(Point point) : this(point.X, point.Y) { }
 
+	public float Dot(V2I other) => x * other.x + y * other.y;
+	public float MagSqr => Dot(this);
+	public float Mag => MathF.Sqrt(MagSqr);
+	public V2F Norm => this == Zero ? V2F.Zero : (V2F)this / Mag;
+	public float DistSqr(V2I other) => (other - this).MagSqr;
+	public float Dist(V2I other) => (other - this).Mag;
+
+	public V2I EnsureMag(float otherMag) => Ceil(Norm * MathF.Max(Mag, otherMag));
+	public static V2I Round(V2F other) => new((int)MathF.Round(other.x), (int)MathF.Round(other.y));
+	public static V2I Ceil(V2F other) => new((int)MathF.Ceiling(other.x), (int)MathF.Ceiling(other.y));
+
 	public override string ToString() => $"[{x},{y}]";
 
 	public bool Equals(V2I other) {
