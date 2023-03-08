@@ -102,7 +102,11 @@ public static class Program {
 			Native.GetCursorPos(out Point point);
 			V2I p = new(point);
 			if (p == prevP) continue;
-			Console.WriteLine($"{prevP} ===========> {p}");
+			if (prevP != null && prevP?.Dist(p) > 50) {
+				Console.WriteLine($"Undoing Windows Correction: {prevP} <- {p}");
+				Native.SetCursorPos(prevP.Value.x, prevP.Value.y);
+				p = prevP.Value;
+			}
 
 			V2I? movedP = setup.Handle(p);
 			if (movedP.HasValue) {

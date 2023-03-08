@@ -16,6 +16,13 @@ public struct V2F {
 
 	public V2F(Point point) : this(point.X, point.Y) { }
 
+	public float Dot(V2F other) => x * other.x + y * other.y;
+	public float MagSqr => Dot(this);
+	public float Mag => MathF.Sqrt(MagSqr);
+	public V2F Norm => this == Zero ? Zero : this / Mag;
+
+	public V2F EnsureMag(float otherMag) => Norm * MathF.Max(Mag, otherMag);
+
 	public override string ToString() => $"[{x},{y}]";
 
 	public bool Equals(V2F other) {

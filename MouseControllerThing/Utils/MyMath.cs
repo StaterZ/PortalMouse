@@ -9,7 +9,7 @@ public static class MyMath {
 		return (value - from.Pos) * to.Size / from.Size + to.Pos;
 	}
 
-	public static V2I MapVec(V2I value, R2I from, R2I to) {
-		return value * to.Size / from.Size;
+	public static V2F MapVec(V2F value, R2I from, R2I to) {
+		return value * (V2F)to.Size / (V2F)from.Size;
 	}
 }
