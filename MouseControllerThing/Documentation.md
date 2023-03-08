@@ -4,6 +4,7 @@
 ### The json root object, nice and simple
 ```c#
 [Required] mappings: Mapping[] //the list of all mappings
+[Optional] correctionDist: i32 //the max number of pixels/frame windows can move the cursor. if it moves faster than the supplied value, the program will attempt to stop windows from teleporting the cursor. if no value is supplied, corrections will be disabled
 ```
 
 ## Mapping

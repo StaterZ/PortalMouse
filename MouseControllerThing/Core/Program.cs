@@ -85,6 +85,11 @@ public static class Program {
 		Console.WriteLine("Loading Config...");
 		Config? config = LoadConfig();
 		if (config == null) return;
+		if (!config.correctionDist.HasValue) {
+			using (new FgScope(ConsoleColor.Yellow)) {
+				Console.WriteLine("Windows corrections are disabled");
+			}
+		}
 		if (!LoadMappings(config, setup)) return;
 		Console.WriteLine("Config Loaded!");
 		Console.WriteLine();
@@ -103,7 +108,7 @@ public static class Program {
 			Native.GetCursorPos(out Point point);
 			V2I p = new(point);
 			if (p == prevP) continue;
-			if (prevP != null && prevP?.Dist(p) > 50) {
+			if (prevP != null && config.correctionDist.HasValue && prevP?.DistSqr(p) > MyMath.Sqr(config.correctionDist.Value)) {
 				Console.WriteLine($"Undoing Windows Correction: {prevP} <- {p}");
 				Native.SetCursorPos(prevP.Value.x, prevP.Value.y);
 				p = prevP.Value;

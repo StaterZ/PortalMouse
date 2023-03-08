@@ -12,4 +12,7 @@ public static class MyMath {
 	public static V2F MapVec(V2F value, R2I from, R2I to) {
 		return value * (V2F)to.Size / (V2F)from.Size;
 	}
+
+	public static int Sqr(int x) => x * x;
+	public static float Sqr(float x) => x * x;
 }
