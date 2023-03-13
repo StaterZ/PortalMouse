@@ -1,14 +1,17 @@
-﻿using System.Runtime.InteropServices;
+﻿using MouseControllerThing.Utils;
+using System.Runtime.InteropServices;
 
-namespace MouseControllerThing.Utils;
+namespace MouseControllerThing.Native;
 
-public static class Native {
+public static class User32
+{
 	public const int MONITOR_DEFAULTTOPRIMERTY = 0x00000001;
 	public const int MONITOR_DEFAULTTONEAREST = 0x00000002;
 	public const int SW_HIDE = 0;
 	public const int SW_SHOW = 5;
 
 	public delegate bool EnumMonitorsDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
+	public delegate IntPtr HookProc(int code, IntPtr wParam, IntPtr lParam);
 
 	[DllImport("user32.dll")]
 	public static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, EnumMonitorsDelegate lpfnEnum, IntPtr dwData);
@@ -24,21 +27,21 @@ public static class Native {
 
 	[DllImport("user32.dll")]
 	public static extern bool GetCursorPos(out Point pos);
-	[DllImport("kernel32.dll")]
-	public static extern IntPtr GetConsoleWindow();
 
 	[DllImport("user32.dll")]
 	public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-	[DllImport("gdi32.dll")]
-	public static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+	[DllImport("user32.dll", SetLastError = true)]
+	public static extern IntPtr SetWindowsHookEx(HookType hookType, HookProc lpfn, IntPtr hMod, uint dwThreadId);
 
-	public enum DeviceCap {
-		VERTRES = 10,
-		DESKTOPVERTRES = 117,
+	[DllImport("user32.dll")]
+	public static extern int CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
 
-		// http://pinvoke.net/default.aspx/gdi32/GetDeviceCaps.html
-	}
+	[DllImport("user32.dll")]
+	public static extern bool ClipCursor(ref Rect lpRect);
+
+	[DllImport("user32.dll")]
+	public static extern bool GetClipCursor(out Rect lpRect);
 
 	[Serializable, StructLayout(LayoutKind.Sequential)]
 	public struct Rect {
@@ -46,7 +49,7 @@ public static class Native {
 		public int Top;
 		public int Right;
 		public int Bottom;
-
+		
 		public Rect(int left, int top, int right, int bottom) {
 			Left = left;
 			Top = top;
@@ -54,9 +57,14 @@ public static class Native {
 			Bottom = bottom;
 		}
 
-		public override string ToString() {
-			return $"[X:{Left},Y:{Top},W:{Right - Left},H:{Bottom - Top}]";
-		}
+		public Rect(R2I other) : this(
+			other.Pos.x,
+			other.Pos.y,
+			other.Pos.x + other.Size.x,
+			other.Pos.y + other.Size.y
+		) { }
+
+		public override string ToString() => $"[X:{Left},Y:{Top},W:{Right - Left},H:{Bottom - Top}]";
 	}
 
 	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]

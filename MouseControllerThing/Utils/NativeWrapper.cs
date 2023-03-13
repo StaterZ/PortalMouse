@@ -1,13 +1,20 @@
 ﻿using MouseControllerThing.Core;
+using MouseControllerThing.Native;
+using System.Windows.Forms;
 
 namespace MouseControllerThing.Utils;
 
 public static class NativeWrapper {
-	public static void ShowConsole(bool shouldShow) {
-		Native.ShowWindow(Native.GetConsoleWindow(), shouldShow ? Native.SW_SHOW : Native.SW_HIDE);
+	public static V2I CursorPos {
+		get {
+			User32.GetCursorPos(out Point point);
+			return new V2I(point);
+		}
+		set => User32.SetCursorPos(value.x, value.y);
 	}
-	public static void ShowConsole(IntPtr hWnd, bool shouldShow) {
-		Native.ShowWindow(hWnd, shouldShow ? Native.SW_SHOW : Native.SW_HIDE);
+
+	public static void ShowConsole(bool shouldShow) {
+		User32.ShowWindow(Kernel32.GetConsoleWindow(), shouldShow ? User32.SW_SHOW : User32.SW_HIDE);
 	}
 
 	//http://pinvoke.net/default.aspx/user32/EnumDisplayMonitors.html
@@ -16,10 +23,10 @@ public static class NativeWrapper {
 
 		Graphics g = Graphics.FromHwnd(IntPtr.Zero);
 		IntPtr desktop = g.GetHdc();
-		Native.EnumDisplayMonitors(desktop, IntPtr.Zero,
-			(IntPtr hMonitor, IntPtr hdcMonitor, ref Native.Rect lprcMonitor, IntPtr dwData) => {
-				Native.MonitorInfo mi = new();
-				if (Native.GetMonitorInfo(hMonitor, mi)) {
+		User32.EnumDisplayMonitors(desktop, IntPtr.Zero,
+			(IntPtr hMonitor, IntPtr hdcMonitor, ref User32.Rect lprcMonitor, IntPtr dwData) => {
+				User32.MonitorInfo mi = new();
+				if (User32.GetMonitorInfo(hMonitor, mi)) {
 					float scale = GetScalingFactor(hdcMonitor);
 					result.Add(new ScreenInfo(mi, scale));
 				}
@@ -31,8 +38,8 @@ public static class NativeWrapper {
 	}
 
 	public static float GetScalingFactor(IntPtr hdc) {
-		int LogicalScreenHeight = Native.GetDeviceCaps(hdc, (int)Native.DeviceCap.VERTRES);
-		int PhysicalScreenHeight = Native.GetDeviceCaps(hdc, (int)Native.DeviceCap.DESKTOPVERTRES);
+		int LogicalScreenHeight = Gdi32.GetDeviceCaps(hdc, (int)DeviceCap.VERTRES);
+		int PhysicalScreenHeight = Gdi32.GetDeviceCaps(hdc, (int)DeviceCap.DESKTOPVERTRES);
 
 		float ScreenScalingFactor = (float)PhysicalScreenHeight / (float)LogicalScreenHeight;
 

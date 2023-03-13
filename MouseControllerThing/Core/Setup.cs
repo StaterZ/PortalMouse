@@ -1,4 +1,5 @@
-﻿using MouseControllerThing.Utils;
+﻿using MouseControllerThing.Native;
+using MouseControllerThing.Utils;
 
 namespace MouseControllerThing.Core;
 
@@ -11,16 +12,17 @@ public sealed class Setup {
 		if (screen == null) return null;
 
 		p = screen.FromLogicalToPhysicalSpace_Pos(p);
-		V2I? result = (m_prevScreen ?? screen).Handle(p);
+		V2I? movedP = (m_prevScreen ?? screen).Handle(p);
 		m_prevScreen = screen;
-		if (!result.HasValue) return null;
+		if (!movedP.HasValue) return null;
+
+		Screen? outScreen = FindCursorScreen(movedP.Value);
+		User32.Rect rect = new(outScreen!.LogicalRect);
+		User32.ClipCursor(ref rect);
 
 		m_prevScreen = null;
-		//return screen.FromPhysicalToLogicalSpace(result.Value);
-		return result.Value;
+		return movedP.Value;
 	}
 
-	private Screen? FindCursorScreen(V2I cur) {
-		return screens.FirstOrDefault(screen => screen.LogicalRect.Contains(cur));
-	}
+	private Screen? FindCursorScreen(V2I p) => screens.FirstOrDefault(screen => screen.LogicalRect.Contains(p));
 }

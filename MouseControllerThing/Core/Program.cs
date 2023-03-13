@@ -1,4 +1,5 @@
-﻿using MouseControllerThing.Utils;
+﻿using MouseControllerThing.Native;
+using MouseControllerThing.Utils;
 using System.IO;
 using System.Text.Json;
 
@@ -11,25 +12,30 @@ public static class Program {
 	public static void Main(string[] args) {
 		NativeWrapper.ShowConsole(true);
 
-		NotifyIcon tray = new();
-		tray.Icon = Resources.trayIcon;
-		tray.Visible = true;
-		tray.Text = Application.ProductName;
-		tray.ContextMenuStrip = new ContextMenuStrip();
-		tray.ContextMenuStrip.Items.Add("Show", null, (sender, eventArgs) => NativeWrapper.ShowConsole(true));
-		tray.ContextMenuStrip.Items.Add("Hide", null, (sender, eventArgs) => NativeWrapper.ShowConsole(false));
-		tray.ContextMenuStrip.Items.Add("Reload", null, (sender, eventArgs) => m_runningState = RunningState.Restart);
-		tray.ContextMenuStrip.Items.Add("Exit", null, (sender, eventArgs) => m_runningState = RunningState.Exit);
+		ContextMenuStrip strip = new();
+		strip.Items.Add("Show", null, (sender, eventArgs) => NativeWrapper.ShowConsole(true));
+		strip.Items.Add("Hide", null, (sender, eventArgs) => NativeWrapper.ShowConsole(false));
+		strip.Items.Add("Reload", null, (sender, eventArgs) => m_runningState = RunningState.Restart);
+		strip.Items.Add("Exit", null, (sender, eventArgs) => m_runningState = RunningState.Exit);
+		NotifyIcon tray = new() {
+			Icon = Resources.trayIcon,
+			Visible = true,
+			Text = Application.ProductName,
+			ContextMenuStrip = strip,
+		};
 
-		Thread trayThread = new(() => GuardedMain(args));
-		trayThread.Start();
+		Thread daemon = new(() => GuardedMain(args));
+		daemon.Start();
 
 		Application.Run();
-		trayThread.Join();
+		daemon.Join();
+		tray.Visible = false;
 		tray.Dispose();
 	}
 
 	private static void GuardedMain(string[] args) {
+		User32.GetClipCursor(out User32.Rect clip);
+
 		while (m_runningState != RunningState.Exit) {
 			NativeWrapper.ShowConsole(true);
 			m_runningState = RunningState.Running;
@@ -48,6 +54,8 @@ public static class Program {
 				m_runningState = ReadYN() ? RunningState.Restart : RunningState.Exit;
 			}
 		}
+
+		User32.ClipCursor(ref clip);
 		Application.Exit();
 	}
 
@@ -85,11 +93,6 @@ public static class Program {
 		Console.WriteLine("Loading Config...");
 		Config? config = LoadConfig();
 		if (config == null) return;
-		if (!config.correctionDist.HasValue) {
-			using (new FgScope(ConsoleColor.Yellow)) {
-				Console.WriteLine("Windows corrections are disabled");
-			}
-		}
 		if (!LoadMappings(config, setup)) return;
 		Console.WriteLine("Config Loaded!");
 		Console.WriteLine();
@@ -102,26 +105,20 @@ public static class Program {
 		NativeWrapper.ShowConsole(false);
 #endif
 
-		V2I? prevP = null;
+		V2I? prevCursorPos = null;
 		while (m_runningState == RunningState.Running) {
 			Thread.Sleep(1);
-			Native.GetCursorPos(out Point point);
-			V2I p = new(point);
-			if (p == prevP) continue;
-			if (prevP != null && config.correctionDist.HasValue && prevP?.DistSqr(p) > MyMath.Sqr(config.correctionDist.Value)) {
-				Console.WriteLine($"Undoing Windows Correction: {prevP} <- {p}");
-				Native.SetCursorPos(prevP.Value.x, prevP.Value.y);
-				p = prevP.Value;
-			}
+			V2I cursorPos = NativeWrapper.CursorPos;
+			if (cursorPos == prevCursorPos) continue;
 
-			V2I? movedP = setup.Handle(p);
+			V2I? movedP = setup.Handle(cursorPos);
 			if (movedP.HasValue) {
-				Native.SetCursorPos(movedP.Value.x, movedP.Value.y);
-				Console.WriteLine($"Moved: {p} -> {movedP.Value}");
-				p = movedP.Value;
+				NativeWrapper.CursorPos = movedP.Value;
+				Console.WriteLine($"Moved: {cursorPos} -> {movedP.Value}");
+				cursorPos = movedP.Value;
 			}
 
-			prevP = p;
+			prevCursorPos = cursorPos;
 		}
 	}
 
@@ -168,7 +165,7 @@ public static class Program {
 			Edge bEdge = bScreen.GetEdge(mapping.b.side);
 			if (!TryParseRange(mapping.b, bEdge, out R1I bRange)) return false;
 
-			Console.WriteLine($"Binding 'screen{mapping.a.screen}_{aEdge.Side}[{aRange.Begin}-{aRange.End}]' to 'screen{mapping.b.screen}_{bEdge.Side}[{bRange.Begin}-{bRange.End}]'");
+			Console.WriteLine($"Mapping 'screen{mapping.a.screen}_{aEdge.Side}[{aRange.Begin}-{aRange.End}]' to 'screen{mapping.b.screen}_{bEdge.Side}[{bRange.Begin}-{bRange.End}]'");
 			Connection.Bind(
 				new EdgeSpan(aEdge, aRange),
 				new EdgeSpan(bEdge, bRange)

@@ -1,4 +1,6 @@
-﻿namespace MouseControllerThing.Utils;
+﻿using MouseControllerThing.Native;
+
+namespace MouseControllerThing.Utils;
 
 public struct R2I {
 	public V2I Pos;
@@ -9,7 +11,7 @@ public struct R2I {
 		Size = size;
 	}
 
-	public R2I(Native.Rect rect) : this(
+	public R2I(User32.Rect rect) : this(
 		new V2I(rect.Left, rect.Top),
 		new V2I(rect.Right - rect.Left, rect.Bottom - rect.Top)
 	) { }
@@ -21,7 +23,5 @@ public struct R2I {
 			p.y >= 0 && p.y < Size.y;
 	}
 
-	public override string ToString() {
-		return $"[X:{Pos.x},Y:{Pos.y},W:{Size.x},H:{Size.y}]";
-	}
+	public override string ToString() => $"[X:{Pos.x},Y:{Pos.y},W:{Size.x},H:{Size.y}]";
 }

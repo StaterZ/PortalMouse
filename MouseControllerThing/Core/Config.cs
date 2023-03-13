@@ -3,7 +3,6 @@
 namespace MouseControllerThing.Core;
 
 public class Config {
-	[JsonInclude, /*JsonRequired*/] public float? correctionDist;
 	[JsonInclude, /*JsonRequired*/] public Mapping[] mappings = null!;
 
 	public class Mapping {
