@@ -38,11 +38,9 @@ public static class NativeWrapper {
 	}
 
 	public static float GetScalingFactor(IntPtr hdc) {
-		int LogicalScreenHeight = Gdi32.GetDeviceCaps(hdc, (int)DeviceCap.VERTRES);
-		int PhysicalScreenHeight = Gdi32.GetDeviceCaps(hdc, (int)DeviceCap.DESKTOPVERTRES);
+		int logicalScreenHeight = Gdi32.GetDeviceCaps(hdc, (int)DeviceCap.VERTRES);
+		int physicalScreenHeight = Gdi32.GetDeviceCaps(hdc, (int)DeviceCap.DESKTOPVERTRES);
 
-		float ScreenScalingFactor = (float)PhysicalScreenHeight / (float)LogicalScreenHeight;
-
-		return ScreenScalingFactor;
+		return (float)physicalScreenHeight / (float)logicalScreenHeight;
 	}
 }

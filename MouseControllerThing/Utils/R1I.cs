@@ -1,3 +1,18 @@
 ﻿namespace MouseControllerThing.Utils;
 
-public record struct R1I(int Begin, int End);
+public struct R1I
+{
+	public int Begin;
+	public int End;
+
+	public int Size => End - Begin;
+
+	public R1I(int begin, int end)
+	{
+		Begin = begin;
+		End = end;
+	}
+
+	public override string ToString() =>
+		$"[X:{Begin},W:{Size}]";
+}

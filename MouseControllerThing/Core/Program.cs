@@ -6,7 +6,7 @@ using System.Text.Json;
 namespace MouseControllerThing.Core;
 
 public static class Program {
-	private static RunningState m_runningState = RunningState.Halted;
+	private static RunningState s_runningState = RunningState.Halted;
 
 	[STAThread]
 	public static void Main(string[] args) {
@@ -15,8 +15,8 @@ public static class Program {
 		ContextMenuStrip strip = new();
 		strip.Items.Add("Show", null, (sender, eventArgs) => NativeWrapper.ShowConsole(true));
 		strip.Items.Add("Hide", null, (sender, eventArgs) => NativeWrapper.ShowConsole(false));
-		strip.Items.Add("Reload", null, (sender, eventArgs) => m_runningState = RunningState.Restart);
-		strip.Items.Add("Exit", null, (sender, eventArgs) => m_runningState = RunningState.Exit);
+		strip.Items.Add("Reload", null, (sender, eventArgs) => s_runningState = RunningState.Restart);
+		strip.Items.Add("Exit", null, (sender, eventArgs) => s_runningState = RunningState.Exit);
 		NotifyIcon tray = new() {
 			Icon = Resources.trayIcon,
 			Visible = true,
@@ -36,22 +36,22 @@ public static class Program {
 	private static void GuardedMain(string[] args) {
 		User32.GetClipCursor(out User32.Rect clip);
 
-		while (m_runningState != RunningState.Exit) {
+		while (s_runningState != RunningState.Exit) {
 			NativeWrapper.ShowConsole(true);
-			m_runningState = RunningState.Running;
+			s_runningState = RunningState.Running;
 			try {
 				Run(args);
 			} catch (Exception ex) {
-				m_runningState = RunningState.Halted;
+				s_runningState = RunningState.Halted;
 				using (new FgScope(ConsoleColor.Red)) {
 					Console.WriteLine(ex);
 				}
 			}
 
-			if (m_runningState == RunningState.Halted) {
+			if (s_runningState == RunningState.Halted) {
 				NativeWrapper.ShowConsole(true);
 				Console.WriteLine("Program has halted! (restart? [y/n])");
-				m_runningState = ReadYN() ? RunningState.Restart : RunningState.Exit;
+				s_runningState = ReadYN() ? RunningState.Restart : RunningState.Exit;
 			}
 		}
 
@@ -86,7 +86,7 @@ public static class Program {
 			Console.WriteLine();
 
 			Screen screen = new(monitor);
-			setup.screens.Add(screen);
+			setup.m_screens.Add(screen);
 		}
 		Console.WriteLine();
 
@@ -106,7 +106,7 @@ public static class Program {
 #endif
 
 		V2I? prevCursorPos = null;
-		while (m_runningState == RunningState.Running) {
+		while (s_runningState == RunningState.Running) {
 			Thread.Sleep(1);
 			V2I cursorPos = NativeWrapper.CursorPos;
 			if (cursorPos == prevCursorPos) continue;
@@ -132,14 +132,14 @@ public static class Program {
 
 		foreach (Config.Mapping mapping in config.mappings) {
 			bool TryParseScreen(int screenIndex, out Screen screen) {
-				if (screenIndex < 0 && screenIndex >= setup.screens.Count) {
+				if (screenIndex < 0 && screenIndex >= setup.m_screens.Count) {
 					using (new FgScope(ConsoleColor.Red)) {
-						Console.WriteLine($"Screen index out of range. '{screenIndex}' supplied, but range is 0-{setup.screens.Count - 1}, aborting");
+						Console.WriteLine($"Screen index out of range. '{screenIndex}' supplied, but range is 0-{setup.m_screens.Count - 1}, aborting");
 					}
 					screen = default!;
 					return false;
 				}
-				screen = setup.screens[screenIndex];
+				screen = setup.m_screens[screenIndex];
 				return true;
 			}
 
@@ -166,7 +166,7 @@ public static class Program {
 			if (!TryParseRange(mapping.b, bEdge, out R1I bRange)) return false;
 
 			Console.WriteLine($"Mapping 'screen{mapping.a.screen}_{aEdge.Side}[{aRange.Begin}-{aRange.End}]' to 'screen{mapping.b.screen}_{bEdge.Side}[{bRange.Begin}-{bRange.End}]'");
-			Connection.Bind(
+			Portal.Bind(
 				new EdgeSpan(aEdge, aRange),
 				new EdgeSpan(bEdge, bRange)
 			);

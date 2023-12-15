@@ -4,7 +4,7 @@ using MouseControllerThing.Utils;
 namespace MouseControllerThing.Core;
 
 public sealed class Setup {
-	public List<Screen> screens = new();
+	public readonly List<Screen> m_screens = new();
 	private Screen? m_prevScreen;
 
 	public V2I? Handle(V2I p) {
@@ -24,5 +24,5 @@ public sealed class Setup {
 		return movedP.Value;
 	}
 
-	private Screen? FindCursorScreen(V2I p) => screens.FirstOrDefault(screen => screen.LogicalRect.Contains(p));
+	private Screen? FindCursorScreen(V2I p) => m_screens.FirstOrDefault(screen => screen.LogicalRect.Contains(p));
 }

@@ -2,11 +2,11 @@
 
 namespace MouseControllerThing.Core;
 
-public class Connection {
-	private EdgeSpan m_a;
-	private EdgeSpan m_b;
+public class Portal {
+	private readonly EdgeSpan m_a;
+	private readonly EdgeSpan m_b;
 
-	public Connection(EdgeSpan a, EdgeSpan b) {
+	private Portal(EdgeSpan a, EdgeSpan b) {
 		m_a = a;
 		m_b = b;
 	}
@@ -14,7 +14,7 @@ public class Connection {
 	private (EdgeSpan self, EdgeSpan other) GetSelfOther(Edge edge) {
 		if (edge == m_a.Edge) return (m_a, m_b);
 		if (edge == m_b.Edge) return (m_b, m_a);
-		throw new ArgumentOutOfRangeException();
+		throw new ArgumentOutOfRangeException(nameof(edge));
 	}
 
 	public V2I? TryRemap(Edge edge, int p, int overStep) {
@@ -25,10 +25,10 @@ public class Connection {
 		return other.Edge.GetLandingSite(result, overStep);
 	}
 
-	public static Connection Bind(EdgeSpan a, EdgeSpan b) {
-		Connection connection = new(a, b);
-		a.Edge.Connections.Add(connection);
-		b.Edge.Connections.Add(connection);
-		return connection;
+	public static Portal Bind(EdgeSpan a, EdgeSpan b) {
+		Portal portal = new(a, b);
+		a.Edge.Portals.Add(portal);
+		b.Edge.Portals.Add(portal);
+		return portal;
 	}
 }

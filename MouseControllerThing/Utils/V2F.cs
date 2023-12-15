@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace MouseControllerThing.Utils;
+﻿namespace MouseControllerThing.Utils;
 
 public struct V2F {
 	public float x;
