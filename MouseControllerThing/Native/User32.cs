@@ -9,6 +9,8 @@ public static class User32
 	public const int MONITOR_DEFAULTTONEAREST = 0x00000002;
 	public const int SW_HIDE = 0;
 	public const int SW_SHOW = 5;
+	public const int WhMouseLl = 14;
+	public const int WmMouseMove = 0x0200;
 
 	public delegate bool EnumMonitorsDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
 	public delegate IntPtr HookProc(int code, IntPtr wParam, IntPtr lParam);
@@ -35,7 +37,7 @@ public static class User32
 	public static extern IntPtr SetWindowsHookEx(HookType hookType, HookProc lpfn, IntPtr hMod, uint dwThreadId);
 
 	[DllImport("user32.dll")]
-	public static extern int CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
+	public static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
 
 	[DllImport("user32.dll")]
 	public static extern bool ClipCursor(ref Rect lpRect);
@@ -49,7 +51,7 @@ public static class User32
 		public int Top;
 		public int Right;
 		public int Bottom;
-		
+
 		public Rect(int left, int top, int right, int bottom) {
 			Left = left;
 			Top = top;
@@ -73,5 +75,15 @@ public static class User32
 		public Rect Monitor;
 		public Rect Work;
 		public int Flags;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	internal struct Msllhookstruct
+	{
+		public Point pt;
+		public uint mouseData;
+		public uint flags;
+		public uint time;
+		public IntPtr dwExtraInfo;
 	}
 }

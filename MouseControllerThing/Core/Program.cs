@@ -2,6 +2,7 @@
 using MouseControllerThing.Utils;
 using System.IO;
 using System.Text.Json;
+using MouseControllerThing.Testing;
 
 namespace MouseControllerThing.Core;
 
@@ -11,6 +12,8 @@ public static class Program {
 	[STAThread]
 	public static void Main(string[] args) {
 		NativeWrapper.ShowConsole(true);
+
+		HookTest x = new();
 
 		ContextMenuStrip strip = new();
 		strip.Items.Add("Show", null, (sender, eventArgs) => NativeWrapper.ShowConsole(true));
