@@ -1,8 +1,7 @@
-﻿using MouseControllerThing.Native;
+﻿using MouseControllerThing.Testing;
 using MouseControllerThing.Utils;
 using System.IO;
 using System.Text.Json;
-using MouseControllerThing.Testing;
 
 namespace MouseControllerThing.Core;
 
@@ -12,8 +11,6 @@ public static class Program {
 	[STAThread]
 	public static void Main(string[] args) {
 		NativeWrapper.ShowConsole(true);
-
-		HookTest x = new();
 
 		ContextMenuStrip strip = new();
 		strip.Items.Add("Show", null, (sender, eventArgs) => NativeWrapper.ShowConsole(true));
@@ -27,18 +24,19 @@ public static class Program {
 			ContextMenuStrip = strip,
 		};
 
-		Thread daemon = new(() => GuardedMain(args));
-		daemon.Start();
+		HookTest hookTest = new();
+
+		//Thread daemon = new(() => GuardedMain(args));
+		//daemon.Start();
 
 		Application.Run();
-		daemon.Join();
+		//daemon.Join();
 		tray.Visible = false;
 		tray.Dispose();
+		hookTest.Dispose();
 	}
 
 	private static void GuardedMain(string[] args) {
-		User32.GetClipCursor(out User32.Rect clip);
-
 		while (s_runningState != RunningState.Exit) {
 			NativeWrapper.ShowConsole(true);
 			s_runningState = RunningState.Running;
@@ -58,7 +56,6 @@ public static class Program {
 			}
 		}
 
-		User32.ClipCursor(ref clip);
 		Application.Exit();
 	}
 
