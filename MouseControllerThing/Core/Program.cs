@@ -1,4 +1,4 @@
-﻿using MouseControllerThing.Testing;
+﻿using MouseControllerThing.Hooking;
 using MouseControllerThing.Utils;
 using System.IO;
 using System.Text.Json;
@@ -24,7 +24,7 @@ public static class Program {
 			ContextMenuStrip = strip,
 		};
 
-		HookTest hookTest = new();
+		LLMouseHook llMouseHook = new();
 
 		//Thread daemon = new(() => GuardedMain(args));
 		//daemon.Start();
@@ -33,7 +33,7 @@ public static class Program {
 		//daemon.Join();
 		tray.Visible = false;
 		tray.Dispose();
-		hookTest.Dispose();
+		llMouseHook.Dispose();
 	}
 
 	private static void GuardedMain(string[] args) {

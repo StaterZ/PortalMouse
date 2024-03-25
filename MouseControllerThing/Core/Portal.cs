@@ -11,10 +11,10 @@ public class Portal {
 		m_b = b;
 	}
 
-	private (EdgeSpan self, EdgeSpan other) GetSelfOther(Edge edge) {
-		if (edge == m_a.Edge) return (m_a, m_b);
-		if (edge == m_b.Edge) return (m_b, m_a);
-		throw new ArgumentOutOfRangeException(nameof(edge));
+	private (EdgeSpan self, EdgeSpan other) GetSelfOther(Edge self) {
+		if (self == m_a.Edge) return (m_a, m_b);
+		if (self == m_b.Edge) return (m_b, m_a);
+		throw new ArgumentOutOfRangeException(nameof(self));
 	}
 
 	public V2I? TryRemap(Edge edge, int p, int overStep) {
