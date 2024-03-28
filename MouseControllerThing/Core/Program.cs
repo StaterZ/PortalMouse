@@ -24,13 +24,27 @@ public static class Program {
 			ContextMenuStrip = strip,
 		};
 
-		LLMouseHook llMouseHook = new();
+		Setup? setup = Run(args);
+		if (setup == null) {
+			Console.WriteLine("Setup Failed!"); //TODO: not the best error handling ever... really should fix this...
+			return;
+		}
 
-		//Thread daemon = new(() => GuardedMain(args));
-		//daemon.Start();
+		V2I? prevPos = null;
+		LLMouseHook llMouseHook = new(pos => {
+			if (pos == prevPos) return;
+
+			V2I? movedPos = setup.Handle(pos);
+			if (movedPos.HasValue) {
+				NativeWrapper.CursorPos = movedPos.Value;
+				Console.WriteLine($"Moved: {pos} -> {movedPos.Value}");
+				pos = movedPos.Value;
+			}
+
+			prevPos = pos;
+		});
 
 		Application.Run();
-		//daemon.Join();
 		tray.Visible = false;
 		tray.Dispose();
 		llMouseHook.Dispose();
@@ -70,12 +84,12 @@ public static class Program {
 		}
 	}
 
-	private static void Run(string[] args) {
+	private static Setup? Run(string[] args) {
 		Console.Clear();
 
 		Setup setup = new();
 		Console.WriteLine("Screens:");
-		foreach ((int i, ScreenInfo monitor) in NativeWrapper.GetDisplays().ZipIndex()) {
+		foreach ((int i, ScreenInfo monitor) in NativeWrapper.GetDisplays().Enumerate()) {
 			Console.Write($"    {i}: {monitor.PhysicalRect}");
 			if (monitor.Scale != 1) {
 				Console.Write($" @ {monitor.Scale * 100}%");
@@ -92,8 +106,8 @@ public static class Program {
 
 		Console.WriteLine("Loading Config...");
 		Config? config = LoadConfig();
-		if (config == null) return;
-		if (!LoadMappings(config, setup)) return;
+		if (config == null) return null;
+		if (!LoadMappings(config, setup)) return null;
 		Console.WriteLine("Config Loaded!");
 		Console.WriteLine();
 
@@ -105,21 +119,23 @@ public static class Program {
 		NativeWrapper.ShowConsole(false);
 #endif
 
-		V2I? prevCursorPos = null;
-		while (s_runningState == RunningState.Running) {
-			Thread.Sleep(1);
-			V2I cursorPos = NativeWrapper.CursorPos;
-			if (cursorPos == prevCursorPos) continue;
+		return setup;
 
-			V2I? movedP = setup.Handle(cursorPos);
-			if (movedP.HasValue) {
-				NativeWrapper.CursorPos = movedP.Value;
-				Console.WriteLine($"Moved: {cursorPos} -> {movedP.Value}");
-				cursorPos = movedP.Value;
-			}
-
-			prevCursorPos = cursorPos;
-		}
+		// V2I? prevCursorPos = null;
+		// while (s_runningState == RunningState.Running) {
+		// 	Thread.Sleep(1);
+		// 	V2I cursorPos = NativeWrapper.CursorPos;
+		// 	if (cursorPos == prevCursorPos) continue;
+		//
+		// 	V2I? movedP = setup.Handle(cursorPos);
+		// 	if (movedP.HasValue) {
+		// 		NativeWrapper.CursorPos = movedP.Value;
+		// 		Console.WriteLine($"Moved: {cursorPos} -> {movedP.Value}");
+		// 		cursorPos = movedP.Value;
+		// 	}
+		//
+		// 	prevCursorPos = cursorPos;
+		// }
 	}
 
 	private static bool LoadMappings(Config config, Setup setup) {

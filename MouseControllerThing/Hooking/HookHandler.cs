@@ -17,7 +17,8 @@ public class HookHandler {
 		using Process currentProcess = Process.GetCurrentProcess();
 		using ProcessModule currentModule = currentProcess.MainModule ?? throw new NullReferenceException("Main Module not found");
 		if (m_moduleHandle == IntPtr.Zero) {
-			m_moduleHandle = Kernel32.GetModuleHandle(currentModule.ModuleName);
+			string moduleName = currentModule.ModuleName ?? throw new NullReferenceException("Main Module has no name");
+			m_moduleHandle = Kernel32.GetModuleHandle(moduleName);
 		}
 
 		m_hookHandle = User32.SetWindowsHookEx(hookType, proc, m_moduleHandle, 0);

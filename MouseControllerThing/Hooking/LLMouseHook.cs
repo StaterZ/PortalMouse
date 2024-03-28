@@ -1,5 +1,6 @@
 ﻿using MouseControllerThing.Native;
 using System.Runtime.InteropServices;
+using MouseControllerThing.Utils;
 
 namespace MouseControllerThing.Hooking;
 
@@ -8,9 +9,9 @@ public class LLMouseHook : IDisposable
 	private readonly User32.HookProc? m_hookCallback = null!; //required to keep memory alive
 	private readonly IntPtr m_llMouseHookHandle = IntPtr.Zero;
 	private readonly HookHandler hookHandler = new();
-	public Action<Point> managedCallback;
+	public Action<V2I> managedCallback;
 
-	public LLMouseHook(Action<Point> callback) {
+	public LLMouseHook(Action<V2I> callback) {
 		managedCallback = callback;
 
 		m_hookCallback = LlMouseHookCallback; //required to keep memory alive
@@ -24,7 +25,7 @@ public class LLMouseHook : IDisposable
 	private IntPtr LlMouseHookCallback(int nCode, IntPtr wParam, IntPtr lParam) {
 		if (nCode == 0 && (uint)wParam == User32.WmMouseMove) {
 			User32.Msllhookstruct hookStruct = (User32.Msllhookstruct)Marshal.PtrToStructure(lParam, typeof(User32.Msllhookstruct))!;
-			managedCallback(hookStruct.pt);
+			managedCallback((V2I)hookStruct.pt);
 		}
 
 		return User32.CallNextHookEx(m_llMouseHookHandle, nCode, wParam, lParam);

@@ -21,7 +21,7 @@ public class Portal {
 		(EdgeSpan self, EdgeSpan other) = GetSelfOther(edge);
 		if (p < self.Range.Begin || p >= self.Range.End) return null;
 
-		int result = MyMath.Map(p, self.Range, other.Range);
+		int result = MathX.Map(p, self.Range, other.Range);
 		return other.Edge.GetLandingSite(result, overStep);
 	}
 

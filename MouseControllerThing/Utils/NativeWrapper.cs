@@ -7,7 +7,7 @@ public static class NativeWrapper {
 	public static V2I CursorPos {
 		get {
 			User32.GetCursorPos(out Point point);
-			return new V2I(point);
+			return (V2I)point;
 		}
 		set => User32.SetCursorPos(value.x, value.y);
 	}

@@ -12,8 +12,6 @@ public struct V2I {
 	public static V2I Zero => new(0, 0);
 	public static V2I One => new(1, 1);
 
-	public V2I(Point point) : this(point.X, point.Y) { }
-
 	public float Dot(V2I other) => x * other.x + y * other.y;
 	public float MagSqr => Dot(this);
 	public float Mag => MathF.Sqrt(MagSqr);
@@ -30,6 +28,12 @@ public struct V2I {
 	public override bool Equals(object? obj) => obj is V2I other && Equals(other);
 	public override int GetHashCode() => HashCode.Combine(x, y);
 
+	public int this[Axis axis] => axis switch {
+		Axis.Horizontal => x,
+		Axis.Vertical => y,
+		_ => throw new ArgumentOutOfRangeException(nameof(axis), axis, null),
+	};
+
 	public static bool operator ==(V2I lhs, V2I rhs) => lhs.x == rhs.x && lhs.y == rhs.y;
 	public static bool operator !=(V2I lhs, V2I rhs) => lhs.x != rhs.x || lhs.y != rhs.y;
 	public static V2I operator +(V2I lhs, V2I rhs) => new(lhs.x + rhs.x, lhs.y + rhs.y);
@@ -38,4 +42,6 @@ public struct V2I {
 	public static V2I operator *(V2I lhs, int rhs) => new(lhs.x * rhs, lhs.y * rhs);
 	public static V2I operator /(V2I lhs, V2I rhs) => new(lhs.x / rhs.x, lhs.y / rhs.y);
 	public static V2I operator /(V2I lhs, int rhs) => new(lhs.x / rhs, lhs.y / rhs);
+
+	public static explicit operator V2I(Point point) => new(point.X, point.Y);
 }

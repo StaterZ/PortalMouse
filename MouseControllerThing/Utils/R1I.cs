@@ -15,4 +15,7 @@ public struct R1I
 
 	public override string ToString() =>
 		$"[X:{Begin},W:{Size}]";
+
+	public bool Contains(int point) =>
+		Begin <= point && point < End;
 }
