@@ -1,4 +1,4 @@
-namespace MouseControllerThing.Utils;
+namespace MouseControllerThing.Utils.Maths;
 
 public enum Axis {
 	Horizontal,

@@ -1,4 +1,4 @@
-﻿using MouseControllerThing.Utils;
+﻿using MouseControllerThing.Utils.Maths;
 
 namespace MouseControllerThing.Core;
 
@@ -11,7 +11,7 @@ public class Portal {
 		m_b = b;
 	}
 
-	private (EdgeSpan self, EdgeSpan other) GetSelfOther(Edge self) {
+	public (EdgeSpan self, EdgeSpan other) GetSelfOther(Edge self) {
 		if (self == m_a.Edge) return (m_a, m_b);
 		if (self == m_b.Edge) return (m_b, m_a);
 		throw new ArgumentOutOfRangeException(nameof(self));
@@ -27,8 +27,8 @@ public class Portal {
 
 	public static Portal Bind(EdgeSpan a, EdgeSpan b) {
 		Portal portal = new(a, b);
-		a.Edge.Portals.Add(portal);
-		b.Edge.Portals.Add(portal);
+		a.Edge.Add(portal);
+		b.Edge.Add(portal);
 		return portal;
 	}
 }

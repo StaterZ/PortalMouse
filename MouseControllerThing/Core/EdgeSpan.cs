@@ -1,4 +1,5 @@
 ﻿using MouseControllerThing.Utils;
+using MouseControllerThing.Utils.Maths;
 
 namespace MouseControllerThing.Core;
 

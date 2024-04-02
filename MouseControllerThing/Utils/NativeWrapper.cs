@@ -1,5 +1,6 @@
 ﻿using MouseControllerThing.Core;
 using MouseControllerThing.Native;
+using MouseControllerThing.Utils.Maths;
 
 namespace MouseControllerThing.Utils;
 

@@ -1,6 +1,6 @@
 ﻿using MouseControllerThing.Native;
 
-namespace MouseControllerThing.Utils;
+namespace MouseControllerThing.Utils.Maths;
 
 public struct R2I {
 	public V2I Pos;

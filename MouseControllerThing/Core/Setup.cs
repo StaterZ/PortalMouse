@@ -1,28 +1,24 @@
-﻿using MouseControllerThing.Native;
-using MouseControllerThing.Utils;
+﻿using MouseControllerThing.Utils;
+using MouseControllerThing.Utils.Maths;
 
 namespace MouseControllerThing.Core;
 
 public sealed class Setup {
-	public readonly List<Screen> m_screens = new();
-	private Screen? m_prevScreen;
+	public readonly List<Screen> Screens = new();
+	private ScreenPos? m_prevMousePos;
 
-	public V2I? Handle(V2I p) {
-		Screen? screen = FindCursorScreen(p);
-		if (screen == null) return null;
+	public V2I? Handle(V2I pos) {
+		m_prevMousePos ??= new ScreenPos(pos, FindCursorScreen(pos) ?? throw new UnreachableException());
 
-		p = screen.FromLogicalToPhysicalSpace_Pos(p);
-		V2I? movedP = (m_prevScreen ?? screen).Handle(p);
-		m_prevScreen = screen;
-		if (!movedP.HasValue) return null;
+		while (!m_prevMousePos.Value.Screen.LogicalRect.Contains(pos)) {
+			LineSeg2I line = new(m_prevMousePos.Value.Pos, pos);
+			m_prevMousePos = m_prevMousePos.Value.Screen.Handle(line);
+		}
 
-		Screen? outScreen = FindCursorScreen(movedP.Value);
-		User32.Rect rect = new(outScreen!.LogicalRect);
-		User32.ClipCursor(ref rect);
-
-		m_prevScreen = null;
-		return movedP.Value;
+		return pos;
 	}
 
-	private Screen? FindCursorScreen(V2I p) => m_screens.FirstOrDefault(screen => screen.LogicalRect.Contains(p));
+	private Screen? FindCursorScreen(V2I pos) =>
+		Screens.FirstOrDefault(screen =>
+			screen.LogicalRect.Contains(pos));
 }

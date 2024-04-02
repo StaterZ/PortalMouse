@@ -1,4 +1,4 @@
-﻿namespace MouseControllerThing.Utils;
+﻿namespace MouseControllerThing.Utils.Maths;
 
 public struct V2I {
 	public int x;
@@ -18,6 +18,7 @@ public struct V2I {
 	public V2F Norm => this == Zero ? V2F.Zero : (V2F)this / Mag;
 	public float DistSqr(V2I other) => (other - this).MagSqr;
 	public float Dist(V2I other) => (other - this).Mag;
+	public V2I Transpose() => new(y, x);
 
 	public V2I EnsureMag(float otherMag) => Ceil(Norm * MathF.Max(Mag, otherMag));
 	public static V2I Round(V2F other) => new((int)MathF.Round(other.x), (int)MathF.Round(other.y));
@@ -37,7 +38,9 @@ public struct V2I {
 	public static bool operator ==(V2I lhs, V2I rhs) => lhs.x == rhs.x && lhs.y == rhs.y;
 	public static bool operator !=(V2I lhs, V2I rhs) => lhs.x != rhs.x || lhs.y != rhs.y;
 	public static V2I operator +(V2I lhs, V2I rhs) => new(lhs.x + rhs.x, lhs.y + rhs.y);
+	public static V2I operator +(V2I lhs, int rhs) => new(lhs.x + rhs, lhs.y + rhs);
 	public static V2I operator -(V2I lhs, V2I rhs) => new(lhs.x - rhs.x, lhs.y - rhs.y);
+	public static V2I operator -(V2I lhs, int rhs) => new(lhs.x - rhs, lhs.y - rhs);
 	public static V2I operator *(V2I lhs, V2I rhs) => new(lhs.x * rhs.x, lhs.y * rhs.y);
 	public static V2I operator *(V2I lhs, int rhs) => new(lhs.x * rhs, lhs.y * rhs);
 	public static V2I operator /(V2I lhs, V2I rhs) => new(lhs.x / rhs.x, lhs.y / rhs.y);

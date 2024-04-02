@@ -1,4 +1,4 @@
-﻿namespace MouseControllerThing.Utils;
+﻿namespace MouseControllerThing.Utils.Maths;
 
 public struct V2F {
 	public float x;
@@ -30,7 +30,9 @@ public struct V2F {
 	public static bool operator ==(V2F lhs, V2F rhs) => lhs.x == rhs.x && lhs.y == rhs.y;
 	public static bool operator !=(V2F lhs, V2F rhs) => lhs.x != rhs.x || lhs.y != rhs.y;
 	public static V2F operator +(V2F lhs, V2F rhs) => new(lhs.x + rhs.x, lhs.y + rhs.y);
+	public static V2F operator +(V2F lhs, float rhs) => new(lhs.x + rhs, lhs.y + rhs);
 	public static V2F operator -(V2F lhs, V2F rhs) => new(lhs.x - rhs.x, lhs.y - rhs.y);
+	public static V2F operator -(V2F lhs, float rhs) => new(lhs.x - rhs, lhs.y - rhs);
 	public static V2F operator *(V2F lhs, V2F rhs) => new(lhs.x * rhs.x, lhs.y * rhs.y);
 	public static V2F operator *(V2F lhs, float rhs) => new(lhs.x * rhs, lhs.y * rhs);
 	public static V2F operator /(V2F lhs, V2F rhs) => new(lhs.x / rhs.x, lhs.y / rhs.y);

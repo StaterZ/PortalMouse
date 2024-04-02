@@ -1,4 +1,5 @@
 ﻿using MouseControllerThing.Utils;
+using MouseControllerThing.Utils.Maths;
 
 namespace MouseControllerThing.Core;
 
@@ -20,16 +21,13 @@ public sealed class Screen {
 		m_bottom = new Edge(this, Side.Bottom);
 	}
 
-	public V2I? Handle(V2I p) {
-		p -= PhysicalRect.Pos;
-
-		V2I? result = null;
-		if (p.x <= 0) result ??= m_left.Handle(p.y, -p.x);
-		if (p.x >= PhysicalRect.Size.x - 1) result ??= m_right.Handle(p.y, p.x - (PhysicalRect.Size.x - 1));
-		if (p.y <= 0) result ??= m_top.Handle(p.x, -p.y);
-		if (p.y >= PhysicalRect.Size.y - 1) result ??= m_bottom.Handle(p.x, p.y - (PhysicalRect.Size.y - 1));
-
-		return result;
+	public ScreenPos Handle(LineSeg2I mouseMove) {
+		return
+			m_left.TryHandle(mouseMove) ??
+			m_right.TryHandle(mouseMove) ??
+			m_top.TryHandle(mouseMove) ??
+			m_bottom.TryHandle(mouseMove) ??
+			throw new UnreachableException();
 	}
 
 	public Edge GetEdge(Side side) {
@@ -42,8 +40,8 @@ public sealed class Screen {
 		};
 	}
 
-	public V2I FromPhysicalToLogicalSpace_Pos(V2I p) => MathX.Map(p, PhysicalRect, LogicalRect);
-	public V2I FromLogicalToPhysicalSpace_Pos(V2I p) => MathX.Map(p, LogicalRect, PhysicalRect);
-	public V2F FromPhysicalToLogicalSpace_Vec(V2F p) => MathX.MapVec(p, PhysicalRect, LogicalRect);
-	public V2F FromLogicalToPhysicalSpace_Vec(V2F p) => MathX.MapVec(p, LogicalRect, PhysicalRect);
+	public V2I FromPhysicalToLogicalSpace(V2I p) => MathX.Map(p, PhysicalRect, LogicalRect);
+	public V2I FromLogicalToPhysicalSpace(V2I p) => MathX.Map(p, LogicalRect, PhysicalRect);
+	public V2F FromPhysicalToLogicalSpace_Local(V2F p) => MathX.MapLocal(p, PhysicalRect, LogicalRect);
+	public V2F FromLogicalToPhysicalSpace_Local(V2F p) => MathX.MapLocal(p, LogicalRect, PhysicalRect);
 }

@@ -1,4 +1,4 @@
-namespace MouseControllerThing.Utils;
+namespace MouseControllerThing.Utils.Maths;
 
 public struct AxisLineSeg2I {
 	public V2I Pos;

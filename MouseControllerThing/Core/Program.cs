@@ -2,6 +2,8 @@
 using MouseControllerThing.Utils;
 using System.IO;
 using System.Text.Json;
+using MouseControllerThing.Utils.Ext;
+using MouseControllerThing.Utils.Maths;
 
 namespace MouseControllerThing.Core;
 
@@ -10,19 +12,22 @@ public static class Program {
 
 	[STAThread]
 	public static void Main(string[] args) {
+		Application.EnableVisualStyles();
+		Application.SetCompatibleTextRenderingDefault(false);
+
 		NativeWrapper.ShowConsole(true);
 
-		ContextMenuStrip strip = new();
-		strip.Items.Add("Show", null, (sender, eventArgs) => NativeWrapper.ShowConsole(true));
-		strip.Items.Add("Hide", null, (sender, eventArgs) => NativeWrapper.ShowConsole(false));
-		strip.Items.Add("Reload", null, (sender, eventArgs) => s_runningState = RunningState.Restart);
-		strip.Items.Add("Exit", null, (sender, eventArgs) => s_runningState = RunningState.Exit);
-		NotifyIcon tray = new() {
-			Icon = Resources.trayIcon,
-			Visible = true,
-			Text = Application.ProductName,
-			ContextMenuStrip = strip,
-		};
+		// ContextMenuStrip strip = new();
+		// strip.Items.Add("Show", null, (sender, eventArgs) => NativeWrapper.ShowConsole(true));
+		// strip.Items.Add("Hide", null, (sender, eventArgs) => NativeWrapper.ShowConsole(false));
+		// strip.Items.Add("Reload", null, (sender, eventArgs) => s_runningState = RunningState.Restart);
+		// strip.Items.Add("Exit", null, (sender, eventArgs) => s_runningState = RunningState.Exit);
+		// NotifyIcon tray = new() {
+		// 	Icon = Resources.trayIcon,
+		// 	Visible = true,
+		// 	Text = Application.ProductName,
+		// 	ContextMenuStrip = strip,
+		// };
 
 		Setup? setup = Run(args);
 		if (setup == null) {
@@ -45,8 +50,8 @@ public static class Program {
 		});
 
 		Application.Run();
-		tray.Visible = false;
-		tray.Dispose();
+		// tray.Visible = false;
+		// tray.Dispose();
 		llMouseHook.Dispose();
 	}
 
@@ -100,7 +105,7 @@ public static class Program {
 			Console.WriteLine();
 
 			Screen screen = new(monitor);
-			setup.m_screens.Add(screen);
+			setup.Screens.Add(screen);
 		}
 		Console.WriteLine();
 
@@ -139,32 +144,32 @@ public static class Program {
 	}
 
 	private static bool LoadMappings(Config config, Setup setup) {
-		if (config.mappings.Length <= 0) {
+		if (config.Portals.Length <= 0) {
 			using (new FgScope(ConsoleColor.Yellow)) {
 				Console.WriteLine("No mappings present in config!");
 			}
 			return true;
 		}
 
-		foreach (Config.Mapping mapping in config.mappings) {
+		foreach (Config.Portal mapping in config.Portals) {
 			bool TryParseScreen(int screenIndex, out Screen screen) {
-				if (screenIndex < 0 && screenIndex >= setup.m_screens.Count) {
+				if (screenIndex < 0 && screenIndex >= setup.Screens.Count) {
 					using (new FgScope(ConsoleColor.Red)) {
-						Console.WriteLine($"Screen index out of range. '{screenIndex}' supplied, but range is 0-{setup.m_screens.Count - 1}, aborting");
+						Console.WriteLine($"Screen index out of range. '{screenIndex}' supplied, but range is 0-{setup.Screens.Count - 1}, aborting");
 					}
 					screen = default!;
 					return false;
 				}
-				screen = setup.m_screens[screenIndex];
+				screen = setup.Screens[screenIndex];
 				return true;
 			}
 
 			bool TryParseRange(Config.EdgeRange edgeRange, Edge edge, out R1I range) {
-				int begin = edgeRange.begin ?? 0;
-				int end = edgeRange.end ?? edge.Length;
+				int begin = edgeRange.Begin ?? 0;
+				int end = edgeRange.End ?? edge.Length;
 				if (begin < 0 && end > edge.Length) {
 					using (new FgScope(ConsoleColor.Red)) {
-						Console.WriteLine($"EdgeRange is out of range. '{edgeRange.begin.ToString() ?? $"({begin})"}-{edgeRange.end.ToString() ?? $"({end})"}' supplied, but range is 0-{edge.Length}, aborting");
+						Console.WriteLine($"EdgeRange is out of range. '{edgeRange.Begin.ToString() ?? $"({begin})"}-{edgeRange.End.ToString() ?? $"({end})"}' supplied, but range is 0-{edge.Length}, aborting");
 					}
 					range = default!;
 					return false;
@@ -173,15 +178,15 @@ public static class Program {
 				return true;
 			}
 
-			if (!TryParseScreen(mapping.a.screen, out Screen aScreen)) return false;
-			Edge aEdge = aScreen.GetEdge(mapping.a.side);
-			if (!TryParseRange(mapping.a, aEdge, out R1I aRange)) return false;
+			if (!TryParseScreen(mapping.A.Screen, out Screen aScreen)) return false;
+			Edge aEdge = aScreen.GetEdge(mapping.A.Side);
+			if (!TryParseRange(mapping.A, aEdge, out R1I aRange)) return false;
 
-			if (!TryParseScreen(mapping.b.screen, out Screen bScreen)) return false;
-			Edge bEdge = bScreen.GetEdge(mapping.b.side);
-			if (!TryParseRange(mapping.b, bEdge, out R1I bRange)) return false;
+			if (!TryParseScreen(mapping.B.Screen, out Screen bScreen)) return false;
+			Edge bEdge = bScreen.GetEdge(mapping.B.Side);
+			if (!TryParseRange(mapping.B, bEdge, out R1I bRange)) return false;
 
-			Console.WriteLine($"Mapping 'screen{mapping.a.screen}_{aEdge.Side}[{aRange.Begin}-{aRange.End}]' to 'screen{mapping.b.screen}_{bEdge.Side}[{bRange.Begin}-{bRange.End}]'");
+			Console.WriteLine($"Mapping 'screen{mapping.A.Screen}_{aEdge.Side}[{aRange.Begin}-{aRange.End}]' to 'screen{mapping.B.Screen}_{bEdge.Side}[{bRange.Begin}-{bRange.End}]'");
 			Portal.Bind(
 				new EdgeSpan(aEdge, aRange),
 				new EdgeSpan(bEdge, bRange)

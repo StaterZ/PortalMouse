@@ -2,7 +2,7 @@
 
 namespace MouseControllerThing.Core;
 
-public struct ScreenInfo {
+public readonly struct ScreenInfo {
 	public readonly User32.MonitorInfo MonitorInfo;
 	public readonly float Scale;
 

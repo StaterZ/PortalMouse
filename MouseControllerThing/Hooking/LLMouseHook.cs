@@ -1,6 +1,7 @@
 ﻿using MouseControllerThing.Native;
 using System.Runtime.InteropServices;
 using MouseControllerThing.Utils;
+using MouseControllerThing.Utils.Maths;
 
 namespace MouseControllerThing.Hooking;
 
