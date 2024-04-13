@@ -3,9 +3,9 @@
 namespace MouseControllerThing.Core;
 
 public class Config {
-	[JsonInclude, JsonPropertyName("portals")] public Portal[] Portals = null!;
+	[JsonInclude, JsonPropertyName("mappings")] public Mapping[] Mappings = null!;
 
-	public class Portal {
+	public class Mapping {
 		[JsonInclude, JsonPropertyName("a")] public EdgeRange A = null!;
 		[JsonInclude, JsonPropertyName("b")] public EdgeRange B = null!;
 	}
@@ -13,7 +13,7 @@ public class Config {
 	public class EdgeRange {
 		[JsonInclude, JsonPropertyName("screen")] public int Screen;
 		[JsonInclude, JsonPropertyName("side"), JsonConverter(typeof(JsonStringEnumConverter))] public Side Side;
-		[JsonInclude, JsonPropertyName("begin")] public int? Begin;
-		[JsonInclude, JsonPropertyName("end")] public int? End;
+		[JsonInclude, JsonPropertyName("begin")] public string? Begin;
+		[JsonInclude, JsonPropertyName("end")] public string? End;
 	}
 }

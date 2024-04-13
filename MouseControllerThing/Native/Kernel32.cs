@@ -3,9 +3,9 @@
 namespace MouseControllerThing.Native;
 
 public static class Kernel32 {
-	[DllImport("kernel32.dll")]
+	[DllImport("kernel32.dll", SetLastError = true)]
 	public static extern IntPtr GetConsoleWindow();
 
-	[DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+	[DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
 	internal static extern IntPtr GetModuleHandle(string lpModuleName);
 }

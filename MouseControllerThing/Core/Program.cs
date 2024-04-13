@@ -1,9 +1,8 @@
 ﻿using MouseControllerThing.Hooking;
 using MouseControllerThing.Utils;
+using MouseControllerThing.Utils.Maths;
 using System.IO;
 using System.Text.Json;
-using MouseControllerThing.Utils.Ext;
-using MouseControllerThing.Utils.Maths;
 
 namespace MouseControllerThing.Core;
 
@@ -15,67 +14,49 @@ public static class Program {
 		Application.EnableVisualStyles();
 		Application.SetCompatibleTextRenderingDefault(false);
 
-		NativeWrapper.ShowConsole(true);
+		ContextMenuStrip strip = new();
+		strip.Items.Add("Show", null, (sender, eventArgs) => NativeWrapper.ShowConsole(true));
+		strip.Items.Add("Hide", null, (sender, eventArgs) => NativeWrapper.ShowConsole(false));
+		strip.Items.Add("Reload", null, (sender, eventArgs) => UpdateState(RunningState.Restart));
+		strip.Items.Add("Exit", null, (sender, eventArgs) => UpdateState(RunningState.Exit));
+		using TrayIcon tray = new(strip);
 
-		// ContextMenuStrip strip = new();
-		// strip.Items.Add("Show", null, (sender, eventArgs) => NativeWrapper.ShowConsole(true));
-		// strip.Items.Add("Hide", null, (sender, eventArgs) => NativeWrapper.ShowConsole(false));
-		// strip.Items.Add("Reload", null, (sender, eventArgs) => s_runningState = RunningState.Restart);
-		// strip.Items.Add("Exit", null, (sender, eventArgs) => s_runningState = RunningState.Exit);
-		// NotifyIcon tray = new() {
-		// 	Icon = Resources.trayIcon,
-		// 	Visible = true,
-		// 	Text = Application.ProductName,
-		// 	ContextMenuStrip = strip,
-		// };
-
-		Setup? setup = Run(args);
-		if (setup == null) {
-			Console.WriteLine("Setup Failed!"); //TODO: not the best error handling ever... really should fix this...
-			return;
-		}
-
-		V2I? prevPos = null;
-		LLMouseHook llMouseHook = new(pos => {
-			if (pos == prevPos) return;
-
-			V2I? movedPos = setup.Handle(pos);
-			if (movedPos.HasValue) {
-				NativeWrapper.CursorPos = movedPos.Value;
-				Console.WriteLine($"Moved: {pos} -> {movedPos.Value}");
-				pos = movedPos.Value;
-			}
-
-			prevPos = pos;
-		});
-
-		Application.Run();
-		// tray.Visible = false;
-		// tray.Dispose();
-		llMouseHook.Dispose();
+		Runtime();
 	}
 
-	private static void GuardedMain(string[] args) {
-		while (s_runningState != RunningState.Exit) {
-			NativeWrapper.ShowConsole(true);
-			s_runningState = RunningState.Running;
-			try {
-				Run(args);
-			} catch (Exception ex) {
-				s_runningState = RunningState.Halted;
-				using (new FgScope(ConsoleColor.Red)) {
-					Console.WriteLine(ex);
-				}
-			}
+	private static void UpdateState(RunningState state) {
+		s_runningState = state;
+		Application.Exit();
+	}
 
-			if (s_runningState == RunningState.Halted) {
-				NativeWrapper.ShowConsole(true);
-				Console.WriteLine("Program has halted! (restart? [y/n])");
-				s_runningState = ReadYN() ? RunningState.Restart : RunningState.Exit;
+	private static void Runtime() {
+		s_runningState = RunningState.Running;
+
+		while (true) {
+			switch (s_runningState) {
+				case RunningState.Running:
+					try {
+						Run();
+					} catch (Exception ex) {
+						s_runningState = RunningState.Halted;
+						using (new FgScope(ConsoleColor.Red)) {
+							NativeWrapper.ShowConsole(true);
+							Console.WriteLine(ex);
+						}
+					}
+					break;
+				case RunningState.Restart:
+					s_runningState = RunningState.Running;
+					break;
+				case RunningState.Halted:
+					NativeWrapper.ShowConsole(true);
+					Console.WriteLine("Program has halted! (restart? [y/n])");
+					s_runningState = ReadYN() ? RunningState.Restart : RunningState.Exit;
+					break;
+				case RunningState.Exit:
+					return;
 			}
 		}
-
-		Application.Exit();
 	}
 
 	private static bool ReadYN() {
@@ -89,15 +70,77 @@ public static class Program {
 		}
 	}
 
-	private static Setup? Run(string[] args) {
+	private static void Run() {
+		NativeWrapper.ShowConsole(true);
 		Console.Clear();
 
+		Setup? setup = LoadSetup();
+		if (setup == null) {
+			Console.WriteLine("Failed to load setup!"); //TODO: not the best error handling ever... really should fix this...
+			return;
+		}
+
+		using (new FgScope(ConsoleColor.Green)) {
+			Console.WriteLine("Entering Runtime...");
+		}
+#if !DEBUG
+		Thread.Sleep(500);
+		NativeWrapper.ShowConsole(false);
+#endif
+		V2I? MoveHandler(V2I pos) {
+#if DEBUG
+			Console.WriteLine($"Pos: {pos}");
+#endif
+
+			V2I? movedPos = setup!.Handle(pos);
+#if DEBUG
+			if (movedPos.HasValue) {
+				Console.WriteLine($"Moved: {pos} -> {movedPos.Value}");
+			}
+#endif
+
+			return movedPos;
+		}
+
+		MouseObserver mouseObserver = CreateObserver(MoveHandler);
+
+		Application.Run();
+
+		mouseObserver.Dispose();
+	}
+
+	private static MouseObserver CreateObserver(Func<V2I, V2I?> MoveHandler) {
+		return new LLMHookObserver(MoveHandler);
+		//return MouseObserver mouseObserver = new PollObserver(MoveHandler);
+		//return MouseObserver mouseObserver = new DummyObserver(MoveHandler, new V2I[] {
+		//	new V2I(25, 25),
+		//	new V2I(-75, -75),
+
+		//	//-X
+		//	new V2I(25, 100),
+		//	new V2I(-75, 100),
+
+		//	//+X
+		//	new V2I(2560 - 25, 100),
+		//	new V2I(2560 + 75, 100),
+
+		//	//-Y
+		//	new V2I(100, 25),
+		//	new V2I(100, -75),
+
+		//	//+Y
+		//	new V2I(100, 1440 - 25),
+		//	new V2I(100, 1440 + 75),
+		//});
+	}
+
+	private static Setup? LoadSetup() {
 		Setup setup = new();
 		Console.WriteLine("Screens:");
-		foreach ((int i, ScreenInfo monitor) in NativeWrapper.GetDisplays().Enumerate()) {
-			Console.Write($"    {i}: {monitor.PhysicalRect}");
-			if (monitor.Scale != 1) {
-				Console.Write($" @ {monitor.Scale * 100}%");
+		foreach (ScreenInfo monitor in NativeWrapper.GetDisplays()) {
+			Console.Write($"    {monitor.Id}: {monitor.PhysicalRect}");
+			if (monitor.Scale != Frac.One) {
+				Console.Write($" @ {(float)monitor.Scale * 100}%");
 #if DEBUG
 				Console.Write($" -> Logical:{monitor.LogicalRect}");
 #endif
@@ -110,70 +153,100 @@ public static class Program {
 		Console.WriteLine();
 
 		Console.WriteLine("Loading Config...");
-		Config? config = LoadConfig();
+		Config? config = LoadConfig("config.json");
 		if (config == null) return null;
-		if (!LoadMappings(config, setup)) return null;
+		if (!LoadPortals(config, setup)) return null;
 		Console.WriteLine("Config Loaded!");
 		Console.WriteLine();
 
-		using (new FgScope(ConsoleColor.Green)) {
-			Console.WriteLine("Entering Runtime...");
-		}
-#if !DEBUG
-		Thread.Sleep(500);
-		NativeWrapper.ShowConsole(false);
-#endif
-
 		return setup;
-
-		// V2I? prevCursorPos = null;
-		// while (s_runningState == RunningState.Running) {
-		// 	Thread.Sleep(1);
-		// 	V2I cursorPos = NativeWrapper.CursorPos;
-		// 	if (cursorPos == prevCursorPos) continue;
-		//
-		// 	V2I? movedP = setup.Handle(cursorPos);
-		// 	if (movedP.HasValue) {
-		// 		NativeWrapper.CursorPos = movedP.Value;
-		// 		Console.WriteLine($"Moved: {cursorPos} -> {movedP.Value}");
-		// 		cursorPos = movedP.Value;
-		// 	}
-		//
-		// 	prevCursorPos = cursorPos;
-		// }
 	}
 
-	private static bool LoadMappings(Config config, Setup setup) {
-		if (config.Portals.Length <= 0) {
+	private static bool LoadPortals(Config config, Setup setup) {
+		if (config.Mappings.Length <= 0) {
 			using (new FgScope(ConsoleColor.Yellow)) {
 				Console.WriteLine("No mappings present in config!");
 			}
 			return true;
 		}
 
-		foreach (Config.Portal mapping in config.Portals) {
-			bool TryParseScreen(int screenIndex, out Screen screen) {
-				if (screenIndex < 0 && screenIndex >= setup.Screens.Count) {
+		foreach (Config.Mapping mapping in config.Mappings) {
+			bool TryParseScreen(int screenId, out Screen screen) {
+				if (screenId < 0 && screenId >= setup.Screens.Count) {
 					using (new FgScope(ConsoleColor.Red)) {
-						Console.WriteLine($"Screen index out of range. '{screenIndex}' supplied, but range is 0-{setup.Screens.Count - 1}, aborting");
+						Console.WriteLine($"Screen id out of range. '{screenId}' supplied, but valid range is 0-{setup.Screens.Count - 1}, aborting");
 					}
 					screen = default!;
 					return false;
 				}
-				screen = setup.Screens[screenIndex];
+				screen = setup.Screens.Single(screen => screen.Id == screenId);
 				return true;
 			}
 
 			bool TryParseRange(Config.EdgeRange edgeRange, Edge edge, out R1I range) {
-				int begin = edgeRange.Begin ?? 0;
-				int end = edgeRange.End ?? edge.Length;
-				if (begin < 0 && end > edge.Length) {
-					using (new FgScope(ConsoleColor.Red)) {
-						Console.WriteLine($"EdgeRange is out of range. '{edgeRange.Begin.ToString() ?? $"({begin})"}-{edgeRange.End.ToString() ?? $"({end})"}' supplied, but range is 0-{edge.Length}, aborting");
+				bool TryParseAnchor(string anchorStr, Edge edge, out int anchor) {
+					R1I pixelRange = new(0, edge.Length);
+					R1I percentRange = new(0, 100);
+
+					if (anchorStr.EndsWith("px")) {
+						if (!int.TryParse(anchorStr[..^2], out int value)) {
+							using (new FgScope(ConsoleColor.Red)) {
+								Console.WriteLine($"Failed to parse anchor. '{anchorStr}' supplied, but int is malformed");
+							}
+							anchor = default;
+							return false;
+						}
+
+						if (
+							value < pixelRange.Begin ||
+							value > pixelRange.End
+						) {
+							using (new FgScope(ConsoleColor.Red)) {
+								Console.WriteLine($"Anchor is out of range. '{anchorStr}' supplied, but valid range is {pixelRange.Begin}px-{pixelRange.End}px");
+							}
+
+							anchor = default;
+							return false;
+						}
+
+						anchor = value;
+						return true;
 					}
-					range = default!;
+					if (anchorStr.EndsWith("%")) {
+						if (!int.TryParse(anchorStr[..^1], out int value)) {
+							using (new FgScope(ConsoleColor.Red)) {
+								Console.WriteLine($"Failed to parse anchor. '{anchorStr}' supplied, but int is malformed");
+							}
+
+							anchor = default;
+							return false;
+						}
+
+						if (
+							value < percentRange.Begin || 
+							value > percentRange.End
+						) {
+							using (new FgScope(ConsoleColor.Red)) {
+								Console.WriteLine($"Anchor is out of range. '{anchorStr}' supplied, but valid range is {percentRange.Begin}%-{percentRange.End}%");
+							}
+
+							anchor = default;
+							return false;
+						}
+
+						anchor = MathX.Map(value, percentRange, pixelRange);
+						return true;
+					}
+
+					anchor = default;
 					return false;
 				}
+
+				const string beginDefault = "0%";
+				const string endDefault = "100%";
+				if (!TryParseAnchor(edgeRange.Begin ?? beginDefault, edge, out int begin)) return false;
+				if (!TryParseAnchor(edgeRange.End ?? endDefault, edge, out int end)) return false;
+				
 				range = new R1I(begin, end);
 				return true;
 			}
@@ -186,25 +259,25 @@ public static class Program {
 			Edge bEdge = bScreen.GetEdge(mapping.B.Side);
 			if (!TryParseRange(mapping.B, bEdge, out R1I bRange)) return false;
 
-			Console.WriteLine($"Mapping 'screen{mapping.A.Screen}_{aEdge.Side}[{aRange.Begin}-{aRange.End}]' to 'screen{mapping.B.Screen}_{bEdge.Side}[{bRange.Begin}-{bRange.End}]'");
+			Console.WriteLine($"Mapping 'screen{mapping.A.Screen} {aEdge.Side} [{aRange.Begin}-{aRange.End}]' to 'screen{mapping.B.Screen} {bEdge.Side} [{bRange.Begin}-{bRange.End}]'");
 			Portal.Bind(
 				new EdgeSpan(aEdge, aRange),
 				new EdgeSpan(bEdge, bRange)
 			);
 		}
+
 		return true;
 	}
 
-	private static Config? LoadConfig() {
-		const string configPath = "config.json";
-		if (!File.Exists(configPath)) {
+	private static Config? LoadConfig(string path) {
+		if (!File.Exists(path)) {
 			using (new FgScope(ConsoleColor.Red)) {
-				Console.WriteLine($"'{configPath}' not found, aborting");
+				Console.WriteLine($"'{path}' not found, aborting");
 			}
 			return null;
 		}
 
-		string configText = File.ReadAllText(configPath);
+		string configText = File.ReadAllText(path);
 		Config? config = JsonSerializer.Deserialize<Config>(configText);
 		if (config == null) {
 			using (new FgScope(ConsoleColor.Red)) {

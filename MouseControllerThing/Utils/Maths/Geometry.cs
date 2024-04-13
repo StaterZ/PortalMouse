@@ -16,7 +16,8 @@ public static class Geometry {
 			return null;
 
 		int numerator = aFromB.Begin.y;
-		numerator = numerator < 0 ? -numerator : (numerator + 1);
+		//numerator = numerator < 0 ? -numerator : (numerator + 1);
+		numerator = Math.Abs(numerator);
 		Frac yFrac = new(
 			numerator,
 			Math.Abs(aFromB.Delta.y)

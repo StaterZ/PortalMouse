@@ -1,9 +1,9 @@
-﻿using MouseControllerThing.Utils;
-using MouseControllerThing.Utils.Maths;
+﻿using MouseControllerThing.Utils.Maths;
 
 namespace MouseControllerThing.Core;
 
 public sealed class Screen {
+	public readonly int Id;
 	public readonly R2I PhysicalRect;
 	public readonly R2I LogicalRect;
 	private readonly Edge m_left;
@@ -12,8 +12,9 @@ public sealed class Screen {
 	private readonly Edge m_bottom;
 
 	public Screen(ScreenInfo monitorInfo) {
-		PhysicalRect = new R2I(monitorInfo.PhysicalRect);
-		LogicalRect = new R2I(monitorInfo.LogicalRect);
+		Id = monitorInfo.Id;
+		PhysicalRect = (R2I)monitorInfo.PhysicalRect;
+		LogicalRect = (R2I)monitorInfo.LogicalRect;
 
 		m_left = new Edge(this, Side.Left);
 		m_right = new Edge(this, Side.Right);
@@ -21,13 +22,12 @@ public sealed class Screen {
 		m_bottom = new Edge(this, Side.Bottom);
 	}
 
-	public ScreenPos Handle(LineSeg2I mouseMove) {
+	public ScreenLineSeg? Handle(LineSeg2I mouseMove) {
 		return
 			m_left.TryHandle(mouseMove) ??
 			m_right.TryHandle(mouseMove) ??
 			m_top.TryHandle(mouseMove) ??
-			m_bottom.TryHandle(mouseMove) ??
-			throw new UnreachableException();
+			m_bottom.TryHandle(mouseMove);
 	}
 
 	public Edge GetEdge(Side side) {
@@ -42,6 +42,4 @@ public sealed class Screen {
 
 	public V2I FromPhysicalToLogicalSpace(V2I p) => MathX.Map(p, PhysicalRect, LogicalRect);
 	public V2I FromLogicalToPhysicalSpace(V2I p) => MathX.Map(p, LogicalRect, PhysicalRect);
-	public V2F FromPhysicalToLogicalSpace_Local(V2F p) => MathX.MapLocal(p, PhysicalRect, LogicalRect);
-	public V2F FromLogicalToPhysicalSpace_Local(V2F p) => MathX.MapLocal(p, LogicalRect, PhysicalRect);
 }

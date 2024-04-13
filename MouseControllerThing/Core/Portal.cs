@@ -3,32 +3,25 @@
 namespace MouseControllerThing.Core;
 
 public class Portal {
-	private readonly EdgeSpan m_a;
-	private readonly EdgeSpan m_b;
+	public readonly EdgeSpan EdgeSpan;
+	public Portal Exit;
 
-	private Portal(EdgeSpan a, EdgeSpan b) {
-		m_a = a;
-		m_b = b;
+	private Portal(EdgeSpan edgeSpan, Portal exit) {
+		EdgeSpan = edgeSpan;
+		Exit = exit;
 	}
 
-	public (EdgeSpan self, EdgeSpan other) GetSelfOther(Edge self) {
-		if (self == m_a.Edge) return (m_a, m_b);
-		if (self == m_b.Edge) return (m_b, m_a);
-		throw new ArgumentOutOfRangeException(nameof(self));
-	}
+	public int Map(int value) =>
+		MathX.Map(value, EdgeSpan.Range, Exit.EdgeSpan.Range);
 
-	public V2I? TryRemap(Edge edge, int p, int overStep) {
-		(EdgeSpan self, EdgeSpan other) = GetSelfOther(edge);
-		if (p < self.Range.Begin || p >= self.Range.End) return null;
+	public static void Bind(EdgeSpan a, EdgeSpan b) {
+		Portal aPortal = new(a, null!);
+		Portal bPortal = new(b, null!);
 
-		int result = MathX.Map(p, self.Range, other.Range);
-		return other.Edge.GetLandingSite(result, overStep);
-	}
+		aPortal.Exit = bPortal;
+		bPortal.Exit = aPortal;
 
-	public static Portal Bind(EdgeSpan a, EdgeSpan b) {
-		Portal portal = new(a, b);
-		a.Edge.Add(portal);
-		b.Edge.Add(portal);
-		return portal;
+		a.Edge.Add(aPortal);
+		b.Edge.Add(bPortal);
 	}
 }

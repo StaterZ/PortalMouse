@@ -4,58 +4,109 @@ using MouseControllerThing.Utils.Maths;
 namespace MouseControllerThing.Core;
 
 public class Edge {
-	private readonly List<Portal> m_portals = new();
 	public readonly Side Side;
-	private readonly Screen m_screen;
+	public readonly Screen Screen;
+	private readonly List<Portal> m_portals = new();
 
-	private V2I Pos => m_screen.PhysicalRect.Pos + (m_screen.PhysicalRect.Size - 1) * Side switch {
-		Side.Left => new V2I(0, 0),
-		Side.Right => new V2I(1, 0),
-		Side.Top => new V2I(0, 0),
-		Side.Bottom => new V2I(0, 1),
-		_ => throw new ArgumentOutOfRangeException(nameof(Side))
-	};
+	private V2I Pos => Screen.PhysicalRect.Pos + Screen.PhysicalRect.Size * Side.ToVec();
 
-	public int Length => m_screen.PhysicalRect.Size[Side.ToDirection().ToAxis().Opposite()];
+	private V2I InnerPos => Screen.PhysicalRect.Pos + (Screen.PhysicalRect.Size - 1) * Side.ToVec();
+
+	private Axis Axis => Side.ToDirection().ToAxis().Opposite();
+
+	public int Length => Screen.PhysicalRect.Size[Axis];
 
 	public AxisLineSeg2I AxisLine => new() {
 		Pos = Pos,
 		Size = Length,
-		Axis = Side.ToDirection().ToAxis(),
+		Axis = Axis,
 	};
 
 	public Edge(Screen screen, Side side) {
-		m_screen = screen;
+		Screen = screen;
 		Side = side;
 	}
 
-	public V2I? TryHandle(LineSeg2I mouseMove) {
+	public void Add(Portal portal) {
+		(bool success, int index) = m_portals.BetterBinarySearch(
+			portal.EdgeSpan.Range.Begin,
+			portal => portal.EdgeSpan.Range.Begin
+		);
+
+		//check for overlapping portals!
+		if (success) throw new ArgumentOutOfRangeException();
+		if (index < m_portals.Count) {
+			Portal nextPortal = m_portals[index];
+			if (portal.EdgeSpan.Range.End < nextPortal.EdgeSpan.Range.Begin) throw new ArgumentOutOfRangeException();
+		}
+
+		m_portals.Insert(index, portal);
+	}
+
+	public ScreenLineSeg? TryHandle(LineSeg2I mouseMove) {
 		(Frac lineFrac, Frac mouseFrac)? intersection = Geometry.Intersect(mouseMove, AxisLine);
 		if (!intersection.HasValue)
 			return null;
 
-		LineSeg1I mouseMoveAxis = mouseMove[Side.ToDirection().ToAxis()];
-		(bool success, int index) = m_portals.BetterBinarySearch(
-			mouseMoveAxis.Begin,
-			portal => portal.GetSelfOther(this).self.Range.Begin
-		);
-		if (success) index++;
+		int inPos = Pos[Axis] + Length * intersection.Value.lineFrac;
+		V2I inMove = mouseMove.Delta * intersection.Value.mouseFrac;
+		LineSeg1I inLine = LineSeg1I.InitBeginDelta(inPos, inMove[Axis]);
+		(int pos, Portal? portal) entry = SlideAlongEdgeIntoPortal(inLine);
 
-		switch (mouseMoveAxis.Delta) {
-			case <0:
-				for (; index >= 0; index--) {
-					if (!m_portals[index].GetSelfOther(this).self.Range.Contains((int)intersection.Value.mouseFrac)) continue;
-					break;
-				}
-				break;
-			case 0:
-				break;
-			case >0:
-				for (; index < m_portals.Count; index++) {
-					if (!m_portals[index].GetSelfOther(this).self.Range.Contains((int)intersection.Value.mouseFrac)) continue;
-					break;
-				}
-				break;
+		ScreenLineSeg result;
+		if (entry.portal == null) {
+			V2I exitPos = new(
+				InnerPos[Axis.Opposite()],
+				entry.pos
+			);
+
+			result = new ScreenLineSeg(
+				new LineSeg2I(mouseMove.Begin, exitPos),
+				Screen
+			);
+		} else {
+			int outMove = mouseMove.Delta[Axis.Opposite()] - inMove[Axis.Opposite()];
+			Edge exitEdge = entry.portal.Exit.EdgeSpan.Edge;
+
+			V2I exitEdgePos = new(
+				exitEdge.Pos[Axis.Opposite()],
+				entry.portal.Map(entry.pos)
+			);
+
+			V2I exitPos = exitEdgePos + new V2I(outMove, inLine.End - entry.pos);
+
+			result = new ScreenLineSeg(
+				new LineSeg2I(exitEdgePos, exitPos),
+				exitEdge.Screen
+			);
+		}
+
+		if (Axis == Axis.Horizontal) { //Convert out of unit space
+			result = new ScreenLineSeg(result.Line.Transpose(), result.Screen);
+		}
+
+		return result;
+	}
+
+	private (int pos, Portal? portal) SlideAlongEdgeIntoPortal(LineSeg1I line) {
+		(bool success, int beginIndex) = m_portals.BetterBinarySearch(
+			line.Begin,
+			portal => portal.EdgeSpan.Range.Begin
+		);
+
+		if (success) {
+			return (line.Begin, m_portals[beginIndex]);
+		} else {
+			beginIndex--;
+			return line.Delta switch {
+				< 0 when m_portals.IsInRange(beginIndex) && line.End < m_portals[beginIndex].EdgeSpan.Range.End =>
+					(m_portals[beginIndex].EdgeSpan.Range.End, m_portals[beginIndex]),
+				0 when m_portals.IsInRange(beginIndex) && line.End < m_portals[beginIndex].EdgeSpan.Range.End =>
+					(line.Begin, m_portals[beginIndex]),
+				> 0 when m_portals.IsInRange(beginIndex + 1) && line.End >= m_portals[beginIndex + 1].EdgeSpan.Range.Begin =>
+					(m_portals[beginIndex + 1].EdgeSpan.Range.Begin, m_portals[beginIndex + 1]),
+				_ => (line.End, null),
+			};
 		}
 	}
 }

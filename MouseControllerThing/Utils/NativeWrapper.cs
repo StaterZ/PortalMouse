@@ -18,16 +18,18 @@ public static class NativeWrapper {
 	}
 
 	//http://pinvoke.net/default.aspx/user32/EnumDisplayMonitors.html
+	//https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-monitorinfoexa
+	//future ideas: https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-display_devicea
+	//future ideas: https://stackoverflow.com/questions/4958683/how-do-i-get-the-actual-monitor-name-as-seen-in-the-resolution-dialog
 	public static List<ScreenInfo> GetDisplays() {
 		List<ScreenInfo> result = new();
-
 		Graphics g = Graphics.FromHwnd(IntPtr.Zero);
 		IntPtr desktop = g.GetHdc();
 		User32.EnumDisplayMonitors(desktop, IntPtr.Zero,
 			(IntPtr hMonitor, IntPtr hdcMonitor, ref User32.Rect lprcMonitor, IntPtr dwData) => {
-				User32.MonitorInfo mi = new();
+				User32.MonitorInfoEx mi = new();
 				if (User32.GetMonitorInfo(hMonitor, mi)) {
-					float scale = GetScalingFactor(hdcMonitor);
+					Frac scale = GetScalingFactor(hdcMonitor);
 					result.Add(new ScreenInfo(mi, scale));
 				}
 				return true;
@@ -37,10 +39,10 @@ public static class NativeWrapper {
 		return result;
 	}
 
-	public static float GetScalingFactor(IntPtr hdc) {
+	public static Frac GetScalingFactor(IntPtr hdc) {
 		int logicalScreenHeight = Gdi32.GetDeviceCaps(hdc, (int)DeviceCap.VERTRES);
 		int physicalScreenHeight = Gdi32.GetDeviceCaps(hdc, (int)DeviceCap.DESKTOPVERTRES);
 
-		return (float)physicalScreenHeight / (float)logicalScreenHeight;
+		return new Frac(physicalScreenHeight, logicalScreenHeight);
 	}
 }

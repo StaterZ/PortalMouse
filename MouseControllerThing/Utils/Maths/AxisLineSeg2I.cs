@@ -5,5 +5,5 @@ public struct AxisLineSeg2I {
 	public int Size;
 	public Axis Axis;
 
-	public R1I Range => new(Pos[Axis], Size);
+	public R1I Range => R1I.InitBeginSize(Pos[Axis], Size);
 }

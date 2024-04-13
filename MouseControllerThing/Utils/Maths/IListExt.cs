@@ -1,7 +1,6 @@
 namespace MouseControllerThing.Utils.Maths;
 
-public static class IListExt
-{
+public static class IListExt {
 	/// <summary>
 	/// If the value is found then `success = true` is returned with the index of the matching element.
 	/// If the value is not found then `success = false` is returned with the index where a matching element could be inserted while maintaining sorted order.
@@ -13,16 +12,14 @@ public static class IListExt
 
 		int min = 0; //inclusive bound
 		int max = list.Count; //exclusive bound
-		while (min < max)
-		{
+		while (min < max) {
 			int size = max - min;
 			int mid = min + size / 2;
 
 			T midItem = list[mid];
 			TKey midKey = keySelector(midItem);
 
-			switch (midKey.CompareTo(key))
-			{
+			switch (midKey.CompareTo(key)) {
 				case < 0: // midKey < key
 					min = mid + 1;
 					break;
