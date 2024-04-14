@@ -72,7 +72,7 @@ public static class Program {
 
 #if !DEBUG
 		Thread.Sleep(500);
-		NativeWrapper.ShowConsole(false);
+		NativeHelper.ShowConsole(false);
 #endif
 		V2I? MoveHandler(V2I pos) {
 #if DEBUG
