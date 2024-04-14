@@ -1,5 +1,5 @@
-﻿using PortalMouse.Utils;
-using PortalMouse.Utils.Math;
+﻿using PortalMouse.Utils.Math;
+using PortalMouse.Utils.Misc;
 
 namespace PortalMouse.Observers;
 
@@ -23,10 +23,10 @@ public class PollObserver : MouseObserver
 		{
 			Thread.Sleep(1);
 
-			V2I? movedPos = m_callback(NativeWrapper.CursorPos);
+			V2I? movedPos = m_callback(NativeHelper.CursorPos);
 			if (!movedPos.HasValue) continue;
 
-			NativeWrapper.CursorPos = movedPos.Value;
+			NativeHelper.CursorPos = movedPos.Value;
 		}
 	}
 

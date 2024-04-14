@@ -53,7 +53,4 @@ public struct V2I {
 	public static V2I operator /(V2I lhs, int rhs) => new(lhs.x / rhs, lhs.y / rhs);
 
 	public static V2I operator *(V2I lhs, Frac rhs) => new(lhs.x * rhs, lhs.y * rhs);
-
-	public static explicit operator V2I(Point point) => new(point.X, point.Y);
-	public static explicit operator Point(V2I point) => new(point.x, point.y);
 }

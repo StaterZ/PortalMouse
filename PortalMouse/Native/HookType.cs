@@ -2,8 +2,9 @@
 
 /// <summary>
 /// Enumerates the valid hook types passed as the idHook parameter into a call to SetWindowsHookEx.
+/// For further details, see: <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowshookexw"></see>
 /// </summary>
-public enum HookType : int {
+internal enum HookType : int {
 	/// <summary>
 	/// Installs a hook procedure that monitors messages generated as a result of an input event in a dialog box,
 	/// message box, menu, or scroll bar. For more information, see the MessageProc hook procedure.

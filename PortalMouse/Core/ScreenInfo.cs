@@ -3,12 +3,12 @@ using PortalMouse.Utils.Math;
 
 namespace PortalMouse.Core;
 
-public readonly struct ScreenInfo {
+internal readonly struct ScreenInfo {
 	public readonly User32.MonitorInfoEx MonitorInfo;
 	public readonly Frac Scale;
 	public readonly int Id;
 
-	public User32.Rect LogicalRect => MonitorInfo.rsMonitor;
+	public User32.Rect LogicalRect => MonitorInfo.rcMonitor;
 	public User32.Rect PhysicalRect => new(
 		LogicalRect.Left,
 		LogicalRect.Top,

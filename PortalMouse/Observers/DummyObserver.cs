@@ -1,5 +1,5 @@
-﻿using PortalMouse.Utils;
-using PortalMouse.Utils.Math;
+﻿using PortalMouse.Utils.Math;
+using PortalMouse.Utils.Misc;
 
 namespace PortalMouse.Observers;
 
@@ -26,10 +26,7 @@ public class DummyObserver : MouseObserver
 		{
 			if (m_dummyIndex >= m_dummyTable.Length)
 			{
-				using (new FgScope(ConsoleColor.Cyan))
-				{
-					Console.WriteLine("Dummy routine success!");
-				}
+				Terminal.Imp("Dummy routine success!");
 
 				m_isRunning.Value = false;
 				break;

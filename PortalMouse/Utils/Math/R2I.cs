@@ -1,6 +1,4 @@
-﻿using PortalMouse.Native;
-
-namespace PortalMouse.Utils.Math;
+﻿namespace PortalMouse.Utils.Math;
 
 public struct R2I {
 	public V2I Pos;
@@ -19,17 +17,4 @@ public struct R2I {
 	}
 
 	public override string ToString() => $"[X:{Pos.x},Y:{Pos.y},W:{Size.x},H:{Size.y}]";
-
-	public static explicit operator R2I(User32.Rect rect) => new(
-		new V2I(rect.Left, rect.Top),
-		new V2I(rect.Right - rect.Left, rect.Bottom - rect.Top)
-	);
-
-	public static explicit operator User32.Rect(R2I other) => new(
-		other.Pos.x,
-		other.Pos.y,
-		other.Pos.x + other.Size.x,
-		other.Pos.y + other.Size.y
-	);
-
 }

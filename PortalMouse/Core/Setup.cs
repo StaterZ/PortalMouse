@@ -1,5 +1,5 @@
-﻿using PortalMouse.Utils;
-using PortalMouse.Utils.Math;
+﻿using PortalMouse.Utils.Math;
+using PortalMouse.Utils.Misc;
 
 namespace PortalMouse.Core;
 
@@ -11,7 +11,7 @@ public sealed class Setup {
 		if (m_prevPos == null) {
 			Screen? screen = FindCursorScreen(pos);
 			if (screen == null) {
-				Console.WriteLine("Failed to find screen for cursor. Unless the error repeats it can be safely ignored");
+				Terminal.Wrn("Failed to find screen for cursor. Unless the error repeats it can be safely ignored");
 				return null;
 			}
 			m_prevPos = new ScreenPos(pos, screen);
@@ -24,7 +24,7 @@ public sealed class Setup {
 		while (!move.Screen.LogicalRect.Contains(move.Line.End)) {
 
 			ScreenLineSeg? nextMove = move.Screen.Handle(move.Line);
-			if (!nextMove.HasValue) throw new UnreachableException(); //If we're outside the screen bounds (checked by the while) we should get to a new screen
+			if (!nextMove.HasValue) throw new UnreachableException("If we're outside the screen bounds (checked by the while) we should get to a new screen");
 
 			move = nextMove.Value;
 		}

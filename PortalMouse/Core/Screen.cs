@@ -11,7 +11,7 @@ public sealed class Screen {
 	private readonly Edge m_top;
 	private readonly Edge m_bottom;
 
-	public Screen(ScreenInfo monitorInfo) {
+	internal Screen(ScreenInfo monitorInfo) {
 		Id = monitorInfo.Id;
 		PhysicalRect = (R2I)monitorInfo.PhysicalRect;
 		LogicalRect = (R2I)monitorInfo.LogicalRect;

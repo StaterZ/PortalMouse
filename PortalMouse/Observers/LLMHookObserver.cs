@@ -1,7 +1,7 @@
 ﻿using PortalMouse.Hooking;
 using PortalMouse.Native;
-using PortalMouse.Utils;
 using PortalMouse.Utils.Math;
+using PortalMouse.Utils.Misc;
 using System.Runtime.InteropServices;
 
 namespace PortalMouse.Observers;
@@ -29,7 +29,7 @@ public class LLMHookObserver : MouseObserver
 			V2I? movedPos = m_callback((V2I)hookStruct.pt);
 			if (movedPos.HasValue)
 			{
-				NativeWrapper.CursorPos = movedPos.Value;
+				NativeHelper.CursorPos = movedPos.Value;
 
 				//Return 1, that's what LBM does at least...
 				//https://github.com/mgth/LittleBigMouse/blob/a327a1aa3d7e2c015c594449b687c23d57a54503/LittleBigMouse.Daemon/LittleBigMouse.Hook/HookerMouse.cpp#L75

@@ -1,17 +1,18 @@
 using PortalMouse.Native;
+using PortalMouse.Utils.Misc;
 
 namespace PortalMouse.Hooking;
 
 //reference:
 //https://github.com/MouseUnSnag/MouseUnSnag/blob/master/MouseUnSnag/Hooking/HookHandler.cs
 
-public class HookHandler {
-	private User32.HookProc? m_hookCallback; //required to keep memory alive
+internal class HookHandler {
+	private User32.LowLevelMouseProc? m_hookCallback; //required to keep memory alive
 	private IntPtr m_hookHandle = IntPtr.Zero;
 
 	public bool IsHooked => m_hookHandle != IntPtr.Zero;
 
-	public bool SetHook(HookType hookType, User32.HookProc proc) {
+	public bool SetHook(HookType hookType, User32.LowLevelMouseProc proc) {
 		if (IsHooked)
 			throw new InvalidOperationException("Hook already set");
 
@@ -29,7 +30,7 @@ public class HookHandler {
 		if (!IsHooked)
 			throw new InvalidOperationException();
 
-		User32.UnhookWindowsHookEx(m_hookHandle);
+		NativeHelper.AssertSuccess(User32.UnhookWindowsHookEx(m_hookHandle), nameof(User32.UnhookWindowsHookEx));
 		m_hookHandle = IntPtr.Zero;
 		m_hookCallback = null;
 	}
