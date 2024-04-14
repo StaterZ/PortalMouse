@@ -39,7 +39,7 @@ internal static class User32 {
 	/// </summary>
 	[DllImport(dllName, SetLastError = true, CharSet = CharSet.Unicode)]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool GetMonitorInfo(IntPtr hMonitor, out MonitorInfoEx lpmi);
+	public static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEx lpmi);
 
 	/*
 	/// <summary>

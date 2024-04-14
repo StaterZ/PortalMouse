@@ -32,7 +32,8 @@ internal static class NativeHelper {
 
 		List<ScreenInfo> result = new();
 		bool Proc(IntPtr hMonitor, IntPtr hdcMonitor, ref User32.Rect lprcMonitor, IntPtr dwData) {
-			if (!User32.GetMonitorInfo(hMonitor, out User32.MonitorInfoEx mi)) {
+			User32.MonitorInfoEx mi = new();
+			if (!User32.GetMonitorInfo(hMonitor, ref mi)) {
 				Terminal.Err($"Failed to get monitor info. {nameof(hMonitor)}={hMonitor}");
 				return true;
 			}
