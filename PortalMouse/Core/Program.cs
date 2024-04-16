@@ -164,12 +164,18 @@ public static class Program {
 
 		foreach (Config.Mapping mapping in config.Mappings) {
 			bool TryParseScreen(int screenId, out Screen screen) {
-				if (!(screenId >= 1 && screenId <= setup.Screens.Count)) {
-					Terminal.Err($"Screen id out of range. '{screenId}' supplied, but valid range is 1-{setup.Screens.Count}, aborting");
+				Screen? foundScreen = setup.Screens.FirstOrDefault(screen => screen.Id == screenId);
+				if (foundScreen == null) {
+					Terminal.Err($@"Screen id out of range. '{screenId}' supplied, but valid ids are: {setup.Screens.Aggregate(new StringBuilder(), (builder, screen) => {
+						if (builder.Length > 0) builder.Append(", ");
+						builder.Append(screen.Id);
+						return builder;
+					})}, aborting");
 					screen = default!;
 					return false;
 				}
-				screen = setup.Screens.Single(screen => screen.Id == screenId);
+
+				screen = foundScreen;
 				return true;
 			}
 
@@ -205,7 +211,7 @@ public static class Program {
 						}
 
 						if (
-							value < percentRange.Begin || 
+							value < percentRange.Begin ||
 							value > percentRange.End
 						) {
 							Terminal.Err($"Anchor is out of range. '{anchorStr}' supplied, but valid range is {percentRange.Begin}%-{percentRange.End}%");
@@ -222,10 +228,17 @@ public static class Program {
 				}
 
 				const string beginDefault = "0%";
+				if (!TryParseAnchor(edgeRange.Begin ?? beginDefault, edge, out int begin)) {
+					range = default;
+					return false;
+				}
+
 				const string endDefault = "100%";
-				if (!TryParseAnchor(edgeRange.Begin ?? beginDefault, edge, out int begin)) return false;
-				if (!TryParseAnchor(edgeRange.End ?? endDefault, edge, out int end)) return false;
-				
+				if (!TryParseAnchor(edgeRange.End ?? endDefault, edge, out int end)) {
+					range = default;
+					return false;
+				}
+
 				range = new R1I(begin, end);
 				return true;
 			}
