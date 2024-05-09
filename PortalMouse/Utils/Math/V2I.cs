@@ -9,20 +9,29 @@ public struct V2I {
 		this.y = y;
 	}
 
-	public static V2I Zero => new(0, 0);
-	public static V2I One => new(1, 1);
+	public readonly float Dot(V2I other) => x * other.x + y * other.y;
+	public readonly float MagSqr => Dot(this);
+	public readonly V2I Transpose() => new(y, x);
 
-	public float Dot(V2I other) => x * other.x + y * other.y;
-	public float MagSqr => Dot(this);
-	public V2I Transpose() => new(y, x);
+	public readonly V2I ToUnitSpace(Axis axis) => axis switch {
+		Axis.Horizontal => this,
+		Axis.Vertical => Transpose(),
+		_ => throw new ArgumentOutOfRangeException(nameof(axis)),
+	};
 
-	public override string ToString() => $"[{x},{y}]";
-	public bool Equals(V2I other) => x == other.x && y == other.y;
-	public override bool Equals(object? obj) => obj is V2I other && Equals(other);
-	public override int GetHashCode() => HashCode.Combine(x, y);
+	public readonly V2I FromUnitSpace(Axis axis) => axis switch {
+		Axis.Horizontal => this,
+		Axis.Vertical => Transpose(),
+		_ => throw new ArgumentOutOfRangeException(nameof(axis)),
+	};
+
+	public override readonly string ToString() => $"[{x},{y}]";
+	public readonly bool Equals(V2I other) => x == other.x && y == other.y;
+	public override readonly bool Equals(object? obj) => obj is V2I other && Equals(other);
+	public override readonly int GetHashCode() => HashCode.Combine(x, y);
 
 	public int this[Axis axis] {
-		get => axis switch {
+		readonly get => axis switch {
 			Axis.Horizontal => x,
 			Axis.Vertical => y,
 			_ => throw new ArgumentOutOfRangeException(nameof(axis), axis, null),

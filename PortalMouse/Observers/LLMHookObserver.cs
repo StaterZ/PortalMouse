@@ -6,29 +6,24 @@ using System.Runtime.InteropServices;
 
 namespace PortalMouse.Observers;
 
-public class LLMHookObserver : MouseObserver
-{
+public class LLMHookObserver : MouseObserver {
 	private readonly IntPtr m_llMouseHookHandle = IntPtr.Zero;
-	private readonly HookHandler hookHandler = new();
+	private readonly HookHandler m_hookHandler = new();
 
-	public LLMHookObserver(Func<V2I, V2I?> callback) : base(callback)
-	{
-		hookHandler.SetHook(HookType.WH_MOUSE_LL, HookCallback);
+	public LLMHookObserver(Func<V2I, V2I?> callback) : base(callback) {
+		m_hookHandler.SetHook(HookType.WH_MOUSE_LL, HookCallback);
 	}
 
-	private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
-	{
+	private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam) {
 		if (
 			nCode >= 0 &&
 			lParam != IntPtr.Zero &&
 			((uint)wParam & User32.WmMouseMove) != 0
-		)
-		{
+		) {
 			User32.MSLLHOOKSTRUCT hookStruct = (User32.MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(User32.MSLLHOOKSTRUCT))!;
 
 			V2I? movedPos = m_callback((V2I)hookStruct.pt);
-			if (movedPos.HasValue)
-			{
+			if (movedPos.HasValue) {
 				NativeHelper.CursorPos = movedPos.Value;
 
 				//Return 1, that's what LBM does at least...
@@ -40,8 +35,9 @@ public class LLMHookObserver : MouseObserver
 		return User32.CallNextHookEx(m_llMouseHookHandle, nCode, wParam, lParam);
 	}
 
-	protected override void ReleaseUnmanagedResources()
-	{
-		hookHandler.UnsetHook();
+	protected override void ReleaseUnmanagedResources() {
+		m_hookHandler.UnsetHook();
+
+		base.ReleaseUnmanagedResources();
 	}
 }

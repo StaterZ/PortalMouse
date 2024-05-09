@@ -1,26 +1,22 @@
 ﻿using PortalMouse.Utils.Math;
 
-namespace PortalMouse.Observers {
-	public abstract class MouseObserver : IDisposable
-	{
-		protected readonly Func<V2I, V2I?> m_callback;
+namespace PortalMouse.Observers;
 
-		public MouseObserver(Func<V2I, V2I?> callback)
-		{
-			m_callback = callback;
-		}
+public abstract class MouseObserver : IDisposable {
+	protected readonly Func<V2I, V2I?> m_callback;
 
-		~MouseObserver()
-		{
-			ReleaseUnmanagedResources();
-		}
+	public MouseObserver(Func<V2I, V2I?> callback) {
+		m_callback = callback;
+	}
 
-		protected abstract void ReleaseUnmanagedResources();
+	~MouseObserver() {
+		ReleaseUnmanagedResources();
+	}
 
-		public void Dispose()
-		{
-			ReleaseUnmanagedResources();
-			GC.SuppressFinalize(this);
-		}
+	protected virtual void ReleaseUnmanagedResources() { }
+
+	public void Dispose() {
+		ReleaseUnmanagedResources();
+		GC.SuppressFinalize(this);
 	}
 }

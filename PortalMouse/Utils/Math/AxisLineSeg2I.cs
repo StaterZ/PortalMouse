@@ -1,9 +1,5 @@
 namespace PortalMouse.Utils.Math;
 
-public struct AxisLineSeg2I {
-	public V2I Pos;
-	public int Size;
-	public Axis Axis;
-
-	public R1I Range => R1I.InitBeginSize(Pos[Axis], Size);
+public record struct AxisLineSeg2I(V2I Pos, int Size, Axis Axis) {
+	public readonly R1I Range => R1I.InitBeginSize(Pos[Axis], Size);
 }

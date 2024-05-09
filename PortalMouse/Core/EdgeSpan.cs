@@ -1,5 +1,4 @@
-﻿using PortalMouse.Utils;
-using PortalMouse.Utils.Math;
+﻿using PortalMouse.Utils.Math;
 
 namespace PortalMouse.Core;
 

@@ -3,24 +3,19 @@ using PortalMouse.Utils.Misc;
 
 namespace PortalMouse.Observers;
 
-public class PollObserver : MouseObserver
-{
+public class PollObserver : MouseObserver {
 	private AtomicBool m_isRunning = new(true);
-	private Thread m_thread;
+	private readonly Thread m_thread;
 
-	public PollObserver(Func<V2I, V2I?> callback) : base(callback)
-	{
-		m_thread = new Thread(PollLoop)
-		{
+	public PollObserver(Func<V2I, V2I?> callback) : base(callback) {
+		m_thread = new Thread(PollLoop) {
 			Name = nameof(PollObserver)
 		};
 		m_thread.Start();
 	}
 
-	private void PollLoop()
-	{
-		while (m_isRunning.Value)
-		{
+	private void PollLoop() {
+		while (m_isRunning.Value) {
 			Thread.Sleep(1);
 
 			V2I? movedPos = m_callback(NativeHelper.CursorPos);
@@ -30,9 +25,10 @@ public class PollObserver : MouseObserver
 		}
 	}
 
-	protected override void ReleaseUnmanagedResources()
-	{
+	protected override void ReleaseUnmanagedResources() {
 		m_isRunning.Value = false;
 		m_thread.Join();
+
+		base.ReleaseUnmanagedResources();
 	}
 }

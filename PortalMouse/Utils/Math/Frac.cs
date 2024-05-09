@@ -20,6 +20,10 @@ public readonly struct Frac {
 	public override int GetHashCode() => HashCode.Combine(Numerator, Denominator);
 	public override string ToString() => $"{Numerator}/{Denominator}";
 
+	internal int Lerp(object range) {
+		throw new NotImplementedException();
+	}
+
 	public static bool operator ==(Frac lhs, Frac rhs) => lhs.Numerator * rhs.Denominator == rhs.Numerator * lhs.Denominator;
 	public static bool operator !=(Frac lhs, Frac rhs) => !(lhs == rhs);
 

@@ -97,28 +97,33 @@ public static class Program {
 	}
 
 	private static MouseObserver CreateObserver(Func<V2I, V2I?> MoveHandler) {
-		return new LLMHookObserver(MoveHandler);
-		//return MouseObserver mouseObserver = new PollObserver(MoveHandler);
-		//return MouseObserver mouseObserver = new DummyObserver(MoveHandler, new V2I[] {
-		//	new V2I(25, 25),
-		//	new V2I(-75, -75),
+		//return new LLMHookObserver(MoveHandler);
+		//return new PollObserver(MoveHandler);
+		return new DummyObserver(MoveHandler, new V2I[] {
+			//test scaled wrap
+			new V2I(3000, 0),
+			new V2I(3000, -1),
 
-		//	//-X
-		//	new V2I(25, 100),
-		//	new V2I(-75, 100),
+			//Diagonal
+			new V2I(25, 25),
+			new V2I(-75, -75),
 
-		//	//+X
-		//	new V2I(2560 - 25, 100),
-		//	new V2I(2560 + 75, 100),
+			//-X
+			new V2I(25, 100),
+			new V2I(-75, 100),
 
-		//	//-Y
-		//	new V2I(100, 25),
-		//	new V2I(100, -75),
+			//+X
+			new V2I(2560 - 25, 100),
+			new V2I(2560 + 75, 100),
 
-		//	//+Y
-		//	new V2I(100, 1440 - 25),
-		//	new V2I(100, 1440 + 75),
-		//});
+			//-Y
+			new V2I(100, 25),
+			new V2I(100, -75),
+
+			//+Y
+			new V2I(100, 1440 - 25),
+			new V2I(100, 1440 + 75),
+		});
 	}
 
 	private static Setup? LoadSetup() {

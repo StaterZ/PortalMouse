@@ -1,10 +1,12 @@
 ﻿namespace PortalMouse.Utils.Math;
 
+using System;
+
 public struct R1I {
 	public int Begin;
 	public int End;
 
-	public int Size => End - Begin;
+	public readonly int Size => End - Begin;
 
 	public R1I(int begin, int end) {
 		Begin = begin;
@@ -14,11 +16,11 @@ public struct R1I {
 	public override string ToString() =>
 		$"[X:{Begin},W:{Size}]";
 
-	public bool Contains(int point) =>
+	public readonly bool Contains(int point) =>
 		Begin <= point && point < End;
 
-	public int Clamp(int value) =>
-		System.Math.Clamp(value, Begin, System.Math.Max(Begin, End - 1));
+	public readonly int Clamp(int value) =>
+		Math.Clamp(value, Begin, Math.Max(Begin, End - 1));
 
 	public static R1I InitBeginSize(int begin, int size) => new(begin, begin + size);
 }

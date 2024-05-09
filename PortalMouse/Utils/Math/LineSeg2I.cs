@@ -1,20 +1,32 @@
 namespace PortalMouse.Utils.Math;
 
-public readonly record struct LineSeg2I(V2I Begin, V2I End) {
-	public V2I Delta => End - Begin;
-	public LineSeg1I X => new(Begin.x, End.x);
-	public LineSeg1I Y => new(Begin.y, End.y);
+public record struct LineSeg2I(V2I Begin, V2I End) {
+	public readonly V2I Delta => End - Begin;
+	public readonly LineSeg1I X => new(Begin.x, End.x);
+	public readonly LineSeg1I Y => new(Begin.y, End.y);
 
-	public LineSeg2I RelativeTo(V2I pos) => new(
+	public readonly LineSeg2I RelativeTo(V2I pos) => new(
 		Begin - pos,
 		End - pos
 	);
 
-	public LineSeg2I Transpose() => new(Begin.Transpose(), End.Transpose());
+	public readonly LineSeg2I Transpose() => new(Begin.Transpose(), End.Transpose());
 
-	public override string ToString() => $"{Begin}->{End}";
+	public override readonly string ToString() => $"{Begin}->{End}";
 
-	public LineSeg1I this[Axis axis] => axis switch {
+	public readonly LineSeg2I ToUnitSpace(Axis axis) => axis switch {
+		Axis.Horizontal => this,
+		Axis.Vertical => Transpose(),
+		_ => throw new ArgumentOutOfRangeException(nameof(axis)),
+	};
+
+	public readonly LineSeg2I FromUnitSpace(Axis axis) => axis switch {
+		Axis.Horizontal => this,
+		Axis.Vertical => Transpose(),
+		_ => throw new ArgumentOutOfRangeException(nameof(axis)),
+	};
+
+	public readonly LineSeg1I this[Axis axis] => axis switch {
 		Axis.Horizontal => X,
 		Axis.Vertical => Y,
 		_ => throw new ArgumentOutOfRangeException(nameof(axis), axis, null)

@@ -40,6 +40,6 @@ public sealed class Screen {
 		};
 	}
 
-	public V2I FromPhysicalToLogicalSpace(V2I p) => MathX.Map(p, PhysicalRect, LogicalRect);
-	public V2I FromLogicalToPhysicalSpace(V2I p) => MathX.Map(p, LogicalRect, PhysicalRect);
+	public V2I PhysicalToLogicalSpace(V2I p) => MathX.Map(p, PhysicalRect, LogicalRect);
+	public V2I LogicalToPhysicalSpace(V2I p) => MathX.Map(p, LogicalRect, PhysicalRect);
 }

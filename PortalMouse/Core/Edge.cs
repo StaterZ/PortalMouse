@@ -8,15 +8,15 @@ public class Edge {
 	public readonly Screen Screen;
 	private readonly List<Portal> m_portals = new();
 
-	private V2I Pos => Screen.PhysicalRect.Pos + Screen.PhysicalRect.Size * Side.ToVec();
+	private V2I Pos => Screen.LogicalRect.Pos + Screen.LogicalRect.Size * Side.ToVec();
 
-	private V2I InnerPos => Screen.PhysicalRect.Pos + (Screen.PhysicalRect.Size - 1) * Side.ToVec();
+	private V2I InnerPos => Screen.LogicalRect.Pos + (Screen.LogicalRect.Size - 1) * Side.ToVec();
 
 	private Axis Axis => Side.ToDirection().ToAxis().Opposite();
 
-	public int Length => Screen.PhysicalRect.Size[Axis];
+	public int Length => Screen.LogicalRect.Size[Axis];
 
-	public AxisLineSeg2I AxisLine => new() {
+	private AxisLineSeg2I AxisLine => new() {
 		Pos = Pos,
 		Size = Length,
 		Axis = Axis,
@@ -27,24 +27,25 @@ public class Edge {
 		Side = side;
 	}
 
-	public void Add(Portal portal) {
+	public bool Add(Portal portal) {
 		(bool success, int index) = m_portals.BetterBinarySearch(
 			portal.EdgeSpan.Range.Begin,
 			portal => portal.EdgeSpan.Range.Begin
 		);
 
 		//check for overlapping portals!
-		if (success) throw new ArgumentOutOfRangeException("Overlapping portals!");
+		if (success) return false;
 		if (index < m_portals.Count) {
 			Portal nextPortal = m_portals[index];
-			if (portal.EdgeSpan.Range.End < nextPortal.EdgeSpan.Range.Begin) throw new ArgumentOutOfRangeException("Overlapping portals!");
+			if (portal.EdgeSpan.Range.End < nextPortal.EdgeSpan.Range.Begin) return false;
 		}
 
 		m_portals.Insert(index, portal);
+		return true;
 	}
 
 	public ScreenLineSeg? TryHandle(LineSeg2I mouseMove) {
-		(Frac lineFrac, Frac mouseFrac)? intersection = Geometry.Intersect(mouseMove, AxisLine);
+		(Frac lineFrac, Frac mouseFrac)? intersection = Geometry.Intersect(mouseMove, AxisLine, false);
 		if (!intersection.HasValue)
 			return null;
 
@@ -53,14 +54,15 @@ public class Edge {
 		LineSeg1I inLine = LineSeg1I.InitBeginDelta(inPos, inMove[Axis]);
 		(int pos, Portal? portal) entry = SlideAlongEdgeIntoPortal(inLine);
 
-		ScreenLineSeg result;
 		if (entry.portal == null) {
 			V2I exitPos = new(
-				InnerPos[Axis.Opposite()],
-				entry.pos
+				entry.pos,
+				InnerPos[Axis.Opposite()]
 			);
 
-			result = new ScreenLineSeg(
+			exitPos = exitPos.FromUnitSpace(Axis);
+
+			return new ScreenLineSeg(
 				new LineSeg2I(mouseMove.Begin, exitPos),
 				Screen
 			);
@@ -69,23 +71,20 @@ public class Edge {
 			Edge exitEdge = entry.portal.Exit.EdgeSpan.Edge;
 
 			V2I exitEdgePos = new(
-				exitEdge.Pos[Axis.Opposite()],
-				entry.portal.Map(entry.pos)
+				entry.portal.Map(entry.pos),
+				exitEdge.Pos[Axis.Opposite()]
 			);
 
-			V2I exitPos = exitEdgePos + new V2I(outMove, inLine.End - entry.pos);
+			V2I exitPos = exitEdgePos + new V2I(inLine.End - entry.pos, outMove);
 
-			result = new ScreenLineSeg(
-				new LineSeg2I(exitEdgePos, exitPos),
+			LineSeg2I line = new(exitEdgePos, exitPos);
+			line = line.FromUnitSpace(Axis);
+
+			return new ScreenLineSeg(
+				line,
 				exitEdge.Screen
 			);
 		}
-
-		if (Axis == Axis.Horizontal) { //Convert out of unit space
-			result = new ScreenLineSeg(result.Line.Transpose(), result.Screen);
-		}
-
-		return result;
 	}
 
 	private (int pos, Portal? portal) SlideAlongEdgeIntoPortal(LineSeg1I line) {

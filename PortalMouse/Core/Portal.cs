@@ -21,7 +21,9 @@ public class Portal {
 		aPortal.Exit = bPortal;
 		bPortal.Exit = aPortal;
 
-		a.Edge.Add(aPortal);
-		b.Edge.Add(bPortal);
+		if (
+			!a.Edge.Add(aPortal) ||
+			!b.Edge.Add(bPortal)
+		) throw new ArgumentOutOfRangeException("Overlapping portals!");
 	}
 }

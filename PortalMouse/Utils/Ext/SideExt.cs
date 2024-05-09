@@ -17,6 +17,6 @@ public static class SideExt {
 		Side.Right => new V2I(1, 0),
 		Side.Top => new V2I(0, 0),
 		Side.Bottom => new V2I(0, 1),
-		_ => throw new ArgumentOutOfRangeException(nameof(Side))
+		_ => throw new ArgumentOutOfRangeException(nameof(self), self, null)
 	};
 }
