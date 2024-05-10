@@ -26,7 +26,7 @@ public static class TestHelper {
 		setup.Screens.Add(mainScreen);
 
 		if (shouldWrap) {
-			static EdgeSpan AutoEdge(Edge edge) => new(edge, new R1I(0, edge.Length + 1));
+			static EdgeSpan AutoEdge(Edge edge) => new(edge, new R1I(0, edge.Length));
 
 			Portal.Bind(AutoEdge(mainScreen.Left), AutoEdge(mainScreen.Right));
 			Portal.Bind(AutoEdge(mainScreen.Top), AutoEdge(mainScreen.Bottom));
