@@ -6,36 +6,36 @@ public sealed class Screen {
 	public readonly int Id;
 	public readonly R2I PhysicalRect;
 	public readonly R2I LogicalRect;
-	private readonly Edge m_left;
-	private readonly Edge m_right;
-	private readonly Edge m_top;
-	private readonly Edge m_bottom;
+	public readonly Edge Left;
+	public readonly Edge Right;
+	public readonly Edge Top;
+	public readonly Edge Bottom;
 
 	public Screen(ScreenInfo monitorInfo) {
 		Id = monitorInfo.Id;
 		PhysicalRect = (R2I)monitorInfo.PhysicalRect;
 		LogicalRect = (R2I)monitorInfo.LogicalRect;
 
-		m_left = new Edge(this, Side.Left);
-		m_right = new Edge(this, Side.Right);
-		m_top = new Edge(this, Side.Top);
-		m_bottom = new Edge(this, Side.Bottom);
+		Left = new Edge(this, Side.Left);
+		Right = new Edge(this, Side.Right);
+		Top = new Edge(this, Side.Top);
+		Bottom = new Edge(this, Side.Bottom);
 	}
 
 	public ScreenLineSeg? Handle(LineSeg2I mouseMove) {
 		return
-			m_left.TryHandle(mouseMove) ??
-			m_right.TryHandle(mouseMove) ??
-			m_top.TryHandle(mouseMove) ??
-			m_bottom.TryHandle(mouseMove);
+			Left.TryHandle(mouseMove) ??
+			Right.TryHandle(mouseMove) ??
+			Top.TryHandle(mouseMove) ??
+			Bottom.TryHandle(mouseMove);
 	}
 
 	public Edge GetEdge(Side side) {
 		return side switch {
-			Side.Left => m_left,
-			Side.Right => m_right,
-			Side.Top => m_top,
-			Side.Bottom => m_bottom,
+			Side.Left => Left,
+			Side.Right => Right,
+			Side.Top => Top,
+			Side.Bottom => Bottom,
 			_ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
 		};
 	}

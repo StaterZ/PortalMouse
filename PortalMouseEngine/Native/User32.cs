@@ -17,6 +17,8 @@ public static class User32 {
 
 	public const int CCHDEVICENAME = 32;
 
+	public const int MONITORINFOF_PRIMARY = 1;
+
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-monitorenumproc"></see>
 	/// </summary>
