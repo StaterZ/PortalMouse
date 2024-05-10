@@ -14,7 +14,7 @@ public static class Geometry {
 		if (mouseFracOpt == null) return null;
 		Frac mouseFrac = mouseFracOpt.Value;
 
-		int lineIntersect = mouseFrac.Lerp(aFromB.X.Range);
+		int lineIntersect = mouseFrac.Lerp(aFromB.X);
 		if (isBounded && !new R1I(0, axisLineSize).Contains(lineIntersect))
 			return null;
 
@@ -35,7 +35,7 @@ public static class Geometry {
 		if (mouseFracOpt == null) return null;
 		Frac mouseFrac = mouseFracOpt.Value;
 
-		int lineIntersect = mouseFrac.Lerp(aFromB.X.Range);
+		int lineIntersect = mouseFrac.Lerp(aFromB.X);
 
 		return (lineIntersect, mouseFrac);
 	}

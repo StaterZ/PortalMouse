@@ -44,15 +44,15 @@ public static class NativeHelper {
 			return true;
 		}
 
-		Graphics g = Graphics.FromHwnd(IntPtr.Zero);
-		IntPtr desktopHdc = g.GetHdc();
-		AssertSuccess(User32.EnumDisplayMonitors(desktopHdc, IntPtr.Zero, Proc, IntPtr.Zero), nameof(User32.EnumDisplayMonitors));
-		g.Dispose();
+		using (Graphics g = Graphics.FromHwnd(IntPtr.Zero)) {
+			IntPtr desktopHdc = g.GetHdc();
+			AssertSuccess(User32.EnumDisplayMonitors(desktopHdc, IntPtr.Zero, Proc, IntPtr.Zero), nameof(User32.EnumDisplayMonitors));
+		}
 
 		return result;
 	}
 
 	public static void AssertSuccess(bool ok, string funcName) {
-		//if (!ok) throw new NativeErrorException($"'{funcName}' Failed!");
+		if (!ok) throw new NativeErrorException($"'{funcName}' Failed!");
 	}
 }

@@ -15,19 +15,22 @@ public readonly struct Frac {
 	public int Lerp(R1I range) =>
 		range.Begin + range.Size * Numerator / Denominator;
 
+	public int Lerp(LineSeg1I line) =>
+		line.Begin + line.Delta * Numerator / Denominator;
+
 	public bool Equals(Frac other) => this == other;
 	public override bool Equals(object? obj) => obj is Frac other && Equals(other);
 	public override int GetHashCode() => HashCode.Combine(Numerator, Denominator);
 	public override string ToString() => $"{Numerator}/{Denominator}";
 
-	internal int Lerp(object range) {
-		throw new NotImplementedException();
-	}
-
 	public static bool operator ==(Frac lhs, Frac rhs) => lhs.Numerator * rhs.Denominator == rhs.Numerator * lhs.Denominator;
 	public static bool operator !=(Frac lhs, Frac rhs) => !(lhs == rhs);
 
+	public static Frac operator *(Frac lhs, int rhs) => new(lhs.Numerator * rhs, lhs.Denominator);
+	public static Frac operator /(Frac lhs, int rhs) => new(lhs.Numerator, lhs.Denominator * rhs);
+
 	public static int operator *(int lhs, Frac rhs) => lhs * rhs.Numerator / rhs.Denominator;
+	public static int operator /(int lhs, Frac rhs) => lhs - lhs * rhs;
 
 	public static explicit operator float(Frac self) => (float)self.Numerator / self.Denominator;
 }

@@ -16,12 +16,6 @@ public class Edge {
 
 	public int Length => Screen.LogicalRect.Size[Axis];
 
-	private AxisLineSeg2I AxisLine => new() {
-		Pos = Pos,
-		Size = Length,
-		Axis = Axis,
-	};
-
 	public Edge(Screen screen, Side side) {
 		Screen = screen;
 		Side = side;
@@ -45,14 +39,20 @@ public class Edge {
 	}
 
 	public ScreenLineSeg? TryHandle(LineSeg2I mouseMove) {
-		(Frac lineFrac, Frac mouseFrac)? intersection = Geometry.Intersect(mouseMove, AxisLine, false);
+		AxisLineSeg2I axisLine = new() {
+			Pos = Pos,
+			Size = Length,
+			Axis = Axis,
+		};
+
+		(Frac lineFrac, Frac mouseFrac)? intersection = Geometry.Intersect(mouseMove, axisLine, false);
 		if (!intersection.HasValue)
 			return null;
 
 		int inPos = Pos[Axis] + Length * intersection.Value.lineFrac;
-		V2I inMove = mouseMove.Delta * intersection.Value.mouseFrac;
-		LineSeg1I inLine = LineSeg1I.InitBeginDelta(inPos, inMove[Axis]);
-		(int pos, Portal? portal) entry = SlideAlongEdgeIntoPortal(inLine);
+		V2I outMove = mouseMove.Delta / intersection.Value.mouseFrac;
+		LineSeg1I inLine = LineSeg1I.InitBeginDelta(inPos, outMove[Axis]);
+		(int pos, Portal? portal) entry = SlideAlongEdgeIntoPortal(inLine.Clamp(axisLine.Range));
 
 		if (entry.portal == null) {
 			V2I exitPos = new(
@@ -67,7 +67,6 @@ public class Edge {
 				Screen
 			);
 		} else {
-			int outMove = mouseMove.Delta[Axis.Opposite()] - inMove[Axis.Opposite()];
 			Edge exitEdge = entry.portal.Exit.EdgeSpan.Edge;
 
 			V2I exitEdgePos = new(
@@ -75,9 +74,14 @@ public class Edge {
 				exitEdge.Pos[Axis.Opposite()]
 			);
 
-			V2I exitPos = exitEdgePos + new V2I(inLine.End - entry.pos, outMove);
+			V2I entryPos = new(
+				exitEdgePos.x,
+				exitEdge.InnerPos[Axis.Opposite()]
+			);
 
-			LineSeg2I line = new(exitEdgePos, exitPos);
+			V2I exitPos = exitEdgePos + new V2I(inLine.End - entry.pos, outMove[Axis.Opposite()]);
+
+			LineSeg2I line = new(entryPos, exitPos);
 			line = line.FromUnitSpace(Axis);
 
 			return new ScreenLineSeg(
@@ -97,11 +101,13 @@ public class Edge {
 			return (line.Begin, m_portals[beginIndex]);
 		} else {
 			beginIndex--;
+			if (m_portals.IsInRange(beginIndex) && line.Begin < m_portals[beginIndex].EdgeSpan.Range.End) {
+				return (line.Begin, m_portals[beginIndex]);
+			}
+
 			return line.Delta switch {
 				< 0 when m_portals.IsInRange(beginIndex) && line.End < m_portals[beginIndex].EdgeSpan.Range.End =>
 					(m_portals[beginIndex].EdgeSpan.Range.End, m_portals[beginIndex]),
-				0 when m_portals.IsInRange(beginIndex) && line.End < m_portals[beginIndex].EdgeSpan.Range.End =>
-					(line.Begin, m_portals[beginIndex]),
 				> 0 when m_portals.IsInRange(beginIndex + 1) && line.End >= m_portals[beginIndex + 1].EdgeSpan.Range.Begin =>
 					(m_portals[beginIndex + 1].EdgeSpan.Range.Begin, m_portals[beginIndex + 1]),
 				_ => (line.End, null),

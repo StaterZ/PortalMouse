@@ -13,4 +13,9 @@ public record struct LineSeg1I(int Begin, int End) {
 	);
 
 	public static LineSeg1I InitBeginDelta(int Begin, int Delta) => new(Begin, Begin + Delta);
+
+	public readonly LineSeg1I Clamp(R1I range) => new(
+		Math.Clamp(Begin, range.Begin, range.End - 1),
+		Math.Clamp(End, range.Begin, range.End - 1)
+	);
 }
