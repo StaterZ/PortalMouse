@@ -63,6 +63,9 @@ public static class Program {
 		NativeHelper.ShowConsole(true);
 		Console.Clear();
 
+		Terminal.Imp("[PortalMouse] by StaterZ");
+		Terminal.BlankLine();
+
 		Setup? setup = LoadSetup();
 		if (setup == null) {
 			Terminal.Err("Failed to load setup!"); //TODO: not the best error handling ever... really should fix this...
@@ -94,25 +97,22 @@ public static class Program {
 		mouseObserver.Dispose();
 	}
 
-	private static MouseObserver CreateObserver(Func<V2I, V2I?> MoveHandler) {
-		//return new PollObserver(MoveHandler);
-		return new LLMHookObserver(MoveHandler);
+	private static MouseObserver CreateObserver(Func<V2I, V2I?> callback) {
+		//return new PollObserver(callback);
+		return new LLMHookObserver(callback);
 	}
 
 	private static Setup? LoadSetup() {
-		Setup setup = new();
+		Setup setup = Setup.ConstructLocalSetup();
 		Terminal.Inf("Screens:");
 		StringBuilder builder = new();
-		foreach (ScreenInfo monitor in NativeHelper.EnumDisplays()) {
-			builder.Append($"    {monitor.Id}: {monitor.PhysicalRect} @ {(float)(monitor.Scale * 100)}%");
-			if (monitor.Scale != Frac.One) {
-				builder.Append($" -> {monitor.LogicalRect}");
+		foreach (Screen screen in setup.Screens) {
+			builder.Append($"    {screen.Id} : {screen.PhysicalRect} @ {(float)(screen.Scale * 100)}%");
+			if (screen.Scale != Frac.One) {
+				builder.Append($" -> {screen.LogicalRect}");
 			}
 			Terminal.Inf(builder.ToString());
 			builder.Clear();
-
-			Screen screen = new(monitor);
-			setup.Screens.Add(screen);
 		}
 		Terminal.BlankLine();
 

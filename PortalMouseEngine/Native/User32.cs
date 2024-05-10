@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace PortalMouse.Native;
 
-public static class User32 {
+internal static class User32 {
 	private const string dllName = "user32.dll";
 
 	public const int MONITOR_DEFAULTTOPRIMERTY = 0x00000001;
@@ -22,33 +22,33 @@ public static class User32 {
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-monitorenumproc"></see>
 	/// </summary>
-	internal delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
+	public delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
 
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/winmsg/lowlevelmouseproc"></see>
 	/// </summary>
-	internal delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
+	public delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
 
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaymonitors"></see>
 	/// </summary>
 	[DllImport(dllName, SetLastError = true)]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	internal static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumProc lpfnEnum, IntPtr dwData);
+	public static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumProc lpfnEnum, IntPtr dwData);
 
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmonitorinfow"></see>
 	/// </summary>
 	[DllImport(dllName, SetLastError = true, CharSet = CharSet.Unicode)]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	internal static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEx lpmi);
+	public static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEx lpmi);
 
 	/*
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-monitorfromwindow"></see>
 	/// </summary>
 	[DllImport(dllName, SetLastError = true)]
-	internal static extern IntPtr MonitorFromWindow(IntPtr hWnd, int dwFlags);
+	public static extern IntPtr MonitorFromWindow(IntPtr hWnd, int dwFlags);
 	*/
 
 	/// <summary>
@@ -56,40 +56,40 @@ public static class User32 {
 	/// </summary>
 	[DllImport(dllName, SetLastError = true)]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	internal static extern bool SetCursorPos(int X, int Y);
+	public static extern bool SetCursorPos(int X, int Y);
 
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getcursorpos"></see>
 	/// </summary>
 	[DllImport(dllName, SetLastError = true)]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	internal static extern bool GetCursorPos(out Point lpPoint);
+	public static extern bool GetCursorPos(out Point lpPoint);
 
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow"></see>
 	/// </summary>
 	[DllImport(dllName, SetLastError = true)]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+	public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowshookexa"></see>
 	/// </summary>
 	[DllImport(dllName, SetLastError = true)]
-	internal static extern IntPtr SetWindowsHookEx(HookType idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
+	public static extern IntPtr SetWindowsHookEx(HookType idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
 
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-unhookwindowshookex"></see>
 	/// </summary>
 	[DllImport(dllName, SetLastError = true)]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	internal static extern bool UnhookWindowsHookEx(IntPtr hhk);
+	public static extern bool UnhookWindowsHookEx(IntPtr hhk);
 
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-callnexthookex"></see>
 	/// </summary>
 	[DllImport(dllName, SetLastError = true)]
-	internal static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
+	public static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
 
 	/*
 	/// <summary>
@@ -97,21 +97,21 @@ public static class User32 {
 	/// </summary>
 	[DllImport(dllName, SetLastError = true)]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	internal static extern bool ClipCursor(ref Rect lpRect);
+	public static extern bool ClipCursor(ref Rect lpRect);
 
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-clipcursor"></see>
 	/// </summary>
 	[DllImport(dllName, SetLastError = true)]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	internal static extern bool ClipCursor(IntPtr lpRect);
+	public static extern bool ClipCursor(IntPtr lpRect);
 
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclipcursor"></see>
 	/// </summary>
 	[DllImport(dllName, SetLastError = true)]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	internal static extern bool GetClipCursor(out Rect lpRect);
+	public static extern bool GetClipCursor(out Rect lpRect);
 	*/
 
 	/// <summary>

@@ -1,7 +1,7 @@
 ﻿namespace PortalMouse.Utils.Misc;
 
 public static class Terminal {
-	public static void Imp(string msg) => WriteLineColor(msg, ConsoleColor.Green);
+	public static void Imp(string msg) => WriteLineColor(msg, ConsoleColor.Cyan);
 	public static void Dbg(string msg) => WriteLineColor(msg, ConsoleColor.Magenta);
 	public static void Inf(string msg) => Console.WriteLine(msg);
 	public static void Wrn(string msg) => WriteLineColor(msg, ConsoleColor.Yellow);

@@ -23,7 +23,7 @@ public static class NativeHelper {
 
 	//future improvement ideas: https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-display_devicew
 	//future improvement ideas: https://stackoverflow.com/questions/4958683/how-do-i-get-the-actual-monitor-name-as-seen-in-the-resolution-dialog
-	public static List<ScreenInfo> EnumDisplays() {
+	internal static List<ScreenInfo> EnumDisplays() {
 		static Frac GetScalingFactor(IntPtr hdc) {
 			int logicalScreenHeight = Gdi32.GetDeviceCaps(hdc, (int)Gdi32.DeviceCap.VERTRES);
 			int physicalScreenHeight = Gdi32.GetDeviceCaps(hdc, (int)Gdi32.DeviceCap.DESKTOPVERTRES);

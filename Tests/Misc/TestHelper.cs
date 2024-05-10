@@ -1,5 +1,4 @@
 ﻿using PortalMouse.Core;
-using PortalMouse.Native;
 using PortalMouse.Utils.Math;
 
 namespace UnitTests;
@@ -11,15 +10,11 @@ public static class TestHelper {
 	public const int k_yMax = k_ySize - 1;
 
 	public static Setup GetSetup(bool shouldWrap) {
-		Screen mainScreen = new(new ScreenInfo(
-			new User32.MonitorInfoEx() {
-				rcMonitor = new User32.Rect(0, 0, k_xSize, k_ySize),
-				rcWork = new User32.Rect(0, 0, k_xSize, k_ySize),
-				dwFlags = User32.MONITORINFOF_PRIMARY,
-				szDevice = @"\\.\DISPLAY1",
-			},
+		Screen mainScreen = new(
+			1,
+			new R2I(new V2I(0, 0), new V2I(k_xSize, k_ySize)),
 			Frac.One
-		));
+		);
 
 
 		Setup setup = new();

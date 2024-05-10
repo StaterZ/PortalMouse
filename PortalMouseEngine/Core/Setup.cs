@@ -37,4 +37,13 @@ public sealed class Setup {
 	private Screen? FindCursorScreen(V2I pos) =>
 		Screens.FirstOrDefault(screen =>
 			screen.LogicalRect.Contains(pos));
+
+	public static Setup ConstructLocalSetup() {
+		Setup setup = new();
+		foreach (ScreenInfo monitor in NativeHelper.EnumDisplays()) {
+			Screen screen = new(monitor);
+			setup.Screens.Add(screen);
+		}
+		return setup;
+	}
 }
