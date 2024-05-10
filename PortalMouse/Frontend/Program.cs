@@ -77,10 +77,6 @@ public static class Program {
 		NativeHelper.ShowConsole(false);
 #endif
 		V2I? MoveHandler(V2I pos) {
-#if DEBUG
-			Terminal.Dbg($"Pos: {pos}");
-#endif
-
 			V2I? movedPos = setup!.Handle(pos);
 #if DEBUG
 			if (movedPos.HasValue) {
@@ -99,33 +95,8 @@ public static class Program {
 	}
 
 	private static MouseObserver CreateObserver(Func<V2I, V2I?> MoveHandler) {
-		//return new LLMHookObserver(MoveHandler);
 		//return new PollObserver(MoveHandler);
-		return new DummyObserver(MoveHandler, new V2I[] {
-			//test scaled wrap
-			new V2I(3000, 0),
-			new V2I(3000, -1),
-
-			//Diagonal
-			new V2I(25, 25),
-			new V2I(-75, -75),
-
-			//-X
-			new V2I(25, 100),
-			new V2I(-75, 100),
-
-			//+X
-			new V2I(2560 - 25, 100),
-			new V2I(2560 + 75, 100),
-
-			//-Y
-			new V2I(100, 25),
-			new V2I(100, -75),
-
-			//+Y
-			new V2I(100, 1440 - 25),
-			new V2I(100, 1440 + 75),
-		});
+		return new LLMHookObserver(MoveHandler);
 	}
 
 	private static Setup? LoadSetup() {
@@ -133,12 +104,9 @@ public static class Program {
 		Terminal.Inf("Screens:");
 		StringBuilder builder = new();
 		foreach (ScreenInfo monitor in NativeHelper.EnumDisplays()) {
-			builder.Append($"    {monitor.Id}: {monitor.PhysicalRect}");
+			builder.Append($"    {monitor.Id}: {monitor.PhysicalRect} @ {(float)(monitor.Scale * 100)}%");
 			if (monitor.Scale != Frac.One) {
-				builder.Append($" @ {(float)monitor.Scale * 100}%");
-#if DEBUG
-				builder.Append($" -> Logical:{monitor.LogicalRect}");
-#endif
+				builder.Append($" -> {monitor.LogicalRect}");
 			}
 			Terminal.Inf(builder.ToString());
 			builder.Clear();
