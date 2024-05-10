@@ -13,7 +13,7 @@ public class TrayIcon : IDisposable {
 		strip.Items.Add("Exit", null, (sender, eventArgs) => Program.UpdateState(RunningState.Exit));
 
 		m_tray = new() {
-			Icon = Resources.trayIcon,
+			Icon = Resources.Icon,
 			Visible = true,
 			Text = Application.ProductName,
 			ContextMenuStrip = strip,
