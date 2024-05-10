@@ -1,6 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using PortalMouse.Core;
+using System.Text.Json.Serialization;
 
-namespace PortalMouse.Core;
+namespace PortalMouse.Frontend;
 
 public class Config {
 	[JsonInclude, JsonPropertyName("mappings")] public Mapping[] Mappings = null!;

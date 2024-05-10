@@ -7,7 +7,7 @@ namespace PortalMouse.Native;
 /// <see href="https://learn.microsoft.com/en-us/windows/win32/api/windef/ns-windef-point"></see>
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-internal struct Point {
+public struct Point {
 	public int x;
 	public int y;
 

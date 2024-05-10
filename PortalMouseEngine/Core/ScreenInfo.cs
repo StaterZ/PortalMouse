@@ -3,7 +3,7 @@ using PortalMouse.Utils.Math;
 
 namespace PortalMouse.Core;
 
-internal readonly struct ScreenInfo {
+public readonly struct ScreenInfo {
 	public readonly User32.MonitorInfoEx MonitorInfo;
 	public readonly Frac Scale;
 	public readonly int Id;

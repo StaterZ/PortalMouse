@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalMouse", "PortalMouse\PortalMouse.csproj", "{9E032B52-E6CF-4941-B427-99910B3C6029}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortalMouse", "PortalMouse\PortalMouse.csproj", "{9E032B52-E6CF-4941-B427-99910B3C6029}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1F88D606-A58E-4404-AC97-94BB0940F185} = {1F88D606-A58E-4404-AC97-94BB0940F185}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortalMouseEngine", "PortalMouseEngine\PortalMouseEngine.csproj", "{1F88D606-A58E-4404-AC97-94BB0940F185}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +20,10 @@ Global
 		{9E032B52-E6CF-4941-B427-99910B3C6029}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E032B52-E6CF-4941-B427-99910B3C6029}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E032B52-E6CF-4941-B427-99910B3C6029}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F88D606-A58E-4404-AC97-94BB0940F185}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F88D606-A58E-4404-AC97-94BB0940F185}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F88D606-A58E-4404-AC97-94BB0940F185}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F88D606-A58E-4404-AC97-94BB0940F185}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

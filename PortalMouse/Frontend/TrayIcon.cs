@@ -1,6 +1,6 @@
 using PortalMouse.Utils.Misc;
 
-namespace PortalMouse.Core;
+namespace PortalMouse.Frontend;
 
 public class TrayIcon : IDisposable {
 	private readonly NotifyIcon m_tray;

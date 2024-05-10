@@ -1,4 +1,4 @@
-﻿namespace PortalMouse;
+﻿namespace PortalMouse.Frontend;
 
 public enum RunningState {
 	Running,

@@ -1,11 +1,12 @@
 ﻿using PortalMouse.Core;
 using PortalMouse.Native;
 using PortalMouse.Utils.Math;
+using System.Drawing;
 using Point = PortalMouse.Native.Point;
 
 namespace PortalMouse.Utils.Misc;
 
-internal static class NativeHelper {
+public static class NativeHelper {
 	public static V2I CursorPos {
 		get {
 			AssertSuccess(User32.GetCursorPos(out Point point), nameof(User32.GetCursorPos));

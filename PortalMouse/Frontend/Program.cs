@@ -1,11 +1,13 @@
-﻿using PortalMouse.Observers;
+﻿using PortalMouse.Core;
+using PortalMouse.Observers;
 using PortalMouse.Utils.Math;
 using PortalMouse.Utils.Misc;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using Screen = PortalMouse.Core.Screen;
 
-namespace PortalMouse.Core;
+namespace PortalMouse.Frontend;
 
 public static class Program {
 	private static RunningState s_runningState = RunningState.Halted;
