@@ -1,7 +1,6 @@
 ﻿using PortalMouse.Core;
 using PortalMouse.Native;
 using PortalMouse.Utils.Math;
-using System.Drawing;
 using Point = PortalMouse.Native.Point;
 
 namespace PortalMouse.Utils.Misc;
@@ -44,11 +43,9 @@ public static class NativeHelper {
 			return true;
 		}
 
-		using (Graphics g = Graphics.FromHwnd(IntPtr.Zero)) {
-			IntPtr desktopHdc = g.GetHdc();
-			AssertSuccess(User32.EnumDisplayMonitors(desktopHdc, IntPtr.Zero, Proc, IntPtr.Zero), nameof(User32.EnumDisplayMonitors));
-		}
-
+		IntPtr desktopHdc = User32.GetDC(IntPtr.Zero);
+		AssertSuccess(User32.EnumDisplayMonitors(desktopHdc, IntPtr.Zero, Proc, IntPtr.Zero), nameof(User32.EnumDisplayMonitors));
+		
 		return result;
 	}
 

@@ -91,6 +91,12 @@ internal static class User32 {
 	[DllImport(dllName, SetLastError = true)]
 	public static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
 
+	/// <summary>
+	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdc"></see>
+	/// </summary>
+	[DllImport(dllName, SetLastError = true)]
+	public static extern IntPtr GetDC(IntPtr zero);
+
 	/*
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-clipcursor"></see>
