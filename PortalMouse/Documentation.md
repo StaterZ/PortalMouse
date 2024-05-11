@@ -1,4 +1,4 @@
-# Documentation
+# PortalMouse Config Documentation
 
 ## Root
 ### The json root object, nice and simple

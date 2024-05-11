@@ -32,7 +32,7 @@ public sealed class Screen {
 			const string IdPrefix = @"\\.\DISPLAY";
 			if (!screenInfo.MonitorInfo.szDevice.StartsWith(IdPrefix)) throw new Exception("Bad monitor id, bad prefix");
 
-			string idStr = screenInfo.MonitorInfo.szDevice.Substring(IdPrefix.Length);
+			string idStr = screenInfo.MonitorInfo.szDevice[IdPrefix.Length..];
 			if (!int.TryParse(idStr, out Id)) throw new Exception("Bad monitor id, failed to parse");
 		}
 
