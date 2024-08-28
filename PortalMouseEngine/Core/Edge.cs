@@ -14,6 +14,7 @@ public class Edge {
 
 	private Axis Axis => Side.ToDirection().ToAxis().Opposite();
 
+	public int Offset => Screen.LogicalRect.Pos[Axis];
 	public int Length => Screen.LogicalRect.Size[Axis];
 
 	public Edge(Screen screen, Side side) {

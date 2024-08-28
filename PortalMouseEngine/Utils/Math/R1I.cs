@@ -23,4 +23,7 @@ public struct R1I {
 		Math.Clamp(value, Begin, Math.Max(Begin, End - 1));
 
 	public static R1I InitBeginSize(int begin, int size) => new(begin, begin + size);
+
+	public static R1I operator +(R1I lhs, int rhs) => new(lhs.Begin + rhs, lhs.End + rhs);
+	public static R1I operator -(R1I lhs, int rhs) => new(lhs.Begin - rhs, lhs.End - rhs);
 }
