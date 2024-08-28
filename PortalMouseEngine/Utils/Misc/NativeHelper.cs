@@ -17,7 +17,7 @@ public static class NativeHelper {
 	}
 
 	public static void ShowConsole(bool shouldShow) {
-		AssertSuccess(User32.ShowWindow(Kernel32.GetConsoleWindow(), shouldShow ? User32.SW_SHOW : User32.SW_HIDE), nameof(User32.ShowWindow));
+		User32.ShowWindow(Kernel32.GetConsoleWindow(), shouldShow ? User32.SW_SHOW : User32.SW_HIDE);
 	}
 
 	//future improvement ideas: https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-display_devicew
