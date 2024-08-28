@@ -13,7 +13,7 @@ public struct R1I {
 		End = end;
 	}
 
-	public override string ToString() =>
+	public override readonly string ToString() =>
 		$"[X:{Begin},W:{Size}]";
 
 	public readonly bool Contains(int point) =>

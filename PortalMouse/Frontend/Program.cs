@@ -156,8 +156,8 @@ public static class Program {
 
 			bool TryParseRange(Config.EdgeRange edgeRange, Edge edge, out R1I range) {
 				bool TryParseAnchor(string anchorStr, Edge edge, out int anchor) {
-					R1I pixelRange = new(0, edge.Length);
-					R1I percentRange = new(0, 100);
+					R1I validPixelRange = new(0, edge.Length); //begin is 0 since this is in local space
+					R1I validPercentRange = new(0, 100);
 
 					if (anchorStr.EndsWith("px")) {
 						if (!int.TryParse(anchorStr[..^2], out int value)) {
@@ -167,10 +167,10 @@ public static class Program {
 						}
 
 						if (
-							value < pixelRange.Begin ||
-							value > pixelRange.End
+							value < validPixelRange.Begin ||
+							value > validPixelRange.End
 						) {
-							Terminal.Err($"Anchor is out of range. '{anchorStr}' supplied, but valid range is {pixelRange.Begin}px-{pixelRange.End}px");
+							Terminal.Err($"Anchor is out of range. '{anchorStr}' supplied, but valid range is {validPixelRange.Begin}px-{validPixelRange.End}px");
 							anchor = default;
 							return false;
 						}
@@ -186,15 +186,15 @@ public static class Program {
 						}
 
 						if (
-							value < percentRange.Begin ||
-							value > percentRange.End
+							value < validPercentRange.Begin ||
+							value > validPercentRange.End
 						) {
-							Terminal.Err($"Anchor is out of range. '{anchorStr}' supplied, but valid range is {percentRange.Begin}%-{percentRange.End}%");
+							Terminal.Err($"Anchor is out of range. '{anchorStr}' supplied, but valid range is {validPercentRange.Begin}%-{validPercentRange.End}%");
 							anchor = default;
 							return false;
 						}
 
-						anchor = MathX.Map(value, percentRange, pixelRange);
+						anchor = MathX.Map(value, validPercentRange, validPixelRange);
 						return true;
 					}
 

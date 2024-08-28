@@ -24,6 +24,6 @@ public class Portal {
 		if (
 			!a.Edge.Add(aPortal) ||
 			!b.Edge.Add(bPortal)
-		) throw new ArgumentOutOfRangeException("Overlapping portals!");
+		) throw new ArgumentOutOfRangeException("Trying to create overlapping portals. This is not supported.");
 	}
 }

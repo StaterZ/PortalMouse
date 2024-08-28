@@ -16,5 +16,6 @@ public struct R2I {
 			p.y >= 0 && p.y < Size.y;
 	}
 
-	public override string ToString() => $"[X:{Pos.x},Y:{Pos.y},W:{Size.x},H:{Size.y}]";
+	public override readonly string ToString() =>
+		$"[X:{Pos.x},Y:{Pos.y},W:{Size.x},H:{Size.y}]";
 }
