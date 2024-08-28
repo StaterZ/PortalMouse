@@ -1,4 +1,4 @@
-﻿namespace PortalMouse.Utils.Misc;
+﻿namespace PortalMouse.Engine.Utils.Misc;
 
 public struct AtomicBool {
 	private int m_value = 0;

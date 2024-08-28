@@ -1,7 +1,7 @@
-using PortalMouse.Core;
-using PortalMouse.Utils.Math;
+using PortalMouse.Engine.Core;
+using PortalMouse.Engine.Utils.Math;
 
-namespace PortalMouse.Utils.Ext;
+namespace PortalMouse.Engine.Utils.Ext;
 
 public static class SideExt {
 	public static Direction ToDirection(this Side self) => self switch {

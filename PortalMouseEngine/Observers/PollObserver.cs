@@ -1,7 +1,7 @@
-﻿using PortalMouse.Utils.Math;
-using PortalMouse.Utils.Misc;
+﻿using PortalMouse.Engine.Utils.Math;
+using PortalMouse.Engine.Utils.Misc;
 
-namespace PortalMouse.Observers;
+namespace PortalMouse.Engine.Observers;
 
 public class PollObserver : MouseObserver {
 	private AtomicBool m_isRunning = new(true);

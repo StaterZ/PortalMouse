@@ -1,7 +1,7 @@
-﻿using PortalMouse.Utils.Math;
+﻿using PortalMouse.Engine.Utils.Math;
 using System.Runtime.InteropServices;
 
-namespace PortalMouse.Native;
+namespace PortalMouse.Engine.Native;
 
 /// <summary>
 /// <see href="https://learn.microsoft.com/en-us/windows/win32/api/windef/ns-windef-point"></see>

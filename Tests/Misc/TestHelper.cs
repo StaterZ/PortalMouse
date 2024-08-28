@@ -1,5 +1,5 @@
-﻿using PortalMouse.Core;
-using PortalMouse.Utils.Math;
+﻿using PortalMouse.Engine.Core;
+using PortalMouse.Engine.Utils.Math;
 
 namespace UnitTests;
 

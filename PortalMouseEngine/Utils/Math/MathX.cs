@@ -1,4 +1,4 @@
-﻿namespace PortalMouse.Utils.Math;
+﻿namespace PortalMouse.Engine.Utils.Math;
 
 public static class MathX {
 	public static int Map(int value, R1I from, R1I to) => (value - from.Begin) * to.Size / from.Size + to.Begin;

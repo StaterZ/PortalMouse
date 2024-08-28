@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace PortalMouse.Utils.Misc;
+namespace PortalMouse.Engine.Utils.Misc;
 
 [Serializable]
 public class UnreachableException : Exception {

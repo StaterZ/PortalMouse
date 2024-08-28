@@ -1,7 +1,7 @@
-﻿using PortalMouse.Utils.Math;
+﻿using PortalMouse.Engine.Utils.Math;
 using System.Runtime.InteropServices;
 
-namespace PortalMouse.Native;
+namespace PortalMouse.Engine.Native;
 
 internal static class User32 {
 	private const string dllName = "user32.dll";

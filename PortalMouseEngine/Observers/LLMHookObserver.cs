@@ -1,10 +1,10 @@
-﻿using PortalMouse.Hooking;
-using PortalMouse.Native;
-using PortalMouse.Utils.Math;
-using PortalMouse.Utils.Misc;
+﻿using PortalMouse.Engine.Hooking;
+using PortalMouse.Engine.Native;
+using PortalMouse.Engine.Utils.Math;
+using PortalMouse.Engine.Utils.Misc;
 using System.Runtime.InteropServices;
 
-namespace PortalMouse.Observers;
+namespace PortalMouse.Engine.Observers;
 
 public class LLMHookObserver : MouseObserver {
 	private readonly IntPtr m_llMouseHookHandle = IntPtr.Zero;

@@ -1,7 +1,7 @@
-﻿using PortalMouse.Utils.Math;
-using PortalMouse.Utils.Misc;
+﻿using PortalMouse.Engine.Utils.Math;
+using PortalMouse.Engine.Utils.Misc;
 
-namespace PortalMouse.Core;
+namespace PortalMouse.Engine.Core;
 
 public sealed class Setup {
 	public readonly List<Screen> Screens = new();

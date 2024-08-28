@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace PortalMouse.Native;
+namespace PortalMouse.Engine.Native;
 
 internal static class Gdi32 {
 	private const string dllName = "gdi32.dll";

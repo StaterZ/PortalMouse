@@ -1,4 +1,4 @@
-﻿namespace PortalMouse.Utils.Math;
+﻿namespace PortalMouse.Engine.Utils.Math;
 
 public struct R2I {
 	public V2I Pos;

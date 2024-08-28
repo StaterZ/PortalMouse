@@ -1,4 +1,4 @@
-﻿namespace PortalMouse.Utils.Ext;
+﻿namespace PortalMouse.Engine.Utils.Ext;
 
 public static class IEnumerableExt {
 	public static IEnumerable<(int index, T item)> Enumerate<T>(this IEnumerable<T> self) {

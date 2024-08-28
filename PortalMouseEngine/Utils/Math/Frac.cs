@@ -1,4 +1,4 @@
-namespace PortalMouse.Utils.Math;
+namespace PortalMouse.Engine.Utils.Math;
 
 public readonly struct Frac {
 	public static readonly Frac Zero = new(0, 1);

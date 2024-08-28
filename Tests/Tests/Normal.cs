@@ -1,4 +1,4 @@
-using PortalMouse.Utils.Math;
+using PortalMouse.Engine.Utils.Math;
 
 namespace UnitTests;
 

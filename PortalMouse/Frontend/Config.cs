@@ -1,4 +1,4 @@
-﻿using PortalMouse.Core;
+﻿using PortalMouse.Engine.Core;
 using System.Text.Json.Serialization;
 
 namespace PortalMouse.Frontend;

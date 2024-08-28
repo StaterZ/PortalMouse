@@ -1,6 +1,6 @@
-using PortalMouse.Utils.Math;
+using PortalMouse.Engine.Utils.Math;
 
-namespace PortalMouse.Utils.Ext;
+namespace PortalMouse.Engine.Utils.Ext;
 
 public static class DirectionExt {
 	public static Axis ToAxis(this Direction self) => self switch {

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace PortalMouse.Native;
+namespace PortalMouse.Engine.Native;
 
 internal static class Kernel32 {
 	private const string dllName = "kernel32.dll";

@@ -1,6 +1,6 @@
-﻿using PortalMouse.Utils.Math;
+﻿using PortalMouse.Engine.Utils.Math;
 
-namespace PortalMouse.Core;
+namespace PortalMouse.Engine.Core;
 
 public sealed class Screen {
 	public readonly int Id;

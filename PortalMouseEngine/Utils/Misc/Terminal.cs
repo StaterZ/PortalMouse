@@ -1,4 +1,4 @@
-﻿namespace PortalMouse.Utils.Misc;
+﻿namespace PortalMouse.Engine.Utils.Misc;
 
 public static class Terminal {
 	public static void Imp(string msg) => WriteLineColor(msg, ConsoleColor.Cyan);

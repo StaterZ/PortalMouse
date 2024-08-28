@@ -1,6 +1,6 @@
-﻿using PortalMouse.Utils.Math;
+﻿using PortalMouse.Engine.Utils.Math;
 
-namespace PortalMouse.Observers;
+namespace PortalMouse.Engine.Observers;
 
 public abstract class MouseObserver : IDisposable {
 	protected readonly Func<V2I, V2I?> m_callback;

@@ -1,6 +1,6 @@
-﻿using PortalMouse.Utils.Math;
+﻿using PortalMouse.Engine.Utils.Math;
 
-namespace PortalMouse.Core;
+namespace PortalMouse.Engine.Core;
 
 public readonly record struct ScreenLineSeg(LineSeg2I Line, Screen Screen) {
 	public ScreenPos Begin => new(Line.Begin, Screen);

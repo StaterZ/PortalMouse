@@ -1,11 +1,11 @@
-﻿using PortalMouse.Core;
-using PortalMouse.Observers;
-using PortalMouse.Utils.Math;
-using PortalMouse.Utils.Misc;
+﻿using PortalMouse.Engine.Core;
+using PortalMouse.Engine.Observers;
+using PortalMouse.Engine.Utils.Math;
+using PortalMouse.Engine.Utils.Misc;
 using System.IO;
 using System.Text;
 using System.Text.Json;
-using Screen = PortalMouse.Core.Screen;
+using Screen = PortalMouse.Engine.Core.Screen;
 
 namespace PortalMouse.Frontend;
 

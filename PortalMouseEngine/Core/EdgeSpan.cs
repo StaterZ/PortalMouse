@@ -1,6 +1,6 @@
-﻿using PortalMouse.Utils.Math;
+﻿using PortalMouse.Engine.Utils.Math;
 
-namespace PortalMouse.Core;
+namespace PortalMouse.Engine.Core;
 
 public record EdgeSpan {
 	public Edge Edge;

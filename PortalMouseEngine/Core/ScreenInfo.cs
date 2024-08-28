@@ -1,6 +1,6 @@
-﻿using PortalMouse.Native;
-using PortalMouse.Utils.Math;
+﻿using PortalMouse.Engine.Native;
+using PortalMouse.Engine.Utils.Math;
 
-namespace PortalMouse.Core;
+namespace PortalMouse.Engine.Core;
 
 internal readonly record struct ScreenInfo(User32.MonitorInfoEx MonitorInfo, Frac Scale);

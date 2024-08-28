@@ -1,7 +1,7 @@
-using PortalMouse.Native;
-using PortalMouse.Utils.Misc;
+using PortalMouse.Engine.Native;
+using PortalMouse.Engine.Utils.Misc;
 
-namespace PortalMouse.Hooking;
+namespace PortalMouse.Engine.Hooking;
 
 //reference:
 //https://github.com/MouseUnSnag/MouseUnSnag/blob/master/MouseUnSnag/Hooking/HookHandler.cs

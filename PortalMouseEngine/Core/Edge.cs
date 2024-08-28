@@ -1,7 +1,7 @@
-﻿using PortalMouse.Utils.Ext;
-using PortalMouse.Utils.Math;
+﻿using PortalMouse.Engine.Utils.Ext;
+using PortalMouse.Engine.Utils.Math;
 
-namespace PortalMouse.Core;
+namespace PortalMouse.Engine.Core;
 
 public class Edge {
 	public readonly Side Side;

@@ -1,4 +1,4 @@
-﻿namespace PortalMouse.Native;
+﻿namespace PortalMouse.Engine.Native;
 
 /// <summary>
 /// Enumerates the valid hook types passed as the idHook parameter into a call to SetWindowsHookEx.

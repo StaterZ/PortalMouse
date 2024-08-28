@@ -1,4 +1,4 @@
-﻿namespace PortalMouse.Core;
+﻿namespace PortalMouse.Engine.Core;
 
 public enum Side {
 	Left,

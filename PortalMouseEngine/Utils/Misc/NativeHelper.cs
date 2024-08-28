@@ -1,9 +1,9 @@
-﻿using PortalMouse.Core;
-using PortalMouse.Native;
-using PortalMouse.Utils.Math;
-using Point = PortalMouse.Native.Point;
+﻿using PortalMouse.Engine.Core;
+using PortalMouse.Engine.Native;
+using PortalMouse.Engine.Utils.Math;
+using Point = PortalMouse.Engine.Native.Point;
 
-namespace PortalMouse.Utils.Misc;
+namespace PortalMouse.Engine.Utils.Misc;
 
 public static class NativeHelper {
 	public static V2I CursorPos {

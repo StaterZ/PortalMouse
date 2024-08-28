@@ -1,4 +1,4 @@
-namespace PortalMouse.Utils.Math;
+namespace PortalMouse.Engine.Utils.Math;
 
 public record struct LineSeg2I(V2I Begin, V2I End) {
 	public readonly V2I Delta => End - Begin;
