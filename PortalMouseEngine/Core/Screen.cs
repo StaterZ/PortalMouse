@@ -1,4 +1,5 @@
 ﻿using PortalMouse.Engine.Utils.Math;
+using PortalMouse.Engine.Utils.Misc;
 
 namespace PortalMouse.Engine.Core;
 
@@ -30,10 +31,11 @@ public sealed class Screen {
 	internal Screen(ScreenInfo screenInfo) : this() {
 		{ //Parse out id
 			const string IdPrefix = @"\\.\DISPLAY";
-			if (!screenInfo.MonitorInfo.szDevice.StartsWith(IdPrefix)) throw new Exception("Bad monitor id, bad prefix");
+			string szDevice = screenInfo.MonitorInfo.szDevice;
+			if (!szDevice.StartsWith(IdPrefix)) throw new FormatException($"Failed to parse monitor id. Bad prefix. szDevice was '{szDevice}'");
 
-			string idStr = screenInfo.MonitorInfo.szDevice[IdPrefix.Length..];
-			if (!int.TryParse(idStr, out Id)) throw new Exception("Bad monitor id, failed to parse");
+			string idStr = szDevice[IdPrefix.Length..];
+			if (!int.TryParse(idStr, out Id)) throw new FormatException($"Failed to parse monitor id. Bad int parse. szDevice was '{szDevice}'");
 		}
 
 		LogicalRect = (R2I)screenInfo.MonitorInfo.rcMonitor;
@@ -54,7 +56,7 @@ public sealed class Screen {
 			Side.Right => Right,
 			Side.Top => Top,
 			Side.Bottom => Bottom,
-			_ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
+			_ => throw new UnreachableException()
 		};
 	}
 }

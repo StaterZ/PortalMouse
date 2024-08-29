@@ -1,4 +1,6 @@
-﻿namespace PortalMouse.Engine.Utils.Math;
+﻿using PortalMouse.Engine.Utils.Misc;
+
+namespace PortalMouse.Engine.Utils.Math;
 
 public record struct LineSeg2Frac(V2Frac Begin, V2Frac End) {
 	public readonly V2Frac Delta => End - Begin;
@@ -17,19 +19,19 @@ public record struct LineSeg2Frac(V2Frac Begin, V2Frac End) {
 	public readonly LineSeg2Frac ToUnitSpace(Axis axis) => axis switch {
 		Axis.Horizontal => this,
 		Axis.Vertical => Transpose(),
-		_ => throw new ArgumentOutOfRangeException(nameof(axis)),
+		_ => throw new UnreachableException(),
 	};
 
 	public readonly LineSeg2Frac FromUnitSpace(Axis axis) => axis switch {
 		Axis.Horizontal => this,
 		Axis.Vertical => Transpose(),
-		_ => throw new ArgumentOutOfRangeException(nameof(axis)),
+		_ => throw new UnreachableException(),
 	};
 
 	public readonly LineSeg1Frac this[Axis axis] => axis switch {
 		Axis.Horizontal => X,
 		Axis.Vertical => Y,
-		_ => throw new ArgumentOutOfRangeException(nameof(axis), axis, null)
+		_ => throw new UnreachableException()
 	};
 
 	public static LineSeg2Frac InitBeginDelta(V2Frac Begin, V2Frac Delta) => new(Begin, Begin + Delta);

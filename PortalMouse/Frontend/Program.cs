@@ -1,5 +1,6 @@
 ﻿using PortalMouse.Engine.Core;
 using PortalMouse.Engine.Observers;
+using PortalMouse.Engine.Utils.Ext;
 using PortalMouse.Engine.Utils.Math;
 using PortalMouse.Engine.Utils.Misc;
 using System.IO;
@@ -104,6 +105,7 @@ public static class Program {
 
 	private static Setup? LoadSetup() {
 		Setup setup = Setup.ConstructLocalSetup();
+
 		Terminal.Inf("Screens:");
 		StringBuilder builder = new();
 		foreach (Screen screen in setup.Screens) {
@@ -225,6 +227,8 @@ public static class Program {
 			if (!TryParseScreen(mapping.B.Screen, out Screen bScreen)) return false;
 			Edge bEdge = bScreen.GetEdge(mapping.B.Side);
 			if (!TryParseRange(mapping.B, bEdge, out R1I bRange)) return false;
+
+			if (mapping.A.Side != mapping.B.Side.Opposite()) throw new ConfigException($"The portals A and B need to be on opposite sides. A is '{mapping.A.Side}', B is '{mapping.B.Side}'. This means A needs to be '{mapping.B.Side.Opposite()}' OR B needs to be'{mapping.A.Side.Opposite()}'");
 
 			Terminal.Inf($"Mapping 'screen{mapping.A.Screen} {aEdge.Side} [{aRange.Begin}-{aRange.End}]' to 'screen{mapping.B.Screen} {bEdge.Side} [{bRange.Begin}-{bRange.End}]'");
 			Portal.Bind(

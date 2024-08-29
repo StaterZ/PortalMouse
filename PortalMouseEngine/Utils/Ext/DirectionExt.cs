@@ -1,4 +1,5 @@
 using PortalMouse.Engine.Utils.Math;
+using PortalMouse.Engine.Utils.Misc;
 
 namespace PortalMouse.Engine.Utils.Ext;
 
@@ -8,6 +9,6 @@ public static class DirectionExt {
 		Direction.Right => Axis.Horizontal,
 		Direction.Up => Axis.Vertical,
 		Direction.Down => Axis.Vertical,
-		_ => throw new ArgumentOutOfRangeException(nameof(self), self, null)
+		_ => throw new UnreachableException()
 	};
 }

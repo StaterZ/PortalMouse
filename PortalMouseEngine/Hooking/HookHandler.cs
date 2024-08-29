@@ -28,7 +28,7 @@ internal class HookHandler {
 
 	public void UnsetHook() {
 		if (!IsHooked)
-			throw new InvalidOperationException();
+			throw new InvalidOperationException("Hook already unset");
 
 		NativeHelper.AssertSuccess(User32.UnhookWindowsHookEx(m_hookHandle), nameof(User32.UnhookWindowsHookEx));
 		m_hookHandle = IntPtr.Zero;

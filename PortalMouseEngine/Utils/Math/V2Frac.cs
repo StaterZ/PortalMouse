@@ -1,4 +1,6 @@
-﻿namespace PortalMouse.Engine.Utils.Math;
+﻿using PortalMouse.Engine.Utils.Misc;
+
+namespace PortalMouse.Engine.Utils.Math;
 
 public struct V2Frac {
 	public Frac x;
@@ -16,13 +18,13 @@ public struct V2Frac {
 	public readonly V2Frac ToUnitSpace(Axis axis) => axis switch {
 		Axis.Horizontal => this,
 		Axis.Vertical => Transpose(),
-		_ => throw new ArgumentOutOfRangeException(nameof(axis)),
+		_ => throw new UnreachableException(),
 	};
 
 	public readonly V2Frac FromUnitSpace(Axis axis) => axis switch {
 		Axis.Horizontal => this,
 		Axis.Vertical => Transpose(),
-		_ => throw new ArgumentOutOfRangeException(nameof(axis)),
+		_ => throw new UnreachableException(),
 	};
 
 	public override readonly string ToString() => $"[{x},{y}]";
@@ -34,7 +36,7 @@ public struct V2Frac {
 		readonly get => axis switch {
 			Axis.Horizontal => x,
 			Axis.Vertical => y,
-			_ => throw new ArgumentOutOfRangeException(nameof(axis), axis, null),
+			_ => throw new UnreachableException(),
 		};
 		set {
 			switch (axis) {
@@ -45,7 +47,7 @@ public struct V2Frac {
 					y = value;
 					break;
 				default:
-					throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
+					throw new UnreachableException();
 			};
 		}
 	}
