@@ -13,9 +13,9 @@ With PortalMouse, you can seamlessly navigate across your monitors without encou
 ## Getting Started
 To install PortalMouse, simply follow these steps:
 
-- Download [The Latest Release](https://github.com/StaterZ/PortalMouse/releases) here on github.
+- Download [The Latest Release](releases/latest) here on github.
 - Unzip the downloaded file and move the directory somewhere you'd like to have it.
-- Configure the `config.json` inside as needed and refer to the included `Documentation.md` for how to configure it.
+- Configure the `config.json` inside as needed and refer to the included [`Documentation.md`](PortalMouse/Documentation.md) for how to configure it.
   - By default, the config contains a simple example wrapping the cursor around screen1.
   - You can test your configuration by launching the exe and using the "Reload" action on the programs system tray icon to quickly iterate on the config.
 - Unless already doing so from setting up the configuration, launch the exe.
