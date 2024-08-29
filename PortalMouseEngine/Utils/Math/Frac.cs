@@ -1,7 +1,7 @@
-﻿namespace PortalMouse.Engine.Utils.Math;
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Numerics;
+
+namespace PortalMouse.Engine.Utils.Math;
 using Math = System.Math;
 
 public readonly struct Frac : IComparable, IComparable<Frac>, IEquatable<Frac> {
