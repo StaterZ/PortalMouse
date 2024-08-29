@@ -16,12 +16,6 @@ public readonly struct Frac : IComparable, IComparable<Frac>, IEquatable<Frac> {
 		Denominator = denominator;
 	}
 
-	public int Lerp(R1I range) =>
-		range.Begin + (int)(range.Size * this);
-
-	public int Lerp(LineSeg1I line) =>
-		line.Begin + (int)(line.Delta * this);
-
 	public Frac Lerp(R1Frac range) =>
 		range.Begin + range.Size * this;
 
