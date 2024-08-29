@@ -1,4 +1,6 @@
-﻿using PortalMouse.Engine.Core;
+﻿using CommandLine;
+using CommandLine.Text;
+using PortalMouse.Engine.Core;
 using PortalMouse.Engine.Observers;
 using PortalMouse.Engine.Utils.Math;
 using PortalMouse.Engine.Utils.Misc;
@@ -10,12 +12,15 @@ public static class Program {
 
 	[STAThread]
 	private static void Main(string[] args) {
+		Options? options = Options.Parse(args);
+		if (options == null) return;
+
 		Application.EnableVisualStyles();
 		Application.SetCompatibleTextRenderingDefault(false);
 
 		using TrayIcon tray = new();
 
-		Runtime(args);
+		Runtime(options);
 	}
 
 	public static void UpdateState(RunningState state) {
@@ -23,14 +28,14 @@ public static class Program {
 		Application.Exit();
 	}
 
-	private static void Runtime(string[] args) {
+	private static void Runtime(Options options) {
 		s_runningState = RunningState.Running;
 
 		while (true) {
 			switch (s_runningState) {
 				case RunningState.Running:
 					try {
-						Run(args);
+						Run(options);
 					} catch (Exception ex) {
 						HandleException(ex);
 					}
@@ -44,14 +49,14 @@ public static class Program {
 					s_runningState = Terminal.ReadYN() ? RunningState.Restart : RunningState.Exit;
 					break;
 				case RunningState.Exit:
+					NativeHelper.ShowConsole(true);
+					Terminal.Imp("Program has exit!");
 					return;
 			}
 		}
 	}
 
-	private static void Run(string[] args) {
-		string configPath = args.Length > 0 ? args[0] : "config.json";
-
+	private static void Run(Options options) {
 		NativeHelper.ShowConsole(true);
 		Console.Clear();
 
@@ -68,7 +73,7 @@ public static class Program {
 		}
 
 		Terminal.Inf("Loading Config...");
-		Config? config = FrontendUtils.LoadConfig(configPath);
+		Config? config = FrontendUtils.LoadConfig(options.ConfigPath);
 		if (config == null) {
 			Terminal.Err("Failed to load the config. Did you move it without setting a custom config path argument? Halting...");
 			UpdateState(RunningState.Halted);
@@ -82,12 +87,7 @@ public static class Program {
 
 		Terminal.Inf("Config Successfully Loaded!");
 		Terminal.BlankLine();
-		Terminal.Imp("Entering Runtime...");
 
-#if !DEBUG
-		Thread.Sleep(500);
-		NativeHelper.ShowConsole(false);
-#endif
 		V2I? MoveHandler(V2I pos) {
 			V2I? movedPos = setup!.Handle(pos);
 #if DEBUG
@@ -99,22 +99,64 @@ public static class Program {
 			return movedPos;
 		}
 
-		MouseObserver mouseObserver = CreateObserver(MoveHandler);
+		Terminal.Imp("Starting Observer!");
+#if !DEBUG
+		if (options.HideDelay > 0) Thread.Sleep(options.HideDelay);
+		NativeHelper.ShowConsole(false);
+#endif
+
+		MouseObserver mouseObserver = CreateObserver(MoveHandler, options.Observer);
 
 		Application.Run();
 
 		mouseObserver.Dispose();
 	}
 
-	private static MouseObserver CreateObserver(Func<V2I, V2I?> callback) {
-		//return new PollObserver(callback, HandleException);
-		return new LLMHookObserver(callback, HandleException);
-	}
+	private static MouseObserver CreateObserver(Func<V2I, V2I?> callback, Options.ObserverKind observerKind) => observerKind switch {
+		Options.ObserverKind.Poll => new PollObserver(callback, HandleException),
+		Options.ObserverKind.LLMH => new LLMHookObserver(callback, HandleException),
+		_ => throw new UnreachableException(),
+	};
 
 	private static void HandleException(Exception ex) {
 		UpdateState(RunningState.Halted);
 		using (new FgScope(ConsoleColor.Red)) {
 			Console.WriteLine(ex);
+		}
+	}
+
+	private class Options {
+		[Option('d', "delay", Default = 500, HelpText = "How many milis to wait before hiding the window as it starts.")]
+		public int HideDelay { get; set; }
+		[Option("cfg", Default = "config.json", HelpText = "The config path.")]
+		public string ConfigPath { get; set; } = null!;
+		[Option('o', "observer", Default = ObserverKind.LLMH, HelpText = "What backend to use for reading the mouse position.")]
+		public ObserverKind Observer { get; set; }
+
+		public static Options? Parse(string[] args) {
+			Parser parser = new(cfg => {
+				cfg.CaseInsensitiveEnumValues = true;
+				cfg.HelpWriter = null;
+			});
+
+			ParserResult<Options> parserResult = parser.ParseArguments<Options>(args);
+			parserResult.WithNotParsed(_ => {
+				Terminal.Inf(HelpText.AutoBuild(parserResult, h => {
+					h.Heading = string.Empty;
+					h.Copyright = string.Empty;
+					h.AddEnumValuesToHelpText = true;
+					h.AdditionalNewLineAfterOption = true;
+					h.MaximumDisplayWidth = int.MaxValue;
+					return h;
+				}));
+			});
+
+			return parserResult.Value;
+		}
+
+		public enum ObserverKind {
+			Poll,
+			LLMH,
 		}
 	}
 }
