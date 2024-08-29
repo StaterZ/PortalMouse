@@ -20,7 +20,7 @@ public static class Program {
 
 		using TrayIcon tray = new();
 
-		Runtime();
+		Runtime(args);
 	}
 
 	public static void UpdateState(RunningState state) {
@@ -28,14 +28,14 @@ public static class Program {
 		Application.Exit();
 	}
 
-	private static void Runtime() {
+	private static void Runtime(string[] args) {
 		s_runningState = RunningState.Running;
 
 		while (true) {
 			switch (s_runningState) {
 				case RunningState.Running:
 					try {
-						Run();
+						Run(args);
 					} catch (Exception ex) {
 						s_runningState = RunningState.Halted;
 						using (new FgScope(ConsoleColor.Red)) {
@@ -60,20 +60,39 @@ public static class Program {
 		}
 	}
 
-	private static void Run() {
+	private static void Run(string[] args) {
+		string configPath = args.Length > 0 ? args[0] : "config.json";
+
 		NativeHelper.ShowConsole(true);
 		Console.Clear();
 
-		Terminal.Imp("[PortalMouse] by StaterZ");
+		Terminal.Imp($"[{Application.ProductName}] V{Application.ProductVersion} by StaterZ");
 		Terminal.BlankLine();
 
-		Setup? setup = LoadSetup();
-		if (setup == null) {
-			Terminal.Err("Failed to load setup!"); //TODO: not the best error handling ever... really should fix this...
+		Setup setup = Setup.ConstructLocalSetup();
+		PrintSetupStats(setup);
+
+		if (setup.Screens.Count <= 0) {
+			Terminal.Err("No screens found in setup? Something has gone terribly wrong! Halting...");
 			UpdateState(RunningState.Halted);
 			return;
 		}
 
+		Terminal.Inf("Loading Config...");
+		Config? config = LoadConfig(configPath);
+		if (config == null) {
+			Terminal.Err("Failed to load the config. Did you move it without setting a custom config path argument? Halting...");
+			UpdateState(RunningState.Halted);
+			return;
+		}
+		if (!LoadPortals(config, setup)) {
+			Terminal.Err("Failed to apply some or all config mappings. Halting...");
+			UpdateState(RunningState.Halted);
+			return;
+		}
+
+		Terminal.Inf("Config Successfully Loaded!");
+		Terminal.BlankLine();
 		Terminal.Imp("Entering Runtime...");
 
 #if !DEBUG
@@ -101,36 +120,6 @@ public static class Program {
 	private static MouseObserver CreateObserver(Func<V2I, V2I?> callback) {
 		//return new PollObserver(callback);
 		return new LLMHookObserver(callback);
-	}
-
-	private static Setup? LoadSetup() {
-		Setup setup = Setup.ConstructLocalSetup();
-
-		Terminal.Inf("Screens:");
-		StringBuilder builder = new();
-		foreach (Screen screen in setup.Screens) {
-			builder.Append($"    {screen.Id} : {screen.PhysicalRect} @ {(float)(screen.Scale * 100)}%");
-			if (screen.Scale != Frac.One) {
-				builder.Append($" -> {screen.LogicalRect}");
-			}
-			Terminal.Inf(builder.ToString());
-			builder.Clear();
-		}
-		Terminal.BlankLine();
-
-		if (setup.Screens.Count <= 0) {
-			Terminal.Err("No screens found in setup? Something has gone terribly wrong!");
-			return null;
-		}
-
-		Terminal.Inf("Loading Config...");
-		Config? config = LoadConfig("config.json");
-		if (config == null) return null;
-		if (!LoadPortals(config, setup)) return null;
-		Terminal.Inf("Config Loaded!");
-		Terminal.BlankLine();
-
-		return setup;
 	}
 
 	private static bool LoadPortals(Config config, Setup setup) {
@@ -242,7 +231,7 @@ public static class Program {
 
 	private static Config? LoadConfig(string path) {
 		if (!File.Exists(path)) {
-			Terminal.Err($"'{path}' not found, aborting");
+			Terminal.Err($"Path '{path}' not found, aborting");
 			return null;
 		}
 
@@ -254,5 +243,23 @@ public static class Program {
 		}
 
 		return config;
+	}
+
+	private static void PrintSetupStats(Setup setup) {
+		Terminal.Inf("Detected Screens:");
+		if (setup.Screens.Count > 0) {
+			StringBuilder builder = new();
+			foreach (Screen screen in setup.Screens) {
+				builder.Append($"    {screen.Id} : {screen.PhysicalRect} @ {(float)(screen.Scale * 100)}%");
+				if (screen.Scale != Frac.One) {
+					builder.Append($" -> {screen.LogicalRect}");
+				}
+				Terminal.Inf(builder.ToString());
+				builder.Clear();
+			}
+		} else {
+			Terminal.Wrn($"    None???");
+		}
+		Terminal.BlankLine();
 	}
 }

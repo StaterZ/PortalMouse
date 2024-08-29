@@ -8,6 +8,7 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <Version>$(VersionPrefix)1.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
