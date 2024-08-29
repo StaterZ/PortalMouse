@@ -1,6 +1,5 @@
 ﻿namespace PortalMouse.Engine.Utils.Math;
-
-using System;
+using Math = System.Math;
 
 public struct R1I {
 	public int Begin;
