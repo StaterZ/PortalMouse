@@ -121,40 +121,40 @@ A 3 screen setup where a large monitor maps the upper half of an edge to a upper
 			"a": {
 				"screen": 1,
 				"side": "Right",
-				"begin": 0%,
-				"end": 50%
+				"begin": "0%",
+				"end": "50%"
 			},
 			"b": {
 				"screen": 2,
 				"side": "Left",
-				"begin": 50%,
-				"end": 100%
+				"begin": "50%",
+				"end": "100%"
 			}
 		},
 		{
 			"a": {
 				"screen": 1,
 				"side": "Right",
-				"begin": 50%,
-				"end": 100%
+				"begin": "50%",
+				"end": "100%"
 			},
 			"b": {
 				"screen": 3,
 				"side": "Left",
-				"begin": 0%,
-				"end": 50%
+				"begin": "0%",
+				"end": "50%"
 			}
 		},
 		{
 			"a": {
 				"screen": 2,
 				"side": "Bottom",
-				"end": 100px
+				"end": "100px"
 			},
 			"b": {
 				"screen": 3,
 				"side": "Top",
-				"end": 100px
+				"end": "100px"
 			}
 		}
 	]
@@ -170,25 +170,25 @@ A 2 screen setup where the bottom part of a larger screen snaps up to the bottom
 			"a": {
 				"screen": 1,
 				"side": "Right",
-				"end": 1079px
+				"end": "1079px"
 			},
 			"b": {
 				"screen": 2,
 				"side": "Left",
-				"end": 1079px
+				"end": "1079px"
 			}
 		},
 		{
 			"a": {
 				"screen": 1,
 				"side": "Right",
-				"begin": 1079px
+				"begin": "1079px"
 			},
 			"b": {
 				"screen": 2,
 				"side": "Left",
-				"begin": 1079px,
-				"end": 1080px
+				"begin": "1079px",
+				"end": "1080px"
 			}
 		}
 	]
