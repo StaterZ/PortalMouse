@@ -37,10 +37,7 @@ public static class Program {
 					try {
 						Run(args);
 					} catch (Exception ex) {
-						s_runningState = RunningState.Halted;
-						using (new FgScope(ConsoleColor.Red)) {
-							Console.WriteLine(ex);
-						}
+						HandleException(ex);
 #if DEBUG
 						throw;
 #endif
@@ -118,8 +115,15 @@ public static class Program {
 	}
 
 	private static MouseObserver CreateObserver(Func<V2I, V2I?> callback) {
-		//return new PollObserver(callback);
-		return new LLMHookObserver(callback);
+		//return new PollObserver(callback, HandleException);
+		return new LLMHookObserver(callback, HandleException);
+	}
+
+	private static void HandleException(Exception ex) {
+		UpdateState(RunningState.Halted);
+		using (new FgScope(ConsoleColor.Red)) {
+			Console.WriteLine(ex);
+		}
 	}
 
 	private static bool LoadPortals(Config config, Setup setup) {

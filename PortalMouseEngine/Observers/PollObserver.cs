@@ -7,7 +7,7 @@ public class PollObserver : MouseObserver {
 	private AtomicBool m_isRunning = new(true);
 	private readonly Thread m_thread;
 
-	public PollObserver(Func<V2I, V2I?> callback) : base(callback) {
+	public PollObserver(Func<V2I, V2I?> callback, Action<Exception> exceptionHandler) : base(callback, exceptionHandler) {
 		m_thread = new Thread(PollLoop) {
 			Name = nameof(PollObserver)
 		};
@@ -15,13 +15,17 @@ public class PollObserver : MouseObserver {
 	}
 
 	private void PollLoop() {
-		while (m_isRunning.Value) {
-			Thread.Sleep(1);
+		try {
+			while (m_isRunning.Value) {
+				Thread.Sleep(1);
 
-			V2I? movedPos = m_callback(NativeHelper.CursorPos);
-			if (!movedPos.HasValue) continue;
+				V2I? movedPos = m_callback(NativeHelper.CursorPos);
+				if (!movedPos.HasValue) continue;
 
-			NativeHelper.CursorPos = movedPos.Value;
+				NativeHelper.CursorPos = movedPos.Value;
+			}
+		} catch(Exception ex) {
+			m_exceptionHandler(ex);
 		}
 	}
 

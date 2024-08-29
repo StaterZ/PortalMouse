@@ -10,7 +10,7 @@ public class DummyObserver : MouseObserver {
 	private AtomicBool m_isRunning = new(true);
 	private int m_index = 0;
 
-	public DummyObserver(Func<V2I, V2I?> callback, IList<V2I> moves) : base(callback) {
+	public DummyObserver(Func<V2I, V2I?> callback, IList<V2I> moves) : base(callback, (_) => { }) {
 		m_moves = moves;
 
 		m_thread = new Thread(PollLoop) {
