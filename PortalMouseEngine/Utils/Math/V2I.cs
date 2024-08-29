@@ -9,8 +9,8 @@ public struct V2I {
 		this.y = y;
 	}
 
-	public readonly float Dot(V2I other) => x * other.x + y * other.y;
-	public readonly float MagSqr => Dot(this);
+	public readonly int Dot(V2I other) => x * other.x + y * other.y;
+	public readonly int MagSqr => Dot(this);
 	public readonly V2I Transpose() => new(y, x);
 
 	public readonly V2I ToUnitSpace(Axis axis) => axis switch {
@@ -60,7 +60,4 @@ public struct V2I {
 	public static V2I operator *(V2I lhs, int rhs) => new(lhs.x * rhs, lhs.y * rhs);
 	public static V2I operator /(V2I lhs, V2I rhs) => new(lhs.x / rhs.x, lhs.y / rhs.y);
 	public static V2I operator /(V2I lhs, int rhs) => new(lhs.x / rhs, lhs.y / rhs);
-
-	public static V2I operator *(V2I lhs, Frac rhs) => new(lhs.x * rhs, lhs.y * rhs);
-	public static V2I operator /(V2I lhs, Frac rhs) => new(lhs.x / rhs, lhs.y / rhs);
 }

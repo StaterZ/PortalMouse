@@ -11,7 +11,7 @@ public class Portal {
 		Exit = exit;
 	}
 
-	public int Map(int value) =>
+	public Frac Map(Frac value) =>
 		MathX.Map(value, EdgeSpan.Range, Exit.EdgeSpan.Range);
 
 	public static void Bind(EdgeSpan a, EdgeSpan b) {

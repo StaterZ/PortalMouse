@@ -16,6 +16,13 @@ public struct R2I {
 			p.y >= 0 && p.y < Size.y;
 	}
 
+	public readonly bool Contains(V2Frac p) {
+		p -= Pos;
+		return
+			p.x >= 0 && p.x < Size.x &&
+			p.y >= 0 && p.y < Size.y;
+	}
+
 	public override readonly string ToString() =>
 		$"[X:{Pos.x},Y:{Pos.y},W:{Size.x},H:{Size.y}]";
 }

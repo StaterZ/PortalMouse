@@ -39,7 +39,7 @@ public class Edge {
 		return true;
 	}
 
-	public ScreenLineSeg? TryHandle(LineSeg2I mouseMove) {
+	public ScreenLineSeg? TryHandle(LineSeg2Frac mouseMove) {
 		AxisLineSeg2I axisLine = new() {
 			Pos = Pos,
 			Size = Length,
@@ -50,13 +50,13 @@ public class Edge {
 		if (!intersection.HasValue)
 			return null;
 
-		int inPos = Pos[Axis] + Length * intersection.Value.lineFrac;
-		V2I outMove = mouseMove.Delta / intersection.Value.mouseFrac;
-		LineSeg1I inLine = LineSeg1I.InitBeginDelta(inPos, outMove[Axis]);
-		(int pos, Portal? portal) entry = SlideAlongEdgeIntoPortal(inLine.Clamp(axisLine.Range));
+		Frac inPos = Pos[Axis] + Length * intersection.Value.lineFrac;
+		V2Frac outMove = mouseMove.Delta * (1 - intersection.Value.mouseFrac);
+		LineSeg1Frac inLine = LineSeg1Frac.InitBeginDelta(inPos, outMove[Axis]);
+		(Frac pos, Portal? portal) entry = SlideAlongEdgeIntoPortal(inLine.Clamp(axisLine.Range));
 
 		if (entry.portal == null) {
-			V2I exitPos = new(
+			V2Frac exitPos = new(
 				entry.pos,
 				InnerPos[Axis.Opposite()]
 			);
@@ -64,25 +64,25 @@ public class Edge {
 			exitPos = exitPos.FromUnitSpace(Axis);
 
 			return new ScreenLineSeg(
-				new LineSeg2I(mouseMove.Begin, exitPos),
+				new LineSeg2Frac(mouseMove.Begin, exitPos),
 				Screen
 			);
 		} else {
 			Edge exitEdge = entry.portal.Exit.EdgeSpan.Edge;
 
-			V2I exitEdgePos = new(
+			V2Frac exitEdgePos = new(
 				entry.portal.Map(entry.pos),
 				exitEdge.Pos[Axis.Opposite()]
 			);
 
-			V2I entryPos = new(
+			V2Frac entryPos = new(
 				exitEdgePos.x,
 				exitEdge.InnerPos[Axis.Opposite()]
 			);
 
-			V2I exitPos = exitEdgePos + new V2I(inLine.End - entry.pos, outMove[Axis.Opposite()]);
+			V2Frac exitPos = exitEdgePos + new V2Frac(inLine.End - entry.pos, outMove[Axis.Opposite()]);
 
-			LineSeg2I line = new(entryPos, exitPos);
+			LineSeg2Frac line = new(entryPos, exitPos);
 			line = line.FromUnitSpace(Axis);
 
 			return new ScreenLineSeg(
@@ -92,10 +92,10 @@ public class Edge {
 		}
 	}
 
-	private (int pos, Portal? portal) SlideAlongEdgeIntoPortal(LineSeg1I line) {
+	private (Frac pos, Portal? portal) SlideAlongEdgeIntoPortal(LineSeg1Frac line) {
 		(bool success, int beginIndex) = m_portals.BetterBinarySearch(
 			line.Begin,
-			portal => portal.EdgeSpan.Range.Begin
+			portal => (Frac)portal.EdgeSpan.Range.Begin
 		);
 
 		if (success) {
@@ -106,13 +106,12 @@ public class Edge {
 				return (line.Begin, m_portals[beginIndex]);
 			}
 
-			return line.Delta switch {
-				< 0 when m_portals.IsInRange(beginIndex) && line.End < m_portals[beginIndex].EdgeSpan.Range.End =>
-					(m_portals[beginIndex].EdgeSpan.Range.End, m_portals[beginIndex]),
-				> 0 when m_portals.IsInRange(beginIndex + 1) && line.End >= m_portals[beginIndex + 1].EdgeSpan.Range.Begin =>
-					(m_portals[beginIndex + 1].EdgeSpan.Range.Begin, m_portals[beginIndex + 1]),
-				_ => (line.End, null),
-			};
+			//UGH!!! stupid C# not allowing struct constants in switch patterns >:(
+			if (line.Delta < 0 && m_portals.IsInRange(beginIndex) && line.End < m_portals[beginIndex].EdgeSpan.Range.End)
+				return (m_portals[beginIndex].EdgeSpan.Range.End, m_portals[beginIndex]);
+			if (line.Delta > 0 && m_portals.IsInRange(beginIndex + 1) && line.End >= m_portals[beginIndex + 1].EdgeSpan.Range.Begin)
+				return (m_portals[beginIndex + 1].EdgeSpan.Range.Begin, m_portals[beginIndex + 1]);
+			return (line.End, null);
 		}
 	}
 }

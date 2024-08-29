@@ -12,7 +12,7 @@ public sealed class Screen {
 	public readonly Edge Top;
 	public readonly Edge Bottom;
 
-	public R2I PhysicalRect => new(LogicalRect.Pos, LogicalRect.Size * Scale);
+	public R2I PhysicalRect => new(LogicalRect.Pos, (V2I)((V2Frac)LogicalRect.Size * Scale));
 
 	private Screen() {
 		Left = new Edge(this, Side.Left);
@@ -40,7 +40,7 @@ public sealed class Screen {
 		Scale = screenInfo.Scale;
 	}
 
-	public ScreenLineSeg? Handle(LineSeg2I mouseMove) {
+	public ScreenLineSeg? Handle(LineSeg2Frac mouseMove) {
 		return
 			Left.TryHandle(mouseMove) ??
 			Right.TryHandle(mouseMove) ??
