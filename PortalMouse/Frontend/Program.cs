@@ -15,6 +15,8 @@ public static class Program {
 		Options? options = Options.Parse(args);
 		if (options == null) return;
 
+		NativeHelper.EnableDpiAwareness();
+
 		Application.EnableVisualStyles();
 		Application.SetCompatibleTextRenderingDefault(false);
 

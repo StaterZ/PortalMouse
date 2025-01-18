@@ -49,6 +49,10 @@ public static class NativeHelper {
 		return result;
 	}
 
+	public static void EnableDpiAwareness() {
+		AssertSuccess(Shcore.SetProcessDpiAwareness(ProcessDpiAwareness.ProcessPerMonitorDpiAware) == IntPtr.Zero, nameof(Shcore.SetProcessDpiAwareness));
+	}
+
 	public static void AssertSuccess(bool ok, string funcName) {
 		if (!ok) throw new NativeErrorException($"'{funcName}' Failed!");
 	}
