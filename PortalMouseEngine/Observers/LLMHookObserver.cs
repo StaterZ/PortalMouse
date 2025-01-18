@@ -14,9 +14,9 @@ public class LLMHookObserver : MouseObserver {
 		m_hookHandler.SetHook(HookType.WH_MOUSE_LL, HookCallback);
 	}
 
-	private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam) {
+	private IntPtr HookCallback(int code, IntPtr wParam, IntPtr lParam) {
 		if (
-			nCode >= 0 &&
+			code >= 0 &&
 			lParam != IntPtr.Zero &&
 			((uint)wParam & User32.WmMouseMove) != 0
 		) {
@@ -37,7 +37,7 @@ public class LLMHookObserver : MouseObserver {
 			}
 		}
 
-		return User32.CallNextHookEx(m_llMouseHookHandle, nCode, wParam, lParam);
+		return User32.CallNextHookEx(m_llMouseHookHandle, code, wParam, lParam);
 	}
 
 	protected override void ReleaseUnmanagedResources() {

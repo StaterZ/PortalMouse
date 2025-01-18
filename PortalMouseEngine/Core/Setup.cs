@@ -40,8 +40,8 @@ public sealed class Setup {
 
 	public static Setup ConstructLocalSetup() {
 		Setup setup = new();
-		foreach (ScreenInfo monitor in NativeHelper.EnumDisplays()) {
-			Screen screen = new(monitor);
+		foreach (ScreenDesc screenDesc in NativeHelper.EnumScreenDescs()) {
+			Screen screen = new(screenDesc);
 			setup.Screens.Add(screen);
 		}
 		return setup;

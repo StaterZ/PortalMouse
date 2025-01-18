@@ -28,7 +28,7 @@ public sealed class Screen {
 		Scale = scale;
 	}
 
-	internal Screen(ScreenInfo screenInfo) : this() {
+	internal Screen(ScreenDesc screenInfo) : this() {
 		{ //Parse out id
 			const string IdPrefix = @"\\.\DISPLAY";
 			string szDevice = screenInfo.MonitorInfo.szDevice;

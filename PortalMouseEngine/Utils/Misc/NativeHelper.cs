@@ -22,7 +22,7 @@ public static class NativeHelper {
 
 	//future improvement ideas: https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-display_devicew
 	//future improvement ideas: https://stackoverflow.com/questions/4958683/how-do-i-get-the-actual-monitor-name-as-seen-in-the-resolution-dialog
-	internal static List<ScreenInfo> EnumDisplays() {
+	internal static List<ScreenDesc> EnumScreenDescs() {
 		static Frac GetScalingFactor(IntPtr hdc) {
 			int logicalScreenHeight = Gdi32.GetDeviceCaps(hdc, (int)Gdi32.DeviceCap.VERTRES);
 			int physicalScreenHeight = Gdi32.GetDeviceCaps(hdc, (int)Gdi32.DeviceCap.DESKTOPVERTRES);
@@ -30,7 +30,7 @@ public static class NativeHelper {
 			return new Frac(physicalScreenHeight, logicalScreenHeight);
 		}
 
-		List<ScreenInfo> result = new();
+		List<ScreenDesc> result = new();
 		bool Proc(IntPtr hMonitor, IntPtr hdcMonitor, ref User32.Rect lprcMonitor, IntPtr dwData) {
 			User32.MonitorInfoEx mi = new();
 			if (!User32.GetMonitorInfo(hMonitor, ref mi)) {
@@ -39,7 +39,7 @@ public static class NativeHelper {
 			}
 
 			Frac scale = GetScalingFactor(hdcMonitor);
-			result.Add(new ScreenInfo(mi, scale));
+			result.Add(new ScreenDesc(mi, scale));
 			return true;
 		}
 

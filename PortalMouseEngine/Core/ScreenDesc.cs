@@ -3,4 +3,4 @@ using PortalMouse.Engine.Utils.Math;
 
 namespace PortalMouse.Engine.Core;
 
-internal readonly record struct ScreenInfo(User32.MonitorInfoEx MonitorInfo, Frac Scale);
+internal readonly record struct ScreenDesc(User32.MonitorInfoEx MonitorInfo, Frac Scale);
