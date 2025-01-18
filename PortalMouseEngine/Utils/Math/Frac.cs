@@ -92,6 +92,6 @@ public readonly struct Frac : IComparable, IComparable<Frac>, IEquatable<Frac> {
 	}
 
 	public static implicit operator Frac(int self) => new(self, 1);
-	public static explicit operator int(Frac self) => self.Numerator / self.Denominator;
+	public static explicit operator int(Frac self) => (self.Numerator - self.Denominator / 2) / self.Denominator;
 	public static explicit operator float(Frac self) => (float)self.Numerator / self.Denominator;
 }
