@@ -43,7 +43,7 @@ public static class NativeHelper {
 			return true;
 		}
 
-		IntPtr desktopHdc = User32.GetDC(IntPtr.Zero);
+		IntPtr desktopHdc = AssertSuccess(User32.GetDC(IntPtr.Zero), nameof(User32.GetDC));
 		AssertSuccess(User32.EnumDisplayMonitors(desktopHdc, IntPtr.Zero, Proc, IntPtr.Zero), nameof(User32.EnumDisplayMonitors));
 		
 		return result;
@@ -53,6 +53,10 @@ public static class NativeHelper {
 		AssertSuccess(Shcore.SetProcessDpiAwareness(ProcessDpiAwareness.ProcessPerMonitorDpiAware) == IntPtr.Zero, nameof(Shcore.SetProcessDpiAwareness));
 	}
 
+	public static IntPtr AssertSuccess(IntPtr ptr, string funcName) {
+		AssertSuccess(ptr != IntPtr.Zero, funcName);
+		return ptr;
+	}
 	public static void AssertSuccess(bool ok, string funcName) {
 		if (!ok) throw new NativeErrorException($"'{funcName}' Failed!");
 	}

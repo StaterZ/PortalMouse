@@ -22,19 +22,19 @@ public sealed class Screen {
 		Bottom = new Edge(this, Side.Bottom);
 	}
 
-	public Screen(int id, R2I physicalRect, Frac scale) : this() {
+	public Screen(int id, R2I logicalRect, Frac scale) : this() {
 		Id = id;
-		LogicalRect = physicalRect;
+		LogicalRect = logicalRect;
 		Scale = scale;
 	}
 
 	internal Screen(ScreenDesc screenInfo) : this() {
 		{ //Parse out id
-			const string IdPrefix = @"\\.\DISPLAY";
+			const string idPrefix = @"\\.\DISPLAY";
 			string szDevice = screenInfo.MonitorInfo.szDevice;
-			if (!szDevice.StartsWith(IdPrefix)) throw new FormatException($"Failed to parse monitor id. Bad prefix. szDevice was '{szDevice}'");
+			if (!szDevice.StartsWith(idPrefix)) throw new FormatException($"Failed to parse monitor id. Bad prefix. szDevice was '{szDevice}'");
 
-			string idStr = szDevice[IdPrefix.Length..];
+			string idStr = szDevice[idPrefix.Length..];
 			if (!int.TryParse(idStr, out Id)) throw new FormatException($"Failed to parse monitor id. Bad int parse. szDevice was '{szDevice}'");
 		}
 

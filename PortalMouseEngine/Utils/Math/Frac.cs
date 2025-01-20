@@ -24,7 +24,7 @@ public readonly struct Frac : IComparable, IComparable<Frac>, IEquatable<Frac> {
 
 	// Adapted to C# from: https://en.wikipedia.org/wiki/Binary_GCD_algorithm
 	private static uint GCD(uint u, uint v) {
-		// Base cases
+		// Base cases: gcd(n, 0) = gcd(0, n) = n
 		if (u == 0) return v;
 		if (v == 0) return u;
 
@@ -62,7 +62,7 @@ public readonly struct Frac : IComparable, IComparable<Frac>, IEquatable<Frac> {
 		}
 	}
 
-	Frac Simplify() {
+	private Frac Simplify() {
 		uint gcd = GCD((uint)Math.Abs(Numerator), (uint)Math.Abs(Denominator));
 		if (gcd is 0 or 1) return this;
 		return new((int)(Numerator / gcd), (int)(Denominator / gcd));

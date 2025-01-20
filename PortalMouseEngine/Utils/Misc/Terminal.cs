@@ -1,9 +1,9 @@
 ﻿namespace PortalMouse.Engine.Utils.Misc;
 
 public static class Terminal {
-	public static void Imp(string msg) => Log("IMP", msg, ConsoleColor.Cyan);
 	public static void Dbg(string msg) => Log("DBG", msg, ConsoleColor.Magenta);
 	public static void Inf(string msg) => Log("INF", msg, ConsoleColor.White);
+	public static void Imp(string msg) => Log("IMP", msg, ConsoleColor.Cyan);
 	public static void Wrn(string msg) => Log("WRN", msg, ConsoleColor.Yellow);
 	public static void Err(string msg) => Log("ERR", msg, ConsoleColor.Red);
 

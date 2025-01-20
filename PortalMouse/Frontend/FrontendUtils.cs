@@ -23,7 +23,7 @@ public static class FrontendUtils {
 				builder.Clear();
 			}
 		} else {
-			Terminal.Wrn($"    None???");
+			Terminal.Wrn("    None???");
 		}
 		Terminal.BlankLine();
 	}
