@@ -60,4 +60,6 @@ public static class NativeHelper {
 	public static void AssertSuccess(bool ok, string funcName) {
 		if (!ok) throw new NativeErrorException($"'{funcName}' Failed!");
 	}
+
+	public static bool IsKeyDown(int vKey) => (User32.GetAsyncKeyState(vKey) & 0x8000) != 0;
 }

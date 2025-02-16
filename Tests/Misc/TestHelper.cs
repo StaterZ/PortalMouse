@@ -10,15 +10,13 @@ public static class TestHelper {
 	public const int k_yMax = k_ySize - 1;
 
 	public static Setup GetSetup(bool shouldWrap) {
+		Setup setup = new();
 		Screen mainScreen = new(
+			setup,
 			1,
 			new R2I(new V2I(0, 0), new V2I(k_xSize, k_ySize)),
 			Frac.One
 		);
-
-
-		Setup setup = new();
-		setup.Screens.Add(mainScreen);
 
 		if (shouldWrap) {
 			static EdgeSpan AutoEdge(Edge edge) => new(edge, new R1I(0, edge.Length));

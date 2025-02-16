@@ -8,6 +8,7 @@ public sealed class Screen {
 	public readonly R2I LogicalRect;
 	public readonly Frac Scale;
 
+	public readonly Setup Setup;
 	public readonly Edge Left;
 	public readonly Edge Right;
 	public readonly Edge Top;
@@ -15,20 +16,23 @@ public sealed class Screen {
 
 	public R2I PhysicalRect => new(LogicalRect.Pos, (V2I)((V2Frac)LogicalRect.Size * Scale));
 
-	private Screen() {
+	private Screen(Setup setup) {
+		Setup = setup;
+		Setup.m_screens.Add(this);
+
 		Left = new Edge(this, Side.Left);
 		Right = new Edge(this, Side.Right);
 		Top = new Edge(this, Side.Top);
 		Bottom = new Edge(this, Side.Bottom);
 	}
 
-	public Screen(int id, R2I logicalRect, Frac scale) : this() {
+	public Screen(Setup setup, int id, R2I logicalRect, Frac scale) : this(setup) {
 		Id = id;
 		LogicalRect = logicalRect;
 		Scale = scale;
 	}
 
-	internal Screen(ScreenDesc screenInfo) : this() {
+	internal Screen(Setup setup, ScreenDesc screenInfo) : this(setup) {
 		{ //Parse out id
 			const string idPrefix = @"\\.\DISPLAY";
 			string szDevice = screenInfo.MonitorInfo.szDevice;

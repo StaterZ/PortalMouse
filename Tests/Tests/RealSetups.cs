@@ -7,27 +7,26 @@ namespace UnitTests;
 public class RealSetups {
 	[TestMethod]
 	public void CommonSetup() {
+		Setup setup = new();
+
 		Screen leftScreen = new(
+			setup,
 			2,
 			new R2I(new V2I(-1920, 0), new V2I(1920, 1080)),
 			Frac.One
 		);
 		Screen mainScreen = new(
+			setup,
 			1,
 			new R2I(new V2I(0, 0), new V2I(2560, 1440)),
 			Frac.One
 		);
 		Screen rightScreen = new(
+			setup,
 			3,
 			new R2I(new V2I(+2560, 0), new V2I(1920, 1080)),
 			Frac.One
 		);
-
-
-		Setup setup = new();
-		setup.Screens.Add(leftScreen);
-		setup.Screens.Add(mainScreen);
-		setup.Screens.Add(rightScreen);
 
 		static EdgeSpan AutoEdge(Edge edge) => new(edge, new R1I(0, edge.Length));
 		Portal.Bind(AutoEdge(leftScreen.Right), AutoEdge(mainScreen.Left));
@@ -41,21 +40,20 @@ public class RealSetups {
 
 	[TestMethod]
 	public void TvSetup() {
+		Setup setup = new();
+
 		Screen mainScreen = new(
+			setup,
 			1,
 			new R2I(new V2I(0, 0), new V2I(1920, 1080)),
 			Frac.One
 		);
 		Screen tvScreen = new(
+			setup,
 			2,
 			new R2I(new V2I(1920, 104), new V2I(3840, 2160)),
 			Frac.One
 		);
-
-
-		Setup setup = new();
-		setup.Screens.Add(mainScreen);
-		setup.Screens.Add(tvScreen);
 
 		static EdgeSpan AutoEdge(Edge edge) => new(edge, new R1I(0, edge.Length));
 		Portal.Bind(AutoEdge(tvScreen.Left), AutoEdge(mainScreen.Right));

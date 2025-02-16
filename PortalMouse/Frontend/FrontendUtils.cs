@@ -144,7 +144,8 @@ public static class FrontendUtils {
 			Terminal.Inf($"Mapping 'screen{mapping.A.Screen} {aEdge.Side} [{aRange.Begin}-{aRange.End}]' to 'screen{mapping.B.Screen} {bEdge.Side} [{bRange.Begin}-{bRange.End}]'");
 			Portal.Bind(
 				new EdgeSpan(aEdge, aRange),
-				new EdgeSpan(bEdge, bRange)
+				new EdgeSpan(bEdge, bRange),
+				mapping.EdgeBarrier ?? 0
 			);
 		}
 

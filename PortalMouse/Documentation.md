@@ -5,7 +5,7 @@
 #### The JSON root object
 ```json
 {
-	"mappings": Portal[] //a list of all portal bindings
+	mappings: Portal[] //a list of all portal bindings
 }
 ```
 
@@ -15,7 +15,8 @@ Moving the mouse into one of them remaps it to the range and position of the oth
 ```json
 {
 	a: EdgeRange, //the first edge
-	b: EdgeRange  //the second edge
+	b: EdgeRange,  //the second edge
+	edgeBarrier: int //(optional) how far to move the cursor at once to cross the portal, defaults to 0px if not specified
 }
 ```
 

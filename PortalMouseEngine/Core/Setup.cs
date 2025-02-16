@@ -4,7 +4,9 @@ using PortalMouse.Engine.Utils.Misc;
 namespace PortalMouse.Engine.Core;
 
 public sealed class Setup {
-	public readonly List<Screen> Screens = new();
+	public IReadOnlyCollection<Screen> Screens => m_screens;
+
+	public readonly List<Screen> m_screens = new();
 	private ScreenPos? m_prevPos;
 
 	public V2I? Handle(V2I pos) {
@@ -41,8 +43,7 @@ public sealed class Setup {
 	public static Setup ConstructLocalSetup() {
 		Setup setup = new();
 		foreach (ScreenDesc screenDesc in NativeHelper.EnumScreenDescs()) {
-			Screen screen = new(screenDesc);
-			setup.Screens.Add(screen);
+			Screen screen = new(setup, screenDesc);
 		}
 		return setup;
 	}

@@ -7,6 +7,7 @@ public class Config {
 	[JsonInclude, JsonPropertyName("mappings")] public Mapping[] Mappings = null!;
 
 	public class Mapping {
+		[JsonInclude, JsonPropertyName("edgeBarrier")] public int? EdgeBarrier = null!;
 		[JsonInclude, JsonPropertyName("a")] public EdgeRange A = null!;
 		[JsonInclude, JsonPropertyName("b")] public EdgeRange B = null!;
 	}

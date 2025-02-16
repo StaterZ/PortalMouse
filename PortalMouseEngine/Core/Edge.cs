@@ -1,5 +1,7 @@
-﻿using PortalMouse.Engine.Utils.Ext;
+﻿using PortalMouse.Engine.Native;
+using PortalMouse.Engine.Utils.Ext;
 using PortalMouse.Engine.Utils.Math;
+using PortalMouse.Engine.Utils.Misc;
 
 namespace PortalMouse.Engine.Core;
 
@@ -53,7 +55,11 @@ public class Edge {
 		Frac inPos = Pos[Axis] + Length * intersection.Value.lineFrac;
 		V2Frac outMove = mouseMove.Delta * (1 - intersection.Value.mouseFrac);
 		LineSeg1Frac inLine = LineSeg1Frac.InitBeginDelta(inPos, outMove[Axis]);
-		(Frac pos, Portal? portal) entry = SlideAlongEdgeIntoPortal(inLine.Clamp(axisLine.Range));
+		LineSeg1Frac slideRange = inLine.Clamp(axisLine.Range);
+		(Frac pos, Portal? portal) entry = SlideAlongEdgeIntoPortal(slideRange);
+		if (outMove[Axis] < entry.portal?.EdgeBarrier && NativeHelper.IsKeyDown(User32.VK_LBUTTON)) {
+			entry = (slideRange.End, null);
+		}
 
 		if (entry.portal == null) {
 			V2Frac exitPos = new(

@@ -19,6 +19,10 @@ internal static class User32 {
 
 	public const int MONITORINFOF_PRIMARY = 1;
 
+	public const int VK_LBUTTON = 1;
+	public const int VK_RBUTTON = 2;
+	public const int VK_MBUTTON = 4;
+
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-monitorenumproc"></see>
 	/// </summary>
@@ -119,6 +123,12 @@ internal static class User32 {
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool GetClipCursor(out Rect lpRect);
 	*/
+
+	/// <summary>
+	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getasynckeystate"></see>
+	/// </summary>
+	[DllImport(dllName, SetLastError = true)]
+	public static extern short GetAsyncKeyState(int vKey);
 
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/windef/ns-windef-rect"></see>
