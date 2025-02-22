@@ -62,7 +62,8 @@ public static class Program {
 		NativeHelper.ShowConsole(true);
 		Console.Clear();
 
-		Terminal.Imp($"[{Application.ProductName}] V{Application.ProductVersion} by StaterZ");
+		Version? version = typeof(Program).Assembly.GetName().Version;
+		Terminal.Imp($"[{Application.ProductName}] V{version} by StaterZ");
 		Terminal.BlankLine();
 
 		Setup setup = Setup.ConstructLocalSetup();

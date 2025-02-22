@@ -16,6 +16,8 @@ public static class NativeHelper {
 		}
 	}
 
+	public static bool IsKeyDown(int vKey) => (User32.GetAsyncKeyState(vKey) & 0x8000) != 0;
+
 	public static void ShowConsole(bool shouldShow) {
 		User32.ShowWindow(Kernel32.GetConsoleWindow(), shouldShow ? User32.SW_SHOW : User32.SW_HIDE);
 	}
@@ -60,6 +62,4 @@ public static class NativeHelper {
 	public static void AssertSuccess(bool ok, string funcName) {
 		if (!ok) throw new NativeErrorException($"'{funcName}' Failed!");
 	}
-
-	public static bool IsKeyDown(int vKey) => (User32.GetAsyncKeyState(vKey) & 0x8000) != 0;
 }
