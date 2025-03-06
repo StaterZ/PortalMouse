@@ -9,6 +9,9 @@ public static class TestHelper {
 	public const int k_xMax = k_xSize - 1;
 	public const int k_yMax = k_ySize - 1;
 
+	public static PortalDesc AutoPortal(Edge edge) =>
+		new(new EdgeRange(edge, new R1I(0, edge.Length)), 0);
+
 	public static Setup GetSetup(bool shouldWrap) {
 		Setup setup = new();
 		Screen mainScreen = new(
@@ -19,10 +22,8 @@ public static class TestHelper {
 		);
 
 		if (shouldWrap) {
-			static EdgeSpan AutoEdge(Edge edge) => new(edge, new R1I(0, edge.Length));
-
-			Portal.Bind(AutoEdge(mainScreen.Left), AutoEdge(mainScreen.Right));
-			Portal.Bind(AutoEdge(mainScreen.Top), AutoEdge(mainScreen.Bottom));
+			Portal.Bind(AutoPortal(mainScreen.Left), AutoPortal(mainScreen.Right));
+			Portal.Bind(AutoPortal(mainScreen.Top), AutoPortal(mainScreen.Bottom));
 		}
 
 		return setup;

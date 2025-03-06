@@ -28,9 +28,8 @@ public class RealSetups {
 			Frac.One
 		);
 
-		static EdgeSpan AutoEdge(Edge edge) => new(edge, new R1I(0, edge.Length));
-		Portal.Bind(AutoEdge(leftScreen.Right), AutoEdge(mainScreen.Left));
-		Portal.Bind(AutoEdge(mainScreen.Right), AutoEdge(rightScreen.Left));
+		Portal.Bind(TestHelper.AutoPortal(leftScreen.Right), TestHelper.AutoPortal(mainScreen.Left));
+		Portal.Bind(TestHelper.AutoPortal(mainScreen.Right), TestHelper.AutoPortal(rightScreen.Left));
 
 		TestHelper.RunTest(setup,
 			(new V2I(+0000 - 1000, 200), null),
@@ -55,8 +54,7 @@ public class RealSetups {
 			Frac.One
 		);
 
-		static EdgeSpan AutoEdge(Edge edge) => new(edge, new R1I(0, edge.Length));
-		Portal.Bind(AutoEdge(tvScreen.Left), AutoEdge(mainScreen.Right));
+		Portal.Bind(TestHelper.AutoPortal(tvScreen.Left), TestHelper.AutoPortal(mainScreen.Right));
 
 		TestHelper.RunTest(setup,
 			(new V2I(1900, 10), null),

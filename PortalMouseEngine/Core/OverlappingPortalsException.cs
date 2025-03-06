@@ -16,7 +16,7 @@ namespace PortalMouse.Engine.Core {
 		public override string Message => base.Message;
 
 		public override string ToString() {
-			return $"Overlapping portals '{aPortal.EdgeSpan}' and '{bPortal.EdgeSpan}'. This is not supported.";
+			return $"Overlapping portals '{aPortal.Desc.EdgeRange}' and '{bPortal.Desc.EdgeRange}'. This is not supported.";
 		}
 	}
 }

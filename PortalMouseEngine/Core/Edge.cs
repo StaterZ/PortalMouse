@@ -26,15 +26,15 @@ public class Edge {
 
 	public bool Add(Portal portal) {
 		(bool success, int index) = m_portals.BetterBinarySearch(
-			portal.EdgeSpan.Range.Begin,
-			portal => portal.EdgeSpan.Range.Begin
+			portal.Desc.EdgeRange.Range.Begin,
+			portal => portal.Desc.EdgeRange.Range.Begin
 		);
 
 		//check for overlapping portals!
 		if (success) return false;
 		if (index < m_portals.Count) {
 			Portal nextPortal = m_portals[index];
-			if (portal.EdgeSpan.Range.End < nextPortal.EdgeSpan.Range.Begin) return false;
+			if (portal.Desc.EdgeRange.Range.End < nextPortal.Desc.EdgeRange.Range.Begin) return false;
 		}
 
 		m_portals.Insert(index, portal);
@@ -57,7 +57,7 @@ public class Edge {
 		LineSeg1Frac inLine = LineSeg1Frac.InitBeginDelta(inPos, outMove[Axis]);
 		LineSeg1Frac slideRange = inLine.Clamp(axisLine.Range);
 		(Frac pos, Portal? portal) entry = SlideAlongEdgeIntoPortal(slideRange);
-		if (outMove[Axis] < entry.portal?.EdgeBarrier && NativeHelper.IsKeyDown(User32.VK_LBUTTON)) {
+		if (outMove[Axis] < entry.portal?.Desc.EdgeBarrier && NativeHelper.IsKeyDown(User32.VK_LBUTTON)) {
 			entry = (slideRange.End, null);
 		}
 
@@ -74,7 +74,7 @@ public class Edge {
 				Screen
 			);
 		} else {
-			Edge exitEdge = entry.portal.Exit.EdgeSpan.Edge;
+			Edge exitEdge = entry.portal.Exit.Desc.EdgeRange.Edge;
 
 			V2Frac exitEdgePos = new(
 				entry.portal.Map(entry.pos),
@@ -101,22 +101,22 @@ public class Edge {
 	private (Frac pos, Portal? portal) SlideAlongEdgeIntoPortal(LineSeg1Frac line) {
 		(bool success, int beginIndex) = m_portals.BetterBinarySearch(
 			line.Begin,
-			portal => (Frac)portal.EdgeSpan.Range.Begin
+			portal => (Frac)portal.Desc.EdgeRange.Range.Begin
 		);
 
 		if (success) {
 			return (line.Begin, m_portals[beginIndex]);
 		} else {
 			beginIndex--;
-			if (m_portals.IsInRange(beginIndex) && line.Begin < m_portals[beginIndex].EdgeSpan.Range.End) {
+			if (m_portals.IsInRange(beginIndex) && line.Begin < m_portals[beginIndex].Desc.EdgeRange.Range.End) {
 				return (line.Begin, m_portals[beginIndex]);
 			}
 
 			//UGH!!! stupid C# not allowing struct constants in switch patterns >:(
-			if (line.Delta < 0 && m_portals.IsInRange(beginIndex) && line.End < m_portals[beginIndex].EdgeSpan.Range.End)
-				return (m_portals[beginIndex].EdgeSpan.Range.End, m_portals[beginIndex]);
-			if (line.Delta > 0 && m_portals.IsInRange(beginIndex + 1) && line.End >= m_portals[beginIndex + 1].EdgeSpan.Range.Begin)
-				return (m_portals[beginIndex + 1].EdgeSpan.Range.Begin, m_portals[beginIndex + 1]);
+			if (line.Delta < 0 && m_portals.IsInRange(beginIndex) && line.End < m_portals[beginIndex].Desc.EdgeRange.Range.End)
+				return (m_portals[beginIndex].Desc.EdgeRange.Range.End, m_portals[beginIndex]);
+			if (line.Delta > 0 && m_portals.IsInRange(beginIndex + 1) && line.End >= m_portals[beginIndex + 1].Desc.EdgeRange.Range.Begin)
+				return (m_portals[beginIndex + 1].Desc.EdgeRange.Range.Begin, m_portals[beginIndex + 1]);
 			return (line.End, null);
 		}
 	}

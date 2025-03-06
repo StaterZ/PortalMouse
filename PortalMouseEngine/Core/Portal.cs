@@ -3,29 +3,27 @@
 namespace PortalMouse.Engine.Core;
 
 public class Portal {
-	public readonly EdgeSpan EdgeSpan;
+	public readonly PortalDesc Desc;
 	public Portal Exit;
-	public readonly int EdgeBarrier;
 
-	private Portal(EdgeSpan edgeSpan, Portal exit, int edgeBarrier) {
-		EdgeSpan = edgeSpan;
+	private Portal(PortalDesc desc, Portal exit) {
+		Desc = desc;
 		Exit = exit;
-		EdgeBarrier = edgeBarrier;
 	}
 
 	public Frac Map(Frac value) =>
-		MathX.Map(value, EdgeSpan.Range, Exit.EdgeSpan.Range);
+		MathX.Map(value, Desc.EdgeRange.Range, Exit.Desc.EdgeRange.Range);
 
-	public static void Bind(EdgeSpan a, EdgeSpan b, int edgeBarrier = 0) {
-		Portal aPortal = new(a, null!, edgeBarrier);
-		Portal bPortal = new(b, null!, edgeBarrier);
+	public static void Bind(PortalDesc a, PortalDesc b) {
+		Portal aPortal = new(a, null!);
+		Portal bPortal = new(b, null!);
 
 		aPortal.Exit = bPortal;
 		bPortal.Exit = aPortal;
 
 		if (
-			!a.Edge.Add(aPortal) ||
-			!b.Edge.Add(bPortal)
+			!aPortal.Desc.EdgeRange.Edge.Add(aPortal) ||
+			!bPortal.Desc.EdgeRange.Edge.Add(bPortal)
 		) throw new OverlappingPortalsException(aPortal, bPortal);
 	}
 }

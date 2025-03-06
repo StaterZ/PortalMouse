@@ -16,7 +16,6 @@ Moving the mouse into one of them remaps it to the range and position of the oth
 {
 	a: EdgeRange, //the first edge
 	b: EdgeRange,  //the second edge
-	edgeBarrier: int //(optional) how far to move the cursor at once to cross the portal, defaults to 0px if not specified
 }
 ```
 
@@ -27,6 +26,7 @@ The pixel range goes between at most between at most 0 and *side length of scree
 {
 	screen: i32,   // the screen indices
 	side: Side,    // what side of the screen are we mapping
+	edgeBarrier: int //(optional) how far to move the cursor at once to cross the portal, defaults to 0px if not specified
 	begin: Anchor, // (optional) what to start the range at (inclusive), defaults to 0% if not specified
 	end: Anchor    // (optional) what to end the range at (exclusive), defaults to 100% if not specified
 }

@@ -51,102 +51,105 @@ public static class FrontendUtils {
 		}
 
 		foreach (Config.Mapping mapping in config.Mappings) {
-			bool TryParseScreen(int screenId, out Screen screen) {
-				Screen? foundScreen = setup.Screens.FirstOrDefault(screen => screen.Id == screenId);
-				if (foundScreen == null) {
-					Terminal.Err($@"Screen id out of range. '{screenId}' supplied, but valid ids are: {setup.Screens.Aggregate(new StringBuilder(), (builder, screen) => {
-						if (builder.Length > 0) builder.Append(", ");
-						builder.Append(screen.Id);
-						return builder;
-					})}, aborting");
-					screen = default!;
-					return false;
-				}
-
-				screen = foundScreen;
-				return true;
-			}
-
-			bool TryParseRange(Config.EdgeRange edgeRange, Edge edge, out R1I range) {
-				bool TryParseAnchor(string anchorStr, Edge edge, out int anchor) {
-					R1I validPixelRange = new(0, edge.Length); //begin is 0 since this is in local space
-					R1I validPercentRange = new(0, 100);
-
-					if (anchorStr.EndsWith("px")) {
-						if (!int.TryParse(anchorStr[..^2], out int value)) {
-							Terminal.Err($"Failed to parse anchor. '{anchorStr}' supplied, but int is malformed");
-							anchor = default;
-							return false;
-						}
-
-						if (
-							value < validPixelRange.Begin ||
-							value > validPixelRange.End
-						) {
-							Terminal.Err($"Anchor is out of range. '{anchorStr}' supplied, but valid range is {validPixelRange.Begin}px-{validPixelRange.End}px");
-							anchor = default;
-							return false;
-						}
-
-						anchor = value;
-						return true;
-					}
-					if (anchorStr.EndsWith("%")) {
-						if (!int.TryParse(anchorStr[..^1], out int value)) {
-							Terminal.Err($"Failed to parse anchor. '{anchorStr}' supplied, but int is malformed");
-							anchor = default;
-							return false;
-						}
-
-						if (
-							value < validPercentRange.Begin ||
-							value > validPercentRange.End
-						) {
-							Terminal.Err($"Anchor is out of range. '{anchorStr}' supplied, but valid range is {validPercentRange.Begin}%-{validPercentRange.End}%");
-							anchor = default;
-							return false;
-						}
-
-						anchor = MathX.Map(value, validPercentRange, validPixelRange);
-						return true;
+			PortalDesc? TryParsePortalEdge(Config.PortalEdge portalEdge) {
+				Screen? TryParseScreen(int screenId) {
+					Screen? foundScreen = setup.Screens.FirstOrDefault(screen => screen.Id == screenId);
+					if (foundScreen == null) {
+						Terminal.Err($@"Screen id out of range. '{screenId}' supplied, but valid ids are: {setup.Screens.Aggregate(new StringBuilder(), (builder, screen) => {
+							if (builder.Length > 0) builder.Append(", ");
+							builder.Append(screen.Id);
+							return builder;
+						})}, aborting");
+						return null;
 					}
 
-					anchor = default;
-					return false;
+					return foundScreen;
 				}
 
-				const string beginDefault = "0%";
-				if (!TryParseAnchor(edgeRange.Begin ?? beginDefault, edge, out int begin)) {
-					range = default;
-					return false;
+				R1I? TryParseRange(Edge edge) {
+					bool TryParseAnchor(string anchorStr, Edge edge, out int anchor) {
+						R1I validPixelRange = new(0, edge.Length); //begin is 0 since this is in local space
+						R1I validPercentRange = new(0, 100);
+
+						if (anchorStr.EndsWith("px")) {
+							if (!int.TryParse(anchorStr[..^2], out int value)) {
+								Terminal.Err($"Failed to parse anchor. '{anchorStr}' supplied, but int is malformed");
+								anchor = default;
+								return false;
+							}
+
+							if (
+								value < validPixelRange.Begin ||
+								value > validPixelRange.End
+							) {
+								Terminal.Err($"Anchor is out of range. '{anchorStr}' supplied, but valid range is {validPixelRange.Begin}px-{validPixelRange.End}px");
+								anchor = default;
+								return false;
+							}
+
+							anchor = value;
+							return true;
+						}
+						if (anchorStr.EndsWith("%")) {
+							if (!int.TryParse(anchorStr[..^1], out int value)) {
+								Terminal.Err($"Failed to parse anchor. '{anchorStr}' supplied, but int is malformed");
+								anchor = default;
+								return false;
+							}
+
+							if (
+								value < validPercentRange.Begin ||
+								value > validPercentRange.End
+							) {
+								Terminal.Err($"Anchor is out of range. '{anchorStr}' supplied, but valid range is {validPercentRange.Begin}%-{validPercentRange.End}%");
+								anchor = default;
+								return false;
+							}
+
+							anchor = MathX.Map(value, validPercentRange, validPixelRange);
+							return true;
+						}
+
+						anchor = default;
+						return false;
+					}
+
+					const string beginDefault = "0%";
+					if (!TryParseAnchor(portalEdge.Begin ?? beginDefault, edge, out int begin)) {
+						return null;
+					}
+
+					const string endDefault = "100%";
+					if (!TryParseAnchor(portalEdge.End ?? endDefault, edge, out int end)) {
+						return null;
+					}
+
+					if (begin > end) throw new ConfigException($"Begin({begin}) can't be larger the end({end})");
+
+					return new R1I(begin, end);
 				}
 
-				const string endDefault = "100%";
-				if (!TryParseAnchor(edgeRange.End ?? endDefault, edge, out int end)) {
-					range = default;
-					return false;
-				}
+				Screen? screen = TryParseScreen(portalEdge.Screen);
+				if (screen == null) return null;
 
-				range = new R1I(begin, end);
-				return true;
+				Edge edge = screen.GetEdge(portalEdge.Side);
+				R1I? range = TryParseRange(edge);
+				if (!range.HasValue) return null;
+
+				EdgeRange edgeRange = new(edge, range.Value);
+				return new PortalDesc(edgeRange, portalEdge.EdgeBarrier ?? 0);
 			}
 
-			if (!TryParseScreen(mapping.A.Screen, out Screen aScreen)) return false;
-			Edge aEdge = aScreen.GetEdge(mapping.A.Side);
-			if (!TryParseRange(mapping.A, aEdge, out R1I aRange)) return false;
+			PortalDesc? a = TryParsePortalEdge(mapping.A);
+			if (a == null) return false;
 
-			if (!TryParseScreen(mapping.B.Screen, out Screen bScreen)) return false;
-			Edge bEdge = bScreen.GetEdge(mapping.B.Side);
-			if (!TryParseRange(mapping.B, bEdge, out R1I bRange)) return false;
+			PortalDesc? b = TryParsePortalEdge(mapping.B);
+			if (b == null) return false;
 
-			if (mapping.A.Side != mapping.B.Side.Opposite()) throw new ConfigException($"The portals A and B need to be on opposite sides. A is '{mapping.A.Side}', B is '{mapping.B.Side}'. This means A needs to be '{mapping.B.Side.Opposite()}' OR B needs to be'{mapping.A.Side.Opposite()}'");
+			if (a.Value.EdgeRange.Edge.Side != b.Value.EdgeRange.Edge.Side.Opposite()) throw new ConfigException($"The portals A and B need to be on opposite sides. A is '{a.Value.EdgeRange.Edge.Side}', B is '{b.Value.EdgeRange.Edge.Side}'. This means A needs to be '{b.Value.EdgeRange.Edge.Side.Opposite()}' OR B needs to be'{a.Value.EdgeRange.Edge.Side.Opposite()}'");
 
-			Terminal.Inf($"Mapping 'screen{mapping.A.Screen} {aEdge.Side} [{aRange.Begin}-{aRange.End}]' to 'screen{mapping.B.Screen} {bEdge.Side} [{bRange.Begin}-{bRange.End}]'");
-			Portal.Bind(
-				new EdgeSpan(aEdge, aRange),
-				new EdgeSpan(bEdge, bRange),
-				mapping.EdgeBarrier ?? 0
-			);
+			Terminal.Inf($"Mapping '{a}' to '{b}'");
+			Portal.Bind(a.Value, b.Value);
 		}
 
 		return true;
