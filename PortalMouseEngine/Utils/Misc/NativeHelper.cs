@@ -60,6 +60,6 @@ public static class NativeHelper {
 		return ptr;
 	}
 	public static void AssertSuccess(bool ok, string funcName) {
-		if (!ok) throw new NativeErrorException($"'{funcName}' Failed!");
+		if (!ok) throw new NativeErrorException($"'{funcName}' Failed! Code: {Kernel32.GetLastError()}");
 	}
 }

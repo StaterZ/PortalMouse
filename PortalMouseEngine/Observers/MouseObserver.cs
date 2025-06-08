@@ -18,7 +18,7 @@ public abstract class MouseObserver : IDisposable {
 	protected virtual void ReleaseUnmanagedResources() { }
 
 	public void Dispose() {
-		ReleaseUnmanagedResources();
 		GC.SuppressFinalize(this);
+		ReleaseUnmanagedResources();
 	}
 }

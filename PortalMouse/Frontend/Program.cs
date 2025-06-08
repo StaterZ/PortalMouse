@@ -60,7 +60,7 @@ public static class Program {
 
 	private static void Run(Options options) {
 		NativeHelper.ShowConsole(true);
-		Console.Clear();
+		//Console.Clear();
 
 		Version? version = typeof(Program).Assembly.GetName().Version;
 		Terminal.Imp($"[{Application.ProductName}] V{version} by StaterZ");

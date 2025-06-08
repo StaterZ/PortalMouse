@@ -18,4 +18,10 @@ internal static class Kernel32 {
 	[DllImport(dllName, SetLastError = true, CharSet = CharSet.Unicode)]
 	public static extern IntPtr GetModuleHandle(string lpModuleName);
 	*/
+
+	/// <summary>
+	/// <see href="">https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-getlasterror</see>
+	/// </summary>
+	[DllImport(dllName, SetLastError = true)]
+	public static extern uint GetLastError();
 }
