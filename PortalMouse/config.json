@@ -1,24 +1,12 @@
 {
 	"mappings": [
 		{
-			"a": {
-				"screen": 1,
-				"side": "Left"
-			},
-			"b": {
-				"screen": 1,
-				"side": "Right"
-			}
+			"a": { "screen": 1, "side": "Left" },
+			"b": { "screen": 1, "side": "Right" }
 		},
 		{
-			"a": {
-				"screen": 1,
-				"side": "Top"
-			},
-			"b": {
-				"screen": 1,
-				"side": "Bottom"
-			}
+			"a": { "screen": 1, "side": "Top" },
+			"b": { "screen": 1, "side": "Bottom" }
 		}
 	]
 }

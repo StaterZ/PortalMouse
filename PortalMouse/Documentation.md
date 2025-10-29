@@ -3,7 +3,7 @@
 ## Available Settings
 ### Root
 #### The JSON root object
-```json
+```
 {
 	mappings: Portal[] //a list of all portal bindings
 }
@@ -12,7 +12,7 @@
 ### Portal
 #### Defines a connection between 2 EdgeRanges
 Moving the mouse into one of them remaps it to the range and position of the other
-```json
+```
 {
 	a: EdgeRange, //the first edge
 	b: EdgeRange,  //the second edge
@@ -22,11 +22,11 @@ Moving the mouse into one of them remaps it to the range and position of the oth
 ### EdgeRange
 #### Defines a pixel range on a given side of a given screen.
 The pixel range goes between at most between at most 0 and *side length of screen* for obvious reasons
-```json
+```
 {
 	screen: i32,   // the screen indices
 	side: Side,    // what side of the screen are we mapping
-	edgeBarrier: int //(optional) how far to move the cursor at once to cross the portal, defaults to 0px if not specified
+	barrier: int,  // (optional) how fast to move the cursor to cross the portal while holding a window/file, defaults to 0px (off) if not specified, this can help with window snapping/overshooting
 	begin: Anchor, // (optional) what to start the range at (inclusive), defaults to 0% if not specified
 	end: Anchor    // (optional) what to end the range at (exclusive), defaults to 100% if not specified
 }

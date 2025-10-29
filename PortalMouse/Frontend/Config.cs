@@ -14,7 +14,7 @@ public class Config {
 	public class PortalEdge {
 		[JsonInclude, JsonPropertyName("screen")] public int Screen;
 		[JsonInclude, JsonPropertyName("side"), JsonConverter(typeof(JsonStringEnumConverter))] public Side Side;
-		[JsonInclude, JsonPropertyName("edgeBarrier")] public int? EdgeBarrier;
+		[JsonInclude, JsonPropertyName("barrier")] public int? Barrier;
 		[JsonInclude, JsonPropertyName("begin")] public string? Begin;
 		[JsonInclude, JsonPropertyName("end")] public string? End;
 	}

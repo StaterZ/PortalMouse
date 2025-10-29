@@ -137,7 +137,7 @@ public static class FrontendUtils {
 				if (!range.HasValue) return null;
 
 				EdgeRange edgeRange = new(edge, range.Value);
-				return new PortalDesc(edgeRange, portalEdge.EdgeBarrier ?? 0);
+				return new PortalDesc(edgeRange, portalEdge.Barrier ?? 0);
 			}
 
 			PortalDesc? a = TryParsePortalEdge(mapping.A);
