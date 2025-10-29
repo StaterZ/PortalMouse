@@ -11,7 +11,7 @@ public class LLMHookObserver : MouseObserver {
 
 	public LLMHookObserver(Func<V2I, V2I?> callback, Action<Exception> exceptionHandler) : base(callback, exceptionHandler) {
 		m_hookCallback = HookCallback;
-		m_hookHandle = User32.SetWindowsHookEx(HookType.WH_MOUSE_LL, m_hookCallback, IntPtr.Zero, 0);
+		m_hookHandle = User32.SetWindowsHookEx(User32.HookType.WH_MOUSE_LL, m_hookCallback, IntPtr.Zero, 0);
 	}
 
 	private IntPtr HookCallback(int code, IntPtr wParam, IntPtr lParam) {

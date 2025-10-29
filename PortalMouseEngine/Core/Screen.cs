@@ -5,6 +5,7 @@ namespace PortalMouse.Engine.Core;
 
 public sealed class Screen {
 	public readonly int Id;
+	public readonly string Name;
 	public readonly R2I LogicalRect;
 	public readonly Frac Scale;
 
@@ -16,9 +17,11 @@ public sealed class Screen {
 
 	public R2I PhysicalRect => new(LogicalRect.Pos, (V2I)((V2Frac)LogicalRect.Size * Scale));
 
-	private Screen(Setup setup) {
+	private Screen(Setup setup, string name) {
 		Setup = setup;
 		Setup.m_screens.Add(this);
+
+		Name = name;
 
 		Left = new Edge(this, Side.Left);
 		Right = new Edge(this, Side.Right);
@@ -26,24 +29,28 @@ public sealed class Screen {
 		Bottom = new Edge(this, Side.Bottom);
 	}
 
-	public Screen(Setup setup, int id, R2I logicalRect, Frac scale) : this(setup) {
+	public Screen(Setup setup, int id, R2I logicalRect, Frac scale, string name) : this(setup, name) {
 		Id = id;
 		LogicalRect = logicalRect;
 		Scale = scale;
 	}
 
-	internal Screen(Setup setup, ScreenDesc screenInfo) : this(setup) {
-		{ //Parse out id
+	internal Screen(Setup setup, ScreenDesc screenDesc) : this(setup, screenDesc.FriendlyName) {
+		if (screenDesc.DisplayDevice != null) {
+			string deviceId = screenDesc.DisplayDevice.Value.DeviceID;
+			string idStr = deviceId[(deviceId.LastIndexOf('\\')+1)..];
+			if (!int.TryParse(idStr, out Id)) throw new FormatException($"Failed to parse display id. Bad int parse. DeviceID was '{idStr}'");
+		} else { //Parse out id
 			const string idPrefix = @"\\.\DISPLAY";
-			string szDevice = screenInfo.MonitorInfo.szDevice;
+			string szDevice = screenDesc.MonitorInfo.szDevice;
 			if (!szDevice.StartsWith(idPrefix)) throw new FormatException($"Failed to parse monitor id. Bad prefix. szDevice was '{szDevice}'");
 
 			string idStr = szDevice[idPrefix.Length..];
 			if (!int.TryParse(idStr, out Id)) throw new FormatException($"Failed to parse monitor id. Bad int parse. szDevice was '{szDevice}'");
 		}
 
-		LogicalRect = (R2I)screenInfo.MonitorInfo.rcMonitor;
-		Scale = screenInfo.Scale;
+		LogicalRect = (R2I)screenDesc.MonitorInfo.rcMonitor;
+		Scale = screenDesc.Scale;
 	}
 
 	public ScreenLineSeg? Handle(LineSeg2Frac mouseMove) {

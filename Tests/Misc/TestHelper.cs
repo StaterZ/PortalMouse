@@ -18,7 +18,8 @@ public static class TestHelper {
 			setup,
 			1,
 			new R2I(new V2I(0, 0), new V2I(k_xSize, k_ySize)),
-			Frac.One
+			Frac.One,
+			"Main"
 		);
 
 		if (shouldWrap) {

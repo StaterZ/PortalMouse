@@ -82,11 +82,7 @@ public static class Program {
 			UpdateState(RunningState.Halted);
 			return;
 		}
-		if (!FrontendUtils.ApplyConfig(config, setup)) {
-			Terminal.Err("Failed to apply some or all config mappings. Halting...");
-			UpdateState(RunningState.Halted);
-			return;
-		}
+		FrontendUtils.ApplyConfig(config, setup);
 
 		Terminal.Inf("Config Successfully Loaded!");
 		Terminal.BlankLine();
@@ -98,7 +94,6 @@ public static class Program {
 				Terminal.Dbg($"Moved: {pos} -> {movedPos.Value}");
 			}
 #endif
-
 			return movedPos;
 		}
 
@@ -122,10 +117,10 @@ public static class Program {
 	};
 
 	private static void HandleException(Exception ex) {
-		UpdateState(RunningState.Halted);
 		using (new FgScope(ConsoleColor.Red)) {
 			Console.WriteLine(ex);
 		}
+		UpdateState(RunningState.Restart);
 	}
 
 	private class Options {

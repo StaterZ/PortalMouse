@@ -14,8 +14,10 @@ public static class FrontendUtils {
 		Terminal.Inf("Detected Screens:");
 		if (setup.Screens.Count > 0) {
 			StringBuilder builder = new();
+			static string GetUniqueName(Screen screen) => $"{screen.Id} ({screen.Name})";
+			int maxUniqueNameLength = setup.Screens.Max(screen => GetUniqueName(screen).Length);
 			foreach (Screen screen in setup.Screens) {
-				builder.Append($"    {screen.Id} : {screen.PhysicalRect} @ {(float)(screen.Scale * 100)}%");
+				builder.Append($"    {GetUniqueName(screen).PadRight(maxUniqueNameLength)} : {screen.PhysicalRect} @ {(float)(screen.Scale * 100)}%");
 				if (screen.Scale != Frac.One) {
 					builder.Append($" -> {screen.LogicalRect}");
 				}
@@ -30,40 +32,40 @@ public static class FrontendUtils {
 
 	public static Config? LoadConfig(string path) {
 		if (!File.Exists(path)) {
-			Terminal.Err($"Path '{path}' not found, aborting");
+			Terminal.Err($"Path '{path}' not found");
 			return null;
 		}
 
 		string configText = File.ReadAllText(path);
 		Config? config = JsonSerializer.Deserialize<Config>(configText);
 		if (config == null) {
-			Terminal.Err("Failed to parse config, aborting");
+			Terminal.Err("Failed to parse config");
 			return null;
 		}
 
 		return config;
 	}
 
-	public static bool ApplyConfig(Config config, Setup setup) {
+	public static void ApplyConfig(Config config, Setup setup) {
 		if (config.Mappings.Length <= 0) {
 			Terminal.Wrn("No mappings present in config!");
-			return true;
+			return;
 		}
 
 		foreach (Config.Mapping mapping in config.Mappings) {
 			PortalDesc? TryParsePortalEdge(Config.PortalEdge portalEdge) {
 				Screen? TryParseScreen(int screenId) {
 					Screen? foundScreen = setup.Screens.FirstOrDefault(screen => screen.Id == screenId);
-					if (foundScreen == null) {
-						Terminal.Err($@"Screen id out of range. '{screenId}' supplied, but valid ids are: {setup.Screens.Aggregate(new StringBuilder(), (builder, screen) => {
-							if (builder.Length > 0) builder.Append(", ");
-							builder.Append(screen.Id);
-							return builder;
-						})}, aborting");
-						return null;
-					}
+					if (foundScreen != null) return foundScreen;
 
-					return foundScreen;
+					Terminal.Err($@"Screen id out of range. '{screenId}' supplied, but valid ids are: {setup.Screens.Aggregate(new StringBuilder(), (builder, screen) => {
+						if (builder.Length > 0) {
+							builder.Append(", ");
+						}
+						builder.Append(screen.Id);
+						return builder;
+					})}");
+					return null;
 				}
 
 				R1I? TryParseRange(Edge edge) {
@@ -141,17 +143,15 @@ public static class FrontendUtils {
 			}
 
 			PortalDesc? a = TryParsePortalEdge(mapping.A);
-			if (a == null) return false;
+			if (a == null) continue;
 
 			PortalDesc? b = TryParsePortalEdge(mapping.B);
-			if (b == null) return false;
+			if (b == null) continue;
 
-			if (a.Value.EdgeRange.Edge.Side != b.Value.EdgeRange.Edge.Side.Opposite()) throw new ConfigException($"The portals A and B need to be on opposite sides. A is '{a.Value.EdgeRange.Edge.Side}', B is '{b.Value.EdgeRange.Edge.Side}'. This means A needs to be '{b.Value.EdgeRange.Edge.Side.Opposite()}' OR B needs to be'{a.Value.EdgeRange.Edge.Side.Opposite()}'");
+			if (a.Value.EdgeRange.Edge.Side != b.Value.EdgeRange.Edge.Side.Opposite()) throw new ConfigException($"The portals A and B need to be on opposite sides. A is '{a.Value.EdgeRange.Edge.Side}', B is '{b.Value.EdgeRange.Edge.Side}'. This means A needs to be '{b.Value.EdgeRange.Edge.Side.Opposite()}' OR B needs to be '{a.Value.EdgeRange.Edge.Side.Opposite()}'");
 
 			Terminal.Inf($"Mapping '{a}' to '{b}'");
 			Portal.Bind(a.Value, b.Value);
 		}
-
-		return true;
 	}
 }

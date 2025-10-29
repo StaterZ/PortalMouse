@@ -8,20 +8,14 @@ internal static class Kernel32 {
 	/// <summary>
 	/// <see href="">https://learn.microsoft.com/en-us/windows/console/getconsolewindow</see>
 	/// </summary>
-	[DllImport(dllName, SetLastError = true)]
+	[DllImport(dllName, CharSet = CharSet.Unicode, SetLastError = true)]
 	public static extern IntPtr GetConsoleWindow();
 
 	/*
 	/// <summary>
 	/// <see href="https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getmodulehandlew"></see>
 	/// </summary>
-	[DllImport(dllName, SetLastError = true, CharSet = CharSet.Unicode)]
+	[DllImport(dllName, CharSet = CharSet.Unicode, SetLastError = true)]
 	public static extern IntPtr GetModuleHandle(string lpModuleName);
 	*/
-
-	/// <summary>
-	/// <see href="">https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-getlasterror</see>
-	/// </summary>
-	[DllImport(dllName, SetLastError = true)]
-	public static extern uint GetLastError();
 }
