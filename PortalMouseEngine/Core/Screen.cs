@@ -17,6 +17,8 @@ public sealed class Screen {
 
 	public R2I PhysicalRect => new(LogicalRect.Pos, (V2I)((V2Frac)LogicalRect.Size * Scale));
 
+	public IEnumerable<Edge> Edges => [Left, Right, Top, Bottom];
+
 	private Screen(Setup setup, string name) {
 		Setup = setup;
 		Setup.m_screens.Add(this);
@@ -53,13 +55,10 @@ public sealed class Screen {
 		Scale = screenDesc.Scale;
 	}
 
-	public ScreenLineSeg? Handle(LineSeg2Frac mouseMove) {
-		return
-			Left.TryHandle(mouseMove) ??
-			Right.TryHandle(mouseMove) ??
-			Top.TryHandle(mouseMove) ??
-			Bottom.TryHandle(mouseMove);
-	}
+	public ScreenLineSeg? Handle(LineSeg2Frac mouseMove) => Edges
+		.Select(edge => edge.TryHandle(mouseMove))
+		.First(result => result != null);
+
 
 	public Edge GetEdge(Side side) {
 		return side switch {

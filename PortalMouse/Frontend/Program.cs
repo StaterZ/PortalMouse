@@ -4,11 +4,18 @@ using PortalMouse.Engine.Core;
 using PortalMouse.Engine.Observers;
 using PortalMouse.Engine.Utils.Math;
 using PortalMouse.Engine.Utils.Misc;
+using System;
+using System.IO;
+using System.Windows.Forms;
+#if !DEBUG
+using System.Threading;
+#endif
 
 namespace PortalMouse.Frontend;
 
 public static class Program {
 	private static RunningState s_runningState = RunningState.Halted;
+	public static Setup? Setup { get; private set; }
 
 	[STAThread]
 	private static void Main(string[] args) {
@@ -25,7 +32,7 @@ public static class Program {
 		Runtime(options);
 	}
 
-	public static void UpdateState(RunningState state) {
+	public static void SwitchState(RunningState state) {
 		s_runningState = state;
 		Application.Exit();
 	}
@@ -60,8 +67,7 @@ public static class Program {
 
 	private static void Run(Options options) {
 		NativeHelper.ShowConsole(true);
-		//Console.Clear();
-
+		
 		Version? version = typeof(Program).Assembly.GetName().Version;
 		Terminal.Imp($"[{Application.ProductName}] V{version} by StaterZ");
 		Terminal.BlankLine();
@@ -71,7 +77,7 @@ public static class Program {
 
 		if (setup.Screens.Count <= 0) {
 			Terminal.Err("No screens found in setup? Something has gone terribly wrong! Halting...");
-			UpdateState(RunningState.Halted);
+			SwitchState(RunningState.Halted);
 			return;
 		}
 
@@ -79,10 +85,16 @@ public static class Program {
 		Config? config = FrontendUtils.LoadConfig(options.ConfigPath);
 		if (config == null) {
 			Terminal.Err("Failed to load the config. Did you move it without setting a custom config path argument? Halting...");
-			UpdateState(RunningState.Halted);
+			SwitchState(RunningState.Halted);
 			return;
 		}
-		FrontendUtils.ApplyConfig(config, setup);
+		try {
+			FrontendUtils.ApplyConfig(config, setup);
+		} catch (Exception) {
+			SwitchState(RunningState.Halted);
+			throw;
+		}
+		Setup = setup;
 
 		Terminal.Inf("Config Successfully Loaded!");
 		Terminal.BlankLine();
@@ -105,9 +117,11 @@ public static class Program {
 
 		MouseObserver mouseObserver = CreateObserver(MoveHandler, options.Observer);
 
+		//Editor.Open(setup);
 		Application.Run();
 
 		mouseObserver.Dispose();
+		Setup = null;
 	}
 
 	private static MouseObserver CreateObserver(Func<V2I, V2I?> callback, Options.ObserverKind observerKind) => observerKind switch {
@@ -120,7 +134,7 @@ public static class Program {
 		using (new FgScope(ConsoleColor.Red)) {
 			Console.WriteLine(ex);
 		}
-		UpdateState(RunningState.Restart);
+		SwitchState(RunningState.Restart);
 	}
 
 	private class Options {

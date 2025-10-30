@@ -21,6 +21,14 @@ public static class SideExt {
 		_ => throw new UnreachableException()
 	};
 
+	public static Axis ToAxis(this Side self) => self switch {
+		Side.Left => Axis.Horizontal,
+		Side.Right => Axis.Horizontal,
+		Side.Top => Axis.Vertical,
+		Side.Bottom => Axis.Vertical,
+		_ => throw new UnreachableException()
+	};
+
 	public static V2I ToVec(this Side self) => self switch {
 		Side.Left => new V2I(0, 0),
 		Side.Right => new V2I(1, 0),

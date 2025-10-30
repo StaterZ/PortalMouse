@@ -2,6 +2,9 @@
 using Math = System.Math;
 
 public struct R1I {
+	public static readonly R1I Zero = new(0, 0);
+	public static readonly R1I One = new(0, 1);
+
 	public int Begin;
 	public int End;
 

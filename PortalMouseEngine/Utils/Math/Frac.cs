@@ -5,8 +5,8 @@ namespace PortalMouse.Engine.Utils.Math;
 using Math = System.Math;
 
 public readonly struct Frac : IComparable, IComparable<Frac>, IEquatable<Frac> {
-	public static readonly Frac Zero = new(0, 1);
-	public static readonly Frac One = new(1, 1);
+	public static readonly Frac Zero = 0;
+	public static readonly Frac One = 1;
 
 	public readonly int Numerator;
 	public readonly int Denominator;

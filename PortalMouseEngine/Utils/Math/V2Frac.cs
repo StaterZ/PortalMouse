@@ -3,6 +3,9 @@
 namespace PortalMouse.Engine.Utils.Math;
 
 public struct V2Frac {
+	public static readonly V2Frac Zero = new(Frac.Zero, Frac.Zero);
+	public static readonly V2Frac One = new(Frac.Zero, Frac.One);
+
 	public Frac x;
 	public Frac y;
 

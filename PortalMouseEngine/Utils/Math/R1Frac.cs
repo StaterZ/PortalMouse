@@ -1,6 +1,9 @@
 ﻿namespace PortalMouse.Engine.Utils.Math;
 
 public struct R1Frac {
+	public static readonly R1I Zero = new(0, 0);
+	public static readonly R1I One = new(0, 1);
+
 	public Frac Begin;
 	public Frac End;
 

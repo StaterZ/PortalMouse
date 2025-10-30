@@ -17,5 +17,14 @@ public class Config {
 		[JsonInclude, JsonPropertyName("barrier")] public int? Barrier;
 		[JsonInclude, JsonPropertyName("begin")] public string? Begin;
 		[JsonInclude, JsonPropertyName("end")] public string? End;
+
+		public PortalEdge() { }
+
+		public PortalEdge(Portal portal) {
+			Screen = portal.Desc.EdgeRange.Edge.Screen.Id;
+			Begin = $"{portal.Desc.EdgeRange.LocalRange.Begin}px";
+			End = $"{portal.Desc.EdgeRange.LocalRange.End}px";
+			Barrier = portal.Desc.EdgeBarrier;
+		}
 	}
 }

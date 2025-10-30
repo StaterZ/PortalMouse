@@ -3,6 +3,9 @@
 namespace PortalMouse.Engine.Utils.Math;
 
 public struct V2I {
+	public static readonly V2I Zero = new(0, 0);
+	public static readonly V2I One = new(1, 1);
+
 	public int x;
 	public int y;
 

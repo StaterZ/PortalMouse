@@ -9,7 +9,8 @@ public class PollObserver : MouseObserver {
 
 	public PollObserver(Func<V2I, V2I?> callback, Action<Exception> exceptionHandler) : base(callback, exceptionHandler) {
 		m_thread = new Thread(PollLoop) {
-			Name = nameof(PollObserver)
+			Name = nameof(PollObserver),
+			IsBackground = true,
 		};
 		m_thread.Start();
 	}

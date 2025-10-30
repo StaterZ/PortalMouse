@@ -14,7 +14,8 @@ public class DummyObserver : MouseObserver {
 		m_moves = moves;
 
 		m_thread = new Thread(PollLoop) {
-			Name = nameof(DummyObserver)
+			Name = nameof(DummyObserver),
+			IsBackground = true,
 		};
 		m_thread.Start();
 	}

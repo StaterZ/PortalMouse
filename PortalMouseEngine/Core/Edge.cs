@@ -10,11 +10,15 @@ public class Edge {
 	public readonly Screen Screen;
 	private readonly List<Portal> m_portals = new();
 
-	private V2I Pos => Screen.LogicalRect.Pos + Screen.LogicalRect.Size * Side.ToVec();
+	public IReadOnlyList<Portal> Portals => m_portals;
 
-	private V2I InnerPos => Screen.LogicalRect.Pos + (Screen.LogicalRect.Size - 1) * Side.ToVec();
+	public V2I LocalPos => Screen.LogicalRect.Size * Side.ToVec();
+	private V2I Pos => Screen.LogicalRect.Pos + LocalPos;
 
-	private Axis Axis => Side.ToDirection().ToAxis().Opposite();
+	private V2I LocalPosInclusive => (Screen.LogicalRect.Size - 1) * Side.ToVec();
+	private V2I PosInclusive => Screen.LogicalRect.Pos + LocalPosInclusive;
+
+	private Axis Axis => Side.ToAxis().Opposite();
 
 	public int Offset => Screen.LogicalRect.Pos[Axis];
 	public int Length => Screen.LogicalRect.Size[Axis];
@@ -64,7 +68,7 @@ public class Edge {
 		if (entry.portal == null) {
 			V2Frac exitPos = new(
 				entry.pos,
-				InnerPos[Axis.Opposite()]
+				PosInclusive[Axis.Opposite()]
 			);
 
 			exitPos = exitPos.FromUnitSpace(Axis);
@@ -83,7 +87,7 @@ public class Edge {
 
 			V2Frac entryPos = new(
 				exitEdgePos.x,
-				exitEdge.InnerPos[Axis.Opposite()]
+				exitEdge.PosInclusive[Axis.Opposite()]
 			);
 
 			V2Frac exitPos = exitEdgePos + new V2Frac(inLine.End - entry.pos, outMove[Axis.Opposite()]);

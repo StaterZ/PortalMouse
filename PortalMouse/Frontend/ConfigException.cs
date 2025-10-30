@@ -1,4 +1,6 @@
-﻿namespace PortalMouse.Frontend;
+﻿using System;
+
+namespace PortalMouse.Frontend;
 
 [Serializable]
 public class ConfigException : Exception {

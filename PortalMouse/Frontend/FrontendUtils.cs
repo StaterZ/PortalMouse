@@ -3,9 +3,9 @@ using PortalMouse.Engine.Utils.Ext;
 using PortalMouse.Engine.Utils.Math;
 using PortalMouse.Engine.Utils.Misc;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
-using Screen = PortalMouse.Engine.Core.Screen;
 
 namespace PortalMouse.Frontend;
 
