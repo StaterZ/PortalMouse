@@ -29,6 +29,22 @@ public static class Program {
 
 		using TrayIcon tray = new();
 
+		string path = Path.GetFullPath(options.ConfigPath);
+		using FileSystemWatcher watch = new(Path.GetDirectoryName(path) ?? string.Empty) {
+			NotifyFilter = NotifyFilters.CreationTime |
+				NotifyFilters.DirectoryName |
+				NotifyFilters.FileName |
+				NotifyFilters.LastWrite |
+				NotifyFilters.Size,
+			Filter = Path.GetFileName(path),
+			IncludeSubdirectories = false,
+		};
+		watch.Changed += static (sender, e) => {
+			Terminal.Inf($"Config was changed! Hot reloading...");
+			SwitchState(RunningState.Restart);
+		};
+		watch.EnableRaisingEvents = true;
+
 		Runtime(options);
 	}
 
