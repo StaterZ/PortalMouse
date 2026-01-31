@@ -70,7 +70,7 @@ public static class FrontendUtils {
 
 				R1I? TryParseRange(Edge edge) {
 					bool TryParseAnchor(string anchorStr, Edge edge, out int anchor) {
-						R1I validPixelRange = new(0, edge.Length); //begin is 0 since this is in local space
+						R1I validPixelRange = new(0, edge.ScreenRangeAlongEdgeAxis.Size); //begin is 0 since this is in local space
 						R1I validPercentRange = new(0, 100);
 
 						if (anchorStr.EndsWith("px")) {

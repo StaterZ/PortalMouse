@@ -24,7 +24,7 @@ public sealed class Setup {
 
 		ScreenLineSeg move = new(new LineSeg2Frac(m_prevPos.Value.Pos, pos), m_prevPos.Value.Screen);
 		while (!move.Screen.LogicalRect.Contains(move.Line.End)) {
-			ScreenLineSeg? nextMove = move.Screen.Handle(move.Line);
+			ScreenLineSeg? nextMove = move.Screen.TryHandle(move.Line);
 			if (!nextMove.HasValue) throw new UnreachableException($"If we're outside the screen bounds (checked by the while) we should get to a new screen. move was: {move}");
 
 			move = nextMove.Value;

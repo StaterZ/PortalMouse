@@ -4,7 +4,7 @@ namespace PortalMouse.Engine.Utils.Math;
 
 public struct V2Frac {
 	public static readonly V2Frac Zero = new(Frac.Zero, Frac.Zero);
-	public static readonly V2Frac One = new(Frac.Zero, Frac.One);
+	public static readonly V2Frac One = new(Frac.One, Frac.One);
 
 	public Frac x;
 	public Frac y;
@@ -23,7 +23,6 @@ public struct V2Frac {
 		Axis.Vertical => Transpose(),
 		_ => throw new UnreachableException(),
 	};
-
 	public readonly V2Frac FromUnitSpace(Axis axis) => axis switch {
 		Axis.Horizontal => this,
 		Axis.Vertical => Transpose(),

@@ -10,7 +10,7 @@ public static class TestHelper {
 	public const int k_yMax = k_ySize - 1;
 
 	public static PortalDesc AutoPortal(Edge edge) =>
-		new(new EdgeRange(edge, new R1I(0, edge.Length)), 0);
+		new(new EdgeRange(edge, new R1I(0, edge.ScreenRangeAlongEdgeAxis.Size)), 0);
 
 	public static Setup GetSetup(bool shouldWrap) {
 		Setup setup = new();

@@ -2,7 +2,6 @@
 
 public record struct LineSeg1Frac(Frac Begin, Frac End) {
 	public readonly Frac Delta => End - Begin;
-
 	public readonly R1Frac Range => new(MathX.Min(Begin, End), MathX.Max(Begin, End));
 
 	public readonly LineSeg1Frac RelativeTo(Frac pos) => new(
@@ -15,5 +14,9 @@ public record struct LineSeg1Frac(Frac Begin, Frac End) {
 	public readonly LineSeg1Frac Clamp(R1I range) => new(
 		MathX.Clamp(Begin, range.Begin, range.End - 1),
 		MathX.Clamp(End, range.Begin, range.End - 1)
+	);
+	public readonly LineSeg1Frac Clamp(R1Frac range) => new(
+		MathX.Clamp(Begin, range.Begin, range.End),
+		MathX.Clamp(End, range.Begin, range.End)
 	);
 }

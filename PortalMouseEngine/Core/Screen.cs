@@ -55,7 +55,7 @@ public sealed class Screen {
 		Scale = screenDesc.Scale;
 	}
 
-	public ScreenLineSeg? Handle(LineSeg2Frac mouseMove) => Edges
+	public ScreenLineSeg? TryHandle(LineSeg2Frac mouseMove) => Edges
 		.Select(edge => edge.TryHandle(mouseMove))
 		.First(result => result != null);
 

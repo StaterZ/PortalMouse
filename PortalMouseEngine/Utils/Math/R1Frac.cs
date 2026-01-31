@@ -14,9 +14,6 @@ public struct R1Frac {
 		End = end;
 	}
 
-	public override readonly string ToString() =>
-		$"[X:{Begin},W:{Size}]";
-
 	public readonly bool Contains(Frac point) =>
 		Begin <= point && point < End;
 
@@ -25,6 +22,12 @@ public struct R1Frac {
 
 	public static R1Frac InitBeginSize(Frac begin, Frac size) => new(begin, begin + size);
 
+	public override readonly string ToString() =>
+		$"[X:{Begin},W:{Size}]";
+
 	public static R1Frac operator +(R1Frac lhs, Frac rhs) => new(lhs.Begin + rhs, lhs.End + rhs);
 	public static R1Frac operator -(R1Frac lhs, Frac rhs) => new(lhs.Begin - rhs, lhs.End - rhs);
+
+	public static implicit operator R1Frac(R1I self) => new(self.Begin, self.End);
+	public static explicit operator R1I(R1Frac self) => new((int)self.Begin, (int)self.End);
 }

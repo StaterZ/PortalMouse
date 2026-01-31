@@ -13,8 +13,7 @@ public static class Geometry {
 		Frac mouseFrac = mouseFracOpt.Value;
 
 		Frac lineIntersect = mouseFrac.Lerp(aFromB.X);
-		if (isBounded && !new R1Frac(0, axisLineSize).Contains(lineIntersect))
-			return null;
+		if (isBounded && !new R1Frac(0, axisLineSize).Contains(lineIntersect)) return null;
 
 		Frac lineFrac = lineIntersect / axisLineSize;
 

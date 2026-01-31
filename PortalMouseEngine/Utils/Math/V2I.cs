@@ -23,7 +23,6 @@ public struct V2I {
 		Axis.Vertical => Transpose(),
 		_ => throw new UnreachableException(),
 	};
-
 	public readonly V2I FromUnitSpace(Axis axis) => axis switch {
 		Axis.Horizontal => this,
 		Axis.Vertical => Transpose(),

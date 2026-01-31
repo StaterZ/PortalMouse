@@ -12,17 +12,15 @@ public class Edge {
 
 	public IReadOnlyList<Portal> Portals => m_portals;
 
+	private Axis Axis => Side.ToAxis().Opposite();
+	public R1I ScreenRangeAlongEdgeAxis => Screen.LogicalRect[Axis];
+
 	public V2I LocalPos => Screen.LogicalRect.Size * Side.ToVec();
 	private V2I Pos => Screen.LogicalRect.Pos + LocalPos;
 
 	private V2I LocalPosInclusive => (Screen.LogicalRect.Size - 1) * Side.ToVec();
 	private V2I PosInclusive => Screen.LogicalRect.Pos + LocalPosInclusive;
-
-	private Axis Axis => Side.ToAxis().Opposite();
-
-	public int Offset => Screen.LogicalRect.Pos[Axis];
-	public int Length => Screen.LogicalRect.Size[Axis];
-
+	
 	public Edge(Screen screen, Side side) {
 		Screen = screen;
 		Side = side;
@@ -46,20 +44,19 @@ public class Edge {
 	}
 
 	public ScreenLineSeg? TryHandle(LineSeg2Frac mouseMove) {
-		AxisLineSeg2I axisLine = new() {
+		AxisLineSeg2I entryEdgeCollider = new() {
 			Pos = Pos,
-			Size = Length,
+			Size = ScreenRangeAlongEdgeAxis.Size,
 			Axis = Axis,
 		};
 
-		(Frac lineFrac, Frac mouseFrac)? intersection = Geometry.Intersect(mouseMove, axisLine, false);
-		if (!intersection.HasValue)
-			return null;
+		(Frac entryEdgeFrac, Frac mouseFrac)? intersection = Geometry.Intersect(mouseMove, entryEdgeCollider, false);
+		if (!intersection.HasValue) return null; //if mouse didn't cross the entry edge, then return
 
-		Frac inPos = Pos[Axis] + Length * intersection.Value.lineFrac;
+		Frac inPos = intersection.Value.entryEdgeFrac.Lerp(entryEdgeCollider.Range);
 		V2Frac outMove = mouseMove.Delta * (1 - intersection.Value.mouseFrac);
 		LineSeg1Frac inLine = LineSeg1Frac.InitBeginDelta(inPos, outMove[Axis]);
-		LineSeg1Frac slideRange = inLine.Clamp(axisLine.Range);
+		LineSeg1Frac slideRange = inLine.Clamp(entryEdgeCollider.Range);
 		(Frac pos, Portal? portal) entry = SlideAlongEdgeIntoPortal(slideRange);
 		if (outMove[Axis] < entry.portal?.Desc.EdgeBarrier && NativeHelper.IsKeyDown(User32.VK_LBUTTON)) {
 			entry = (slideRange.End, null);
@@ -80,19 +77,19 @@ public class Edge {
 		} else {
 			Edge exitEdge = entry.portal.Exit.Desc.EdgeRange.Edge;
 
-			V2Frac exitEdgePos = new(
+			V2Frac exitEdgeEntryPos = new(
 				entry.portal.Map(entry.pos),
-				exitEdge.Pos[Axis.Opposite()]
-			);
-
-			V2Frac entryPos = new(
-				exitEdgePos.x,
 				exitEdge.PosInclusive[Axis.Opposite()]
 			);
 
-			V2Frac exitPos = exitEdgePos + new V2Frac(inLine.End - entry.pos, outMove[Axis.Opposite()]);
+			V2Frac exitEdgeEndPos = new(
+				exitEdgeEntryPos.x,
+				exitEdge.Pos[Axis.Opposite()]
+			);
+			V2Frac exitMove = new(inLine.End - entry.pos, outMove[Axis.Opposite()]);
+			exitEdgeEndPos += exitMove;
 
-			LineSeg2Frac line = new(entryPos, exitPos);
+			LineSeg2Frac line = new(exitEdgeEntryPos, exitEdgeEndPos);
 			line = line.FromUnitSpace(Axis);
 
 			return new ScreenLineSeg(
