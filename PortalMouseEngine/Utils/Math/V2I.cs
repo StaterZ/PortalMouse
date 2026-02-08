@@ -1,4 +1,5 @@
-﻿using PortalMouse.Engine.Utils.Misc;
+﻿using System;
+using PortalMouse.Engine.Utils.Misc;
 
 namespace PortalMouse.Engine.Utils.Math;
 
@@ -13,6 +14,11 @@ public struct V2I {
 		this.x = x;
 		this.y = y;
 	}
+
+	public V2I Clamp(R2I range) => new(
+		range.X.Clamp(x),
+		range.Y.Clamp(y) 
+	);
 
 	public readonly int Dot(V2I other) => x * other.x + y * other.y;
 	public readonly int MagSqr => Dot(this);
@@ -29,10 +35,10 @@ public struct V2I {
 		_ => throw new UnreachableException(),
 	};
 
-	public override readonly string ToString() => $"[{x},{y}]";
+	public readonly override string ToString() => $"[{x},{y}]";
 	public readonly bool Equals(V2I other) => x == other.x && y == other.y;
-	public override readonly bool Equals(object? obj) => obj is V2I other && Equals(other);
-	public override readonly int GetHashCode() => HashCode.Combine(x, y);
+	public readonly override bool Equals(object? obj) => obj is V2I other && Equals(other);
+	public readonly override int GetHashCode() => HashCode.Combine(x, y);
 
 	public int this[Axis axis] {
 		readonly get => axis switch {
@@ -64,4 +70,6 @@ public struct V2I {
 	public static V2I operator *(V2I lhs, int rhs) => new(lhs.x * rhs, lhs.y * rhs);
 	public static V2I operator /(V2I lhs, V2I rhs) => new(lhs.x / rhs.x, lhs.y / rhs.y);
 	public static V2I operator /(V2I lhs, int rhs) => new(lhs.x / rhs, lhs.y / rhs);
+	
+	public static V2I operator -(V2I self) => new(-self.x, -self.y);
 }

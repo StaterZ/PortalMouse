@@ -11,10 +11,6 @@ public record struct LineSeg1Frac(Frac Begin, Frac End) {
 
 	public static LineSeg1Frac InitBeginDelta(Frac Begin, Frac Delta) => new(Begin, Begin + Delta);
 
-	public readonly LineSeg1Frac Clamp(R1I range) => new(
-		MathX.Clamp(Begin, range.Begin, range.End - 1),
-		MathX.Clamp(End, range.Begin, range.End - 1)
-	);
 	public readonly LineSeg1Frac Clamp(R1Frac range) => new(
 		MathX.Clamp(Begin, range.Begin, range.End),
 		MathX.Clamp(End, range.Begin, range.End)

@@ -15,9 +15,9 @@ public struct R1I {
 		End = end;
 	}
 
-	public readonly bool Contains(int point) => Begin <= point && point < End;
+	public readonly int Clamp(int value) => Math.Clamp(value, Begin, End);
 
-	public readonly int Clamp(int value) => Math.Clamp(value, Begin, Math.Max(Begin, End - 1));
+	public readonly bool Contains(int point) => Begin <= point && point < End;
 
 	public static R1I InitBeginSize(int begin, int size) => new(begin, begin + size);
 

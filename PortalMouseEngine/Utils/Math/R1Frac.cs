@@ -1,8 +1,8 @@
 ﻿namespace PortalMouse.Engine.Utils.Math;
 
 public struct R1Frac {
-	public static readonly R1I Zero = new(0, 0);
-	public static readonly R1I One = new(0, 1);
+	public static readonly R1Frac Zero = new(0, 0);
+	public static readonly R1Frac One = new(0, 1);
 
 	public Frac Begin;
 	public Frac End;
@@ -22,7 +22,7 @@ public struct R1Frac {
 
 	public static R1Frac InitBeginSize(Frac begin, Frac size) => new(begin, begin + size);
 
-	public override readonly string ToString() =>
+	public readonly override string ToString() =>
 		$"[X:{Begin},W:{Size}]";
 
 	public static R1Frac operator +(R1Frac lhs, Frac rhs) => new(lhs.Begin + rhs, lhs.End + rhs);

@@ -6,7 +6,7 @@ public record EdgeRange {
 	public Edge Edge;
 
 	public R1I LocalRange { get; private set; }
-	public R1I Range => LocalRange + Edge.ScreenRangeAlongEdgeAxis.Begin; //TODO: slightly wonky to offset here, but it's okay for now...
+	public R1I Range => LocalRange + Edge.ScreenRangeAlongEdgeAxis.Begin;
 
 	public EdgeRange(Edge edge, R1I range) {
 		Edge = edge;

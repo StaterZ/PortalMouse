@@ -1,4 +1,6 @@
-﻿namespace PortalMouse.Engine.Utils.Misc;
+﻿using System;
+
+namespace PortalMouse.Engine.Utils.Misc;
 
 [Serializable]
 public class NativeErrorException : Exception {

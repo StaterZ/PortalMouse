@@ -1,4 +1,6 @@
-﻿namespace PortalMouse.Engine.Utils.Misc;
+﻿using System;
+
+namespace PortalMouse.Engine.Utils.Misc;
 
 public static class Terminal {
 	public static void Dbg(string msg) => Log("DBG", msg, ConsoleColor.Magenta);

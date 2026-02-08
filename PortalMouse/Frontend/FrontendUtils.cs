@@ -1,11 +1,10 @@
-﻿using PortalMouse.Engine.Core;
-using PortalMouse.Engine.Utils.Ext;
-using PortalMouse.Engine.Utils.Math;
-using PortalMouse.Engine.Utils.Misc;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using PortalMouse.Engine.Core;
+using PortalMouse.Engine.Utils.Math;
+using PortalMouse.Engine.Utils.Misc;
 
 namespace PortalMouse.Frontend;
 
@@ -148,7 +147,7 @@ public static class FrontendUtils {
 			PortalDesc? b = TryParsePortalEdge(mapping.B);
 			if (b == null) continue;
 
-			if (a.Value.EdgeRange.Edge.Side != b.Value.EdgeRange.Edge.Side.Opposite()) throw new ConfigException($"The portals A and B need to be on opposite sides. A is '{a.Value.EdgeRange.Edge.Side}', B is '{b.Value.EdgeRange.Edge.Side}'. This means A needs to be '{b.Value.EdgeRange.Edge.Side.Opposite()}' OR B needs to be '{a.Value.EdgeRange.Edge.Side.Opposite()}'");
+			if (a.Value.EdgeRange.Edge.Side == b.Value.EdgeRange.Edge.Side) throw new ConfigException($"The portals A and B need to be on different sides. Both A and B is '{a.Value.EdgeRange.Edge.Side}'");
 
 			Terminal.Inf($"Mapping '{a}' to '{b}'");
 			Portal.Bind(a.Value, b.Value);

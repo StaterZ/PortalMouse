@@ -10,26 +10,26 @@ public class RealSetups {
 		Setup setup = new();
 
 		Screen leftScreen = new(
-			setup,
 			2,
 			new R2I(new V2I(-1920, 0), new V2I(1920, 1080)),
 			Frac.One,
 			"Left"
 		);
+		setup.Screens.Add(leftScreen);
 		Screen mainScreen = new(
-			setup,
 			1,
 			new R2I(new V2I(0, 0), new V2I(2560, 1440)),
 			Frac.One,
 			"Main"
 		);
+		setup.Screens.Add(mainScreen);
 		Screen rightScreen = new(
-			setup,
 			3,
 			new R2I(new V2I(+2560, 0), new V2I(1920, 1080)),
 			Frac.One,
 			"Right"
 		);
+		setup.Screens.Add(rightScreen);
 
 		Portal.Bind(TestHelper.AutoPortal(leftScreen.Right), TestHelper.AutoPortal(mainScreen.Left));
 		Portal.Bind(TestHelper.AutoPortal(mainScreen.Right), TestHelper.AutoPortal(rightScreen.Left));
@@ -45,19 +45,19 @@ public class RealSetups {
 		Setup setup = new();
 
 		Screen mainScreen = new(
-			setup,
 			1,
 			new R2I(new V2I(0, 0), new V2I(1920, 1080)),
 			Frac.One,
 			"Main"
 		);
+		setup.Screens.Add(mainScreen);
 		Screen tvScreen = new(
-			setup,
 			2,
 			new R2I(new V2I(1920, 104), new V2I(3840, 2160)),
 			Frac.One,
 			"TV"
 		);
+		setup.Screens.Add(tvScreen);
 
 		Portal.Bind(TestHelper.AutoPortal(tvScreen.Left), TestHelper.AutoPortal(mainScreen.Right));
 

@@ -1,8 +1,7 @@
-﻿using Love;
+﻿using System.Linq;
+using Love;
 using PortalMouse.Engine.Utils.Ext;
 using PortalMouse.Love.Utils.Ext;
-using System;
-using System.Linq;
 
 namespace PortalMouse.Love.Utils;
 

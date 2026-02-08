@@ -1,4 +1,5 @@
-﻿using PortalMouse.Engine.Utils.Math;
+﻿using System;
+using PortalMouse.Engine.Utils.Math;
 
 namespace PortalMouse.Engine.Observers;
 

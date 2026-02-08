@@ -1,5 +1,5 @@
-﻿using PortalMouse.Engine.Core;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using PortalMouse.Engine.Core;
 
 namespace PortalMouse.Frontend;
 

@@ -1,8 +1,11 @@
 # PortalMouse Config Documentation
 
 ## Available Settings
+
 ### Root
+
 #### The JSON root object
+
 ```
 {
 	mappings: Portal[] //a list of all portal bindings
@@ -10,8 +13,11 @@
 ```
 
 ### Portal
+
 #### Defines a connection between 2 EdgeRanges
+
 Moving the mouse into one of them remaps it to the range and position of the other
+
 ```
 {
 	a: EdgeRange, //the first edge
@@ -20,8 +26,11 @@ Moving the mouse into one of them remaps it to the range and position of the oth
 ```
 
 ### EdgeRange
+
 #### Defines a pixel range on a given side of a given screen.
+
 The pixel range goes between at most between at most 0 and *side length of screen* for obvious reasons
+
 ```
 {
 	screen: i32,   // the screen indices
@@ -33,17 +42,20 @@ The pixel range goes between at most between at most 0 and *side length of scree
 ```
 
 ### Anchor
+
 #### Defines a range on a given side of a given screen.
+
 An Anchor is just a `string` with a special format. All anchors begin with an integer, directly followed by a unit.
 
 | Unit    | symbol | Description                                                                            |
-| ------- | ------ | -------------------------------------------------------------------------------------- |
+|---------|--------|----------------------------------------------------------------------------------------|
 | Pixel   | px     | Specifies a pixel along the edge between 0 and the side length of the screen in pixels |
 | Percent | %      | Specifies a percentage between 0% and 100% of the side length of the screen            |
 
-
 ### Side
+
 #### Defines a screen side
+
 ```c#
 enum {
 	Left, //left side of screen
@@ -53,10 +65,12 @@ enum {
 }
 ```
 
-
 ## Examples
+
 ### Example 1: Looping
+
 Single screen setup where the sides loop around.
+
 ```json
 {
 	"mappings": [
@@ -85,7 +99,9 @@ Single screen setup where the sides loop around.
 ```
 
 ### Example 2: 1-to-1 Edge Mapping
+
 A 3 screen setup where no matter the resolution of the displays, it will map the edges 1-to-1.
+
 ```json
 {
 	"mappings": [
@@ -114,7 +130,10 @@ A 3 screen setup where no matter the resolution of the displays, it will map the
 ```
 
 ### Example 3: Edge ranges
-A 3 screen setup where a large monitor maps the upper half of an edge to a upper right screen and the lower half to a lower right screen, with a 100 pixel vertical link between these smaller screens.
+
+A 3 screen setup where a large monitor maps the upper half of an edge to a upper right screen and the lower half to a
+lower right screen, with a 100 pixel vertical link between these smaller screens.
+
 ```json
 {
 	"mappings": [
@@ -163,7 +182,9 @@ A 3 screen setup where a large monitor maps the upper half of an edge to a upper
 ```
 
 ### Example 4: Snapping
+
 A 2 screen setup where the bottom part of a larger screen snaps up to the bottom of a smaller screen.
+
 ```json
 {
 	"mappings": [

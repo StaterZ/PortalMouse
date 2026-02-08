@@ -1,9 +1,9 @@
-﻿using Love;
+﻿using System.Diagnostics;
+using Love;
 using PortalMouse.Engine.Core;
 using PortalMouse.Engine.Utils.Ext;
 using PortalMouse.Engine.Utils.Math;
 using PortalMouse.Love.Utils;
-using System.Diagnostics;
 
 namespace PortalMouse.Love;
 

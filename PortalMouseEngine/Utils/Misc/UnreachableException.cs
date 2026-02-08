@@ -1,3 +1,5 @@
+using System;
+
 namespace PortalMouse.Engine.Utils.Misc;
 
 [Serializable]

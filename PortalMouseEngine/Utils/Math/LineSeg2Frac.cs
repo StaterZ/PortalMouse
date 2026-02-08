@@ -8,6 +8,8 @@ public record struct LineSeg2Frac(V2Frac Begin, V2Frac End) {
 	public readonly LineSeg1Frac X => new(Begin.x, End.x);
 	public readonly LineSeg1Frac Y => new(Begin.y, End.y);
 
+	public V2Frac Lerp(Frac t) => Begin + Delta * t;
+
 	public readonly LineSeg2Frac RelativeTo(V2Frac pos) => new(
 		Begin - pos,
 		End - pos
@@ -29,7 +31,7 @@ public record struct LineSeg2Frac(V2Frac Begin, V2Frac End) {
 
 	public static LineSeg2Frac InitBeginDelta(V2Frac Begin, V2Frac Delta) => new(Begin, Begin + Delta);
 
-	public override readonly string ToString() => $"{Begin}->{End}";
+	public readonly override string ToString() => $"{Begin}->{End}";
 
 	public readonly LineSeg1Frac this[Axis axis] => new(Begin[axis], End[axis]);
 }

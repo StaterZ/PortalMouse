@@ -1,8 +1,8 @@
-﻿using System.Collections;
+﻿using System;
 
 namespace PortalMouse.Engine.Core {
 	[Serializable]
-	internal class OverlappingPortalsException : Exception {
+	public class OverlappingPortalsException : Exception {
 		private readonly Portal aPortal;
 		private readonly Portal bPortal;
 
@@ -11,12 +11,6 @@ namespace PortalMouse.Engine.Core {
 			this.bPortal = bPortal;
 		}
 
-		public override IDictionary Data => base.Data;
-
-		public override string Message => base.Message;
-
-		public override string ToString() {
-			return $"Overlapping portals '{aPortal.Desc.EdgeRange}' and '{bPortal.Desc.EdgeRange}'. This is not supported.";
-		}
+		public override string ToString() => $"Overlapping portals '{aPortal.Desc.EdgeRange}' and '{bPortal.Desc.EdgeRange}'. This is not supported.";
 	}
 }

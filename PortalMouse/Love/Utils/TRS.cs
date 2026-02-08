@@ -1,6 +1,6 @@
-﻿using Love;
+﻿using System.Collections.Generic;
+using Love;
 using PortalMouse.Love.Utils.Ext;
-using System.Collections.Generic;
 
 namespace PortalMouse.Love.Utils;
 

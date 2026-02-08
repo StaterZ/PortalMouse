@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace PortalMouse.Engine.Utils.Math;
@@ -7,6 +8,7 @@ using Math = System.Math;
 public readonly struct Frac : IComparable, IComparable<Frac>, IEquatable<Frac> {
 	public static readonly Frac Zero = 0;
 	public static readonly Frac One = 1;
+	public static readonly Frac Half = new(1, 2);
 
 	public readonly int Numerator;
 	public readonly int Denominator;
@@ -91,7 +93,13 @@ public readonly struct Frac : IComparable, IComparable<Frac>, IEquatable<Frac> {
 		return new Frac(lhs.Numerator * rhs.Denominator, lhs.Denominator * rhs.Numerator).Simplify();
 	}
 
+	public static Frac operator -(Frac self) => new(-self.Numerator, self.Denominator);
+	
 	public static implicit operator Frac(int self) => new(self, 1);
-	public static explicit operator int(Frac self) => (self.Numerator - self.Denominator / 2) / self.Denominator;
+	public static explicit operator int(Frac self) {
+		int bias = Math.Sign(self.Numerator) * Math.Abs(self.Denominator) / 2;
+		return (self.Numerator + bias) / self.Denominator;
+	}
+
 	public static explicit operator float(Frac self) => (float)self.Numerator / self.Denominator;
 }

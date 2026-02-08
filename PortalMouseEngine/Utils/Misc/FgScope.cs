@@ -1,4 +1,6 @@
-﻿namespace PortalMouse.Engine.Utils.Misc;
+﻿using System;
+
+namespace PortalMouse.Engine.Utils.Misc;
 
 public class FgScope : IDisposable {
 	private readonly ConsoleColor m_prev;

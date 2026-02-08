@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using static PortalMouse.Engine.Native.WinDef;
 using static PortalMouse.Engine.Native.WinNt;
 

@@ -1,7 +1,7 @@
-using PortalMouse.Engine.Utils.Misc;
-using PortalMouse.Love;
 using System;
 using System.Windows.Forms;
+using PortalMouse.Engine.Utils.Misc;
+using PortalMouse.Love;
 
 namespace PortalMouse.Frontend;
 

@@ -6,7 +6,7 @@ namespace UnitTests;
 public class Normal {
 	[TestMethod]
 	public void NegX() {
-		TestHelper.RunTest(TestHelper.GetSetup(true),
+		TestHelper.RunTest(TestHelper.CreateTestSetup(true),
 			(new V2I(+200, +100), null),
 			(new V2I(+100, +100), null)
 		);
@@ -14,7 +14,7 @@ public class Normal {
 
 	[TestMethod]
 	public void PosX() {
-		TestHelper.RunTest(TestHelper.GetSetup(true),
+		TestHelper.RunTest(TestHelper.CreateTestSetup(true),
 			(new V2I(+100, +100), null),
 			(new V2I(+200, +100), null)
 		);
@@ -22,7 +22,7 @@ public class Normal {
 
 	[TestMethod]
 	public void NegY() {
-		TestHelper.RunTest(TestHelper.GetSetup(true),
+		TestHelper.RunTest(TestHelper.CreateTestSetup(true),
 			(new V2I(+100, +200), null),
 			(new V2I(+200, +100), null)
 		);
@@ -30,7 +30,7 @@ public class Normal {
 
 	[TestMethod]
 	public void PosY() {
-		TestHelper.RunTest(TestHelper.GetSetup(true),
+		TestHelper.RunTest(TestHelper.CreateTestSetup(true),
 			(new V2I(+100, +100), null),
 			(new V2I(+100, +200), null)
 		);

@@ -1,7 +1,8 @@
-﻿using PortalMouse.Engine.Native;
+﻿using System;
+using System.Runtime.InteropServices;
+using PortalMouse.Engine.Native;
 using PortalMouse.Engine.Utils.Math;
 using PortalMouse.Engine.Utils.Misc;
-using System.Runtime.InteropServices;
 
 namespace PortalMouse.Engine.Observers;
 

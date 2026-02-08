@@ -1,4 +1,5 @@
-﻿using PortalMouse.Engine.Native;
+﻿using System.Collections.Generic;
+using PortalMouse.Engine.Native;
 using PortalMouse.Engine.Utils.Ext;
 using PortalMouse.Engine.Utils.Math;
 using PortalMouse.Engine.Utils.Misc;
@@ -44,13 +45,13 @@ public class Edge {
 	}
 
 	public ScreenLineSeg? TryHandle(LineSeg2Frac mouseMove) {
-		AxisLineSeg2I entryEdgeCollider = new() {
-			Pos = Pos,
+		AxisLineSeg2Frac entryEdgeCollider = new() {
+			Pos = Pos - V2Frac.Half,
 			Size = ScreenRangeAlongEdgeAxis.Size,
 			Axis = Axis,
 		};
 
-		(Frac entryEdgeFrac, Frac mouseFrac)? intersection = Geometry.Intersect(mouseMove, entryEdgeCollider, false);
+		(Frac entryEdgeFrac, Frac mouseFrac)? intersection = Geometry.Intersect(mouseMove, entryEdgeCollider, false, Side is Side.Top or Side.Left);
 		if (!intersection.HasValue) return null; //if mouse didn't cross the entry edge, then return
 
 		Frac inPos = intersection.Value.entryEdgeFrac.Lerp(entryEdgeCollider.Range);
@@ -65,11 +66,11 @@ public class Edge {
 		if (entry.portal == null) {
 			V2Frac exitPos = new(
 				entry.pos,
-				PosInclusive[Axis.Opposite()]
+				entryEdgeCollider.Pos[Axis.Opposite()]
 			);
 
 			exitPos = exitPos.FromUnitSpace(Axis);
-
+			
 			return new ScreenLineSeg(
 				new LineSeg2Frac(mouseMove.Begin, exitPos),
 				Screen
@@ -77,21 +78,22 @@ public class Edge {
 		} else {
 			Edge exitEdge = entry.portal.Exit.Desc.EdgeRange.Edge;
 
-			V2Frac exitEdgeEntryPos = new(
+			V2Frac exitEdgeExitPos = new(
 				entry.portal.Map(entry.pos),
-				exitEdge.PosInclusive[Axis.Opposite()]
+				exitEdge.Pos[exitEdge.Axis.Opposite()] - Frac.Half
 			);
 
-			V2Frac exitEdgeEndPos = new(
-				exitEdgeEntryPos.x,
-				exitEdge.Pos[Axis.Opposite()]
-			);
-			V2Frac exitMove = new(inLine.End - entry.pos, outMove[Axis.Opposite()]);
-			exitEdgeEndPos += exitMove;
+			V2Frac exitMove = new(inLine.End - entry.pos, outMove[Axis.Opposite()]); //this is what is left over of the move after crossing the portal boundary
 
-			LineSeg2Frac line = new(exitEdgeEntryPos, exitEdgeEndPos);
-			line = line.FromUnitSpace(Axis);
+			exitEdgeExitPos = exitEdgeExitPos.FromUnitSpace(exitEdge.Axis);
+			exitMove = exitMove.FromUnitSpace(Axis);
+			exitMove[exitEdge.Axis.Opposite()] = exitEdge.Side is Side.Left or Side.Top ?
+				MathX.Max(exitMove[exitEdge.Axis.Opposite()], Frac.Half) :
+				MathX.Min(exitMove[exitEdge.Axis.Opposite()], -Frac.Half);//ensure we leave the exit portal
 
+			V2Frac exitEdgeEndPos = exitEdgeExitPos + exitMove;
+
+			LineSeg2Frac line = new(exitEdgeExitPos, exitEdgeEndPos);
 			return new ScreenLineSeg(
 				line,
 				exitEdge.Screen
@@ -102,22 +104,22 @@ public class Edge {
 	private (Frac pos, Portal? portal) SlideAlongEdgeIntoPortal(LineSeg1Frac line) {
 		(bool success, int beginIndex) = m_portals.BetterBinarySearch(
 			line.Begin,
-			portal => (Frac)portal.Desc.EdgeRange.Range.Begin
+			portal => portal.Desc.EdgeRange.Range.Begin - Frac.Half
 		);
 
 		if (success) {
 			return (line.Begin, m_portals[beginIndex]);
 		} else {
 			beginIndex--;
-			if (m_portals.IsInRange(beginIndex) && line.Begin < m_portals[beginIndex].Desc.EdgeRange.Range.End) {
+			if (m_portals.IsInRange(beginIndex) && line.Begin <= m_portals[beginIndex].Desc.EdgeRange.Range.End - Frac.Half) {
 				return (line.Begin, m_portals[beginIndex]);
 			}
 
 			//UGH!!! stupid C# not allowing struct constants in switch patterns >:(
-			if (line.Delta < 0 && m_portals.IsInRange(beginIndex) && line.End < m_portals[beginIndex].Desc.EdgeRange.Range.End)
-				return (m_portals[beginIndex].Desc.EdgeRange.Range.End, m_portals[beginIndex]);
-			if (line.Delta > 0 && m_portals.IsInRange(beginIndex + 1) && line.End >= m_portals[beginIndex + 1].Desc.EdgeRange.Range.Begin)
-				return (m_portals[beginIndex + 1].Desc.EdgeRange.Range.Begin, m_portals[beginIndex + 1]);
+			if (line.Delta < 0 && m_portals.IsInRange(beginIndex) && line.End < m_portals[beginIndex].Desc.EdgeRange.Range.End - Frac.Half)
+				return (m_portals[beginIndex].Desc.EdgeRange.Range.End - Frac.Half, m_portals[beginIndex]);
+			if (line.Delta > 0 && m_portals.IsInRange(beginIndex + 1) && line.End >= m_portals[beginIndex + 1].Desc.EdgeRange.Range.Begin - Frac.Half)
+				return (m_portals[beginIndex + 1].Desc.EdgeRange.Range.Begin - Frac.Half, m_portals[beginIndex + 1]);
 			return (line.End, null);
 		}
 	}

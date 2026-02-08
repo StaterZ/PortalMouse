@@ -1,4 +1,7 @@
-﻿using PortalMouse.Engine.Utils.Math;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using PortalMouse.Engine.Utils.Math;
 using PortalMouse.Engine.Utils.Misc;
 
 namespace PortalMouse.Engine.Core;
@@ -9,7 +12,6 @@ public sealed class Screen {
 	public readonly R2I LogicalRect;
 	public readonly Frac Scale;
 
-	public readonly Setup Setup;
 	public readonly Edge Left;
 	public readonly Edge Right;
 	public readonly Edge Top;
@@ -19,10 +21,7 @@ public sealed class Screen {
 
 	public IEnumerable<Edge> Edges => [Left, Right, Top, Bottom];
 
-	private Screen(Setup setup, string name) {
-		Setup = setup;
-		Setup.m_screens.Add(this);
-
+	private Screen(string name) {
 		Name = name;
 
 		Left = new Edge(this, Side.Left);
@@ -31,13 +30,13 @@ public sealed class Screen {
 		Bottom = new Edge(this, Side.Bottom);
 	}
 
-	public Screen(Setup setup, int id, R2I logicalRect, Frac scale, string name) : this(setup, name) {
+	public Screen(int id, R2I logicalRect, Frac scale, string name) : this(name) {
 		Id = id;
 		LogicalRect = logicalRect;
 		Scale = scale;
 	}
 
-	internal Screen(Setup setup, ScreenDesc screenDesc) : this(setup, screenDesc.FriendlyName) {
+	internal Screen(ScreenDesc screenDesc) : this(screenDesc.FriendlyName) {
 		if (screenDesc.DisplayDevice != null) {
 			string deviceId = screenDesc.DisplayDevice.Value.DeviceID;
 			string idStr = deviceId[(deviceId.LastIndexOf('\\')+1)..];
@@ -57,7 +56,7 @@ public sealed class Screen {
 
 	public ScreenLineSeg? TryHandle(LineSeg2Frac mouseMove) => Edges
 		.Select(edge => edge.TryHandle(mouseMove))
-		.First(result => result != null);
+		.FirstOrDefault(result => result != null);
 
 
 	public Edge GetEdge(Side side) {
@@ -66,7 +65,7 @@ public sealed class Screen {
 			Side.Right => Right,
 			Side.Top => Top,
 			Side.Bottom => Bottom,
-			_ => throw new UnreachableException()
+			_ => throw new UnreachableException(),
 		};
 	}
 }

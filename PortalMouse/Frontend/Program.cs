@@ -1,12 +1,12 @@
-﻿using CommandLine;
+﻿using System;
+using System.IO;
+using System.Windows.Forms;
+using CommandLine;
 using CommandLine.Text;
 using PortalMouse.Engine.Core;
 using PortalMouse.Engine.Observers;
 using PortalMouse.Engine.Utils.Math;
 using PortalMouse.Engine.Utils.Misc;
-using System;
-using System.IO;
-using System.Windows.Forms;
 #if !DEBUG
 using System.Threading;
 #endif

@@ -1,5 +1,5 @@
-﻿using PortalMouse.Engine.Utils.Math;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using PortalMouse.Engine.Utils.Math;
 
 namespace PortalMouse.Engine.Native;
 
