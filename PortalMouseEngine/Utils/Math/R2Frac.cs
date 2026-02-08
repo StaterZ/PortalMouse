@@ -1,4 +1,6 @@
-﻿namespace PortalMouse.Engine.Utils.Math;
+﻿using System;
+
+namespace PortalMouse.Engine.Utils.Math;
 
 public struct R2Frac {
 	public static readonly R2Frac Zero = new(V2Frac.Zero, V2Frac.Zero);
@@ -26,16 +28,13 @@ public struct R2Frac {
 			p.y >= 0 && p.y <= Size.y;
 	}
 
-	public V2Frac Contain(V2Frac p) => new(
-		MathX.Clamp(p.x, Pos.x, Max.x), 
-		MathX.Clamp(p.y, Pos.y, Max.y)
-	);
-	
 	public readonly R1Frac this[Axis axis] => R1Frac.InitBeginSize(Pos[axis], Size[axis]);
 
-	public readonly override string ToString() =>
-		$"[X:{Pos.x},Y:{Pos.y},W:{Size.x},H:{Size.y}]";
-
+	public readonly override string ToString() => $"[X:{Pos.x},Y:{Pos.y},W:{Size.x},H:{Size.y}]";
+	public readonly bool Equals(R2Frac other) => Pos == other.Pos && Size == other.Size;
+	public readonly override bool Equals(object? obj) => obj is R2Frac other && Equals(other);
+	public readonly override int GetHashCode() => HashCode.Combine(Pos, Size);
+	
 	public static R2Frac operator +(R2Frac lhs, V2Frac rhs) => new(lhs.Pos + rhs, lhs.Size);
 	public static R2Frac operator -(R2Frac lhs, V2Frac rhs) => new(lhs.Pos - rhs, lhs.Size);
 	

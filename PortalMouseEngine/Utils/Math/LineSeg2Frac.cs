@@ -4,7 +4,7 @@ namespace PortalMouse.Engine.Utils.Math;
 
 public record struct LineSeg2Frac(V2Frac Begin, V2Frac End) {
 	public readonly V2Frac Delta => End - Begin;
-	//public readonly R2Frac Range => new(MathX.Min(Begin, End), MathX.Max(Begin, End));
+	public readonly R2Frac Range => new(MathX.Min(Begin, End), MathX.Max(Begin, End));
 	public readonly LineSeg1Frac X => new(Begin.x, End.x);
 	public readonly LineSeg1Frac Y => new(Begin.y, End.y);
 

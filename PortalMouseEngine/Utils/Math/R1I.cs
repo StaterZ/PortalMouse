@@ -1,4 +1,6 @@
-﻿namespace PortalMouse.Engine.Utils.Math;
+﻿using System;
+
+namespace PortalMouse.Engine.Utils.Math;
 using Math = System.Math;
 
 public struct R1I {
@@ -21,8 +23,11 @@ public struct R1I {
 
 	public static R1I InitBeginSize(int begin, int size) => new(begin, begin + size);
 
-	public override readonly string ToString() => $"[X:{Begin},W:{Size}]";
-
+	public readonly override string ToString() => $"[X:{Begin},W:{Size}]";
+	public readonly bool Equals(R1I other) => Begin == other.Begin && End == other.End;
+	public readonly override bool Equals(object? obj) => obj is R1I other && Equals(other);
+	public readonly override int GetHashCode() => HashCode.Combine(Begin, End);
+	
 	public static R1I operator +(R1I lhs, int rhs) => new(lhs.Begin + rhs, lhs.End + rhs);
 	public static R1I operator -(R1I lhs, int rhs) => new(lhs.Begin - rhs, lhs.End - rhs);
 }

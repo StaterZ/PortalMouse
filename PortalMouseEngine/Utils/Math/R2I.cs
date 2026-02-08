@@ -1,4 +1,6 @@
-﻿namespace PortalMouse.Engine.Utils.Math;
+﻿using System;
+
+namespace PortalMouse.Engine.Utils.Math;
 
 public struct R2I {
 	public static readonly R2I Zero = new(V2I.Zero, V2I.Zero);
@@ -27,8 +29,10 @@ public struct R2I {
 
 	public readonly R1I this[Axis axis] => R1I.InitBeginSize(Pos[axis], Size[axis]);
 
-	public readonly override string ToString() =>
-		$"[X:{Pos.x},Y:{Pos.y},W:{Size.x},H:{Size.y}]";
+	public readonly override string ToString() => $"[X:{Pos.x},Y:{Pos.y},W:{Size.x},H:{Size.y}]";
+	public readonly bool Equals(R2I other) => Pos == other.Pos && Size == other.Size;
+	public readonly override bool Equals(object? obj) => obj is R2I other && Equals(other);
+	public readonly override int GetHashCode() => HashCode.Combine(Pos, Size);
 
 	public static R2I operator +(R2I lhs, V2I rhs) => new(lhs.Pos + rhs, lhs.Size);
 	public static R2I operator -(R2I lhs, V2I rhs) => new(lhs.Pos - rhs, lhs.Size);
