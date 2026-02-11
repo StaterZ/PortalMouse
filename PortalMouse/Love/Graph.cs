@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Love;
 using PortalMouse.Engine.Core;
 using PortalMouse.Engine.Utils.Ext;
 using PortalMouse.Engine.Utils.Math;
+using PortalMouse.Engine.Utils.Misc;
 using PortalMouse.Frontend;
 using PortalMouse.Love.Utils;
 using PortalMouse.Love.Utils.Ext;
@@ -14,7 +14,9 @@ namespace PortalMouse.Love;
 public sealed class Graph {
 	public readonly HashSet<Portal> m_drawnPortals = new();
 	private readonly List<Node> m_nodes = new();
+	public readonly List<(float time, V2I pos)> m_mouseTrail = new();
 	public Node? Selected;
+	private float Time;
 
 	public readonly Cam Cam = new() {
 		Scale = 0.1f,
@@ -35,12 +37,19 @@ public sealed class Graph {
 	}
 
 	public void Update(float dt) {
+		Time += dt;
 		Selection.Reset();
 
 		HandlePhysics(dt);
 
 		for (int i = m_nodes.Count; i --> 0;) {
 			m_nodes[i].Update(dt);
+		}
+		
+		m_mouseTrail.Add((Time, NativeHelper.CursorPos));
+		const float trailTimeLength = 0.4f;
+		while (m_mouseTrail.Count > 0 && m_mouseTrail[0].Item1 < Time - trailTimeLength) {
+			m_mouseTrail.RemoveAt(0);
 		}
 	}
 
@@ -156,6 +165,24 @@ public sealed class Graph {
 			node.Draw1();
 		}
 
+		Vector2 GetRenderPos(V2I pos) {
+			Node? node = m_nodes.FirstOrDefault(n => n.Screen.LogicalRect.Contains(pos));
+			return node.Trs.GlobalRect.Location + (pos - node.Screen.LogicalRect.Pos).ToLove();
+		}
+		if (m_mouseTrail.Count >= 2) {
+			Graphics.Push(StackType.All);
+			Graphics.SetLineWidth(3 / Cam.Scale);
+			Graphics.SetLineStyle(LineStyle.Smooth);
+			Graphics.SetLineJoin(LineJoin.None);
+			Graphics.SetColor(Color.Red);
+			Graphics.Line(m_mouseTrail.Select(timedPos => GetRenderPos(timedPos.pos)).ToArray());
+			Graphics.Pop();
+		}
+		if (m_mouseTrail.Count >= 1) {
+			Graphics.SetColor(Color.Red);
+			Graphics.Circle(DrawMode.Fill, GetRenderPos(m_mouseTrail.Last().pos), 5 / Cam.Scale);
+		}
+		
 		//Graphics.Circle(DrawMode.Fill, MouseWorldPos, 0.1f); //for debug
 		Cam.End();
 
