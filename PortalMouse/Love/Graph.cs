@@ -14,13 +14,13 @@ namespace PortalMouse.Love;
 public sealed class Graph {
 	public readonly HashSet<Portal> m_drawnPortals = new();
 	private readonly List<Node> m_nodes = new();
-	public readonly List<(float time, V2I pos)> m_mouseTrail = new();
+	private readonly List<(float time, V2I pos)> m_mouseTrail = new();
 	public Node? Selected;
 	private float Time;
 
 	public readonly Cam Cam = new() {
 		Scale = 0.1f,
-		Cfg = new() {
+		Cfg = new Cam.Config {
 			ZoomSpeed = 1,
 		},
 	};
@@ -56,22 +56,22 @@ public sealed class Graph {
 	public Vector2 GetPortalPos(EdgeRange edgeRange, float posAlongPortalNorm) {
 		float portalPosAlongEdge = MathX.Map(posAlongPortalNorm, R1I.One, edgeRange.LocalRange);
 		Vector2 portalPos = edgeRange.Edge.Side.ToAxis() switch {
-			Axis.Horizontal => new(0, portalPosAlongEdge),
-			Axis.Vertical => new(portalPosAlongEdge, 0),
+			Axis.Horizontal => new Vector2(0, portalPosAlongEdge),
+			Axis.Vertical => new Vector2(portalPosAlongEdge, 0),
 			_ => throw new UnreachableException(),
 		};
 		Node node = m_nodes.First(node => node.Screen == edgeRange.Edge.Screen);
-		Vector2 edgePos = edgeRange.Edge.LocalPos.ToLove();
+		Vector2 edgePos = edgeRange.Edge.LocalPos.ToLovePoint();
 		return node.Trs.GlobalRect.Location + edgePos + portalPos;
 	}
 
 	private void HandlePhysics(float dt) {
 		const float RepulsionStrength = 50000f;   // strength of node-node repulsion
-		const float SpringStrength = 20f;        // strength of link springs
+		const float SpringStrength = 20f;         // strength of link springs
 		const float SpringRestLength = 2000f;     // desired link distance
 		const float Damping = 0.9f;               // motion damping per frame
 		const float MaxVelocity = 2000f;          // velocity cap to avoid explosion
-		const float RotationalForce = 50000f;        // how strongly nodes align spring direction
+		const float RotationalForce = 50000f;     // how strongly nodes align spring direction
 
 		// 1 - Repulsion between all nodes
 		foreach (Node node in m_nodes) {
@@ -113,7 +113,7 @@ public sealed class Graph {
 					exitNode.Acc -= springForce;
 
 					// --- Rotational (orientation) force ---
-					Vector2 desiredDir = portal.Desc.EdgeRange.Edge.Side.ToDirection().ToVec().ToLove();
+					Vector2 desiredDir = portal.Desc.EdgeRange.Edge.Side.ToDirection().ToVec().ToLoveVector();
 
 					// Angle error between desired direction and actual spring direction
 					float cross = springDir.X * desiredDir.Y - springDir.Y * desiredDir.X; // signed
@@ -167,7 +167,7 @@ public sealed class Graph {
 
 		Vector2 GetRenderPos(V2I pos) {
 			Node? node = m_nodes.FirstOrDefault(n => n.Screen.LogicalRect.Contains(pos));
-			return node.Trs.GlobalRect.Location + (pos - node.Screen.LogicalRect.Pos).ToLove();
+			return node.Trs.GlobalRect.Location + (pos - node.Screen.LogicalRect.Pos).ToLovePoint();
 		}
 		if (m_mouseTrail.Count >= 2) {
 			Graphics.Push(StackType.All);
@@ -200,12 +200,12 @@ public sealed class Graph {
 
 	public Config Save(string path) {
 		HashSet<Portal> savedPortals = new();
-		return new() {
+		return new Config {
 			Mappings = m_nodes
 			.SelectMany(n => n.Screen.Edges)
 			.SelectMany(e => e.Portals)
 			.Where(p => savedPortals.Add(p) && savedPortals.Add(p.Exit))
-			.Select(p => new Config.Mapping() {
+			.Select(p => new Config.Mapping {
 				A = new Config.PortalEdge(p),
 				B = new Config.PortalEdge(p.Exit),
 			})

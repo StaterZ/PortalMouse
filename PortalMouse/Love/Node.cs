@@ -4,6 +4,7 @@ using PortalMouse.Engine.Core;
 using PortalMouse.Engine.Utils.Ext;
 using PortalMouse.Engine.Utils.Math;
 using PortalMouse.Love.Utils;
+using PortalMouse.Love.Utils.Ext;
 
 namespace PortalMouse.Love;
 
@@ -13,19 +14,14 @@ public class Node {
 	public Vector2 Acc;
 	public Vector2 Vel;
 	public readonly Screen Screen;
-	public Graph m_graph;
+	public readonly Graph m_graph;
 
 	public Node(Graph graph, Screen screen) {
 		m_graph = graph;
 		Screen = screen;
 		Trs = new TRS(null) {
 			Anchor = default,
-			LocalRect = new RectangleF(
-				screen.LogicalRect.Pos.x,
-				screen.LogicalRect.Pos.y,
-				screen.LogicalRect.Size.x,
-				screen.LogicalRect.Size.y
-			),
+			LocalRect = screen.LogicalRect.ToLove(),
 			Pivot = new Vector2(0.0f, 0.0f),
 		};
 	}
@@ -88,7 +84,7 @@ public class Node {
 					m_graph.GetPortalPos(entryEdgeRange, 0),
 					m_graph.GetPortalPos(entryEdgeRange, 1),
 					m_graph.GetPortalPos(exitEdgeRange, 1),
-					m_graph.GetPortalPos(exitEdgeRange, 0)
+					m_graph.GetPortalPos(exitEdgeRange, 0),
 				];
 
 				bool isBackgroundMissing = m_graph.m_drawnPortals.Add(portal) && m_graph.m_drawnPortals.Add(portal.Exit);

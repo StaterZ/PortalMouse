@@ -9,7 +9,6 @@ public class TRS {
 	public required Vector2 Anchor;
 	public required Vector2 Pivot;
 
-	private TRS? m_parent;
 	private readonly List<TRS> m_children = new();
 
 	private RectangleF? m_globalRectCache;
@@ -34,13 +33,13 @@ public class TRS {
 	}
 
 	public TRS? Parent {
-		get => m_parent;
+		get;
 		set {
-			if (m_parent == value) return;
+			if (field == value) return;
 
-			m_parent?.m_children.Remove(this);
-			m_parent = value;
-			m_parent?.m_children.Add(this);
+			field?.m_children.Remove(this);
+			field = value;
+			field?.m_children.Add(this);
 
 			MarkDirty();
 		}

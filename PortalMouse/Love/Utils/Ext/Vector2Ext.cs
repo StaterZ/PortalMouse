@@ -3,6 +3,8 @@
 namespace PortalMouse.Love.Utils.Ext;
 
 public static class Vector2Ext {
-	public static Vector2 Abs(this Vector2 self) => new(Mathf.Abs(self.X), Mathf.Abs(self.Y));
-	public static Vector2 Floor(this Vector2 self) => new(Mathf.Floor(self.X), Mathf.Floor(self.Y));
+	extension(Vector2 self) {
+		public Vector2 Abs() => new(Mathf.Abs(self.X), Mathf.Abs(self.Y));
+		public Vector2 Floor() => new(Mathf.Floor(self.X), Mathf.Floor(self.Y));
+	}
 }

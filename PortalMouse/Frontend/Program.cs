@@ -77,6 +77,8 @@ public static class Program {
 					NativeHelper.ShowConsole(true);
 					Terminal.Imp("Program has exit!");
 					return;
+				default:
+					throw new ArgumentOutOfRangeException();
 			}
 		}
 	}
@@ -116,7 +118,7 @@ public static class Program {
 		Terminal.BlankLine();
 
 		V2I? MoveHandler(V2I pos) {
-			V2I? movedPos = setup!.Handle(pos);
+			V2I? movedPos = setup.Handle(pos);
 #if DEBUG
 			if (movedPos.HasValue) {
 				Terminal.Dbg($"Moved: {pos} -> {movedPos.Value}");
