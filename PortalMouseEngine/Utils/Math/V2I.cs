@@ -1,4 +1,5 @@
 ﻿using System;
+using PortalMouse.Engine.Utils.Ext;
 using PortalMouse.Engine.Utils.Misc;
 
 namespace PortalMouse.Engine.Utils.Math;
@@ -18,6 +19,11 @@ public struct V2I {
 	public V2I Clamp(R2I range) => new(
 		range.X.Clamp(x),
 		range.Y.Clamp(y) 
+	);
+	
+	public readonly V2I Lerp(R2I range) => new(
+		x.Lerp(range.X),
+		y.Lerp(range.Y)
 	);
 
 	public readonly int Dot(V2I other) => x * other.x + y * other.y;

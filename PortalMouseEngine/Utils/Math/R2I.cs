@@ -36,4 +36,6 @@ public struct R2I {
 
 	public static R2I operator +(R2I lhs, V2I rhs) => new(lhs.Pos + rhs, lhs.Size);
 	public static R2I operator -(R2I lhs, V2I rhs) => new(lhs.Pos - rhs, lhs.Size);
+
+	public R2I Inflate(V2I growth) => new(Pos - growth, Size + growth * 2);
 }

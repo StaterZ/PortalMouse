@@ -5,24 +5,24 @@ using System.Numerics;
 namespace PortalMouse.Engine.Utils.Math;
 using Math = System.Math;
 
-public readonly struct Frac : IComparable, IComparable<Frac>, IEquatable<Frac> {
+public struct Frac : IComparable, IComparable<Frac>, IEquatable<Frac> {
 	public static readonly Frac Zero = 0;
 	public static readonly Frac One = 1;
 	public static readonly Frac Half = new(1, 2);
 
-	public readonly int Numerator;
-	public readonly int Denominator;
+	public int Numerator;
+	public int Denominator;
 
 	public Frac(int numerator, int denominator) {
 		Numerator = numerator;
 		Denominator = denominator;
 	}
 
-	public Frac Lerp(R1Frac range) =>
-		range.Begin + range.Size * this;
-
-	public Frac Lerp(LineSeg1Frac line) =>
-		line.Begin + line.Delta * this;
+	public readonly Frac InvLerp(R1Frac range) => (this - range.Begin) / range.Size;
+	public readonly Frac InvLerp(LineSeg1Frac line) => (this - line.Begin) / line.Delta;
+	public readonly Frac Lerp(R1Frac range) => range.Begin + range.Size * this;
+	public readonly Frac Lerp(LineSeg1Frac line) => line.Begin + line.Delta * this;
+	public readonly Frac Map(R1Frac from, R1Frac to) => InvLerp(from).Lerp(to);
 
 	// Adapted to C# from: https://en.wikipedia.org/wiki/Binary_GCD_algorithm
 	private static uint GCD(uint u, uint v) {
@@ -101,5 +101,28 @@ public readonly struct Frac : IComparable, IComparable<Frac>, IEquatable<Frac> {
 		return (self.Numerator + bias) / self.Denominator;
 	}
 
+	public static explicit operator Frac(float self) {
+		if (float.IsNaN(self)) throw new ArgumentException("NaN cannot be represented as a fraction.");
+		if (float.IsInfinity(self))  throw new ArgumentException("Infinity cannot be represented as a fraction.");
+		if (self == 0f) return Zero;
+
+		//extract IEEE 754 components
+		int bits     = BitConverter.SingleToInt32Bits(self);
+		int sign     = (bits >> 31) == 0 ? 1 : -1;
+		int exponent = ((bits >> 23) & 0xFF) - 127;   //biased exponent -> actual exponent
+		int mantissa = exponent == -127               //subnormal?
+			? (bits & 0x7FFFFF) << 1
+			: (bits & 0x7FFFFF) | 0x800000; //restore implicit leading 1
+
+		//self = sign * mantissa * 2^(exponent - 23)
+		Frac frac = new(sign * mantissa, 1);
+		int shift = exponent - 23;
+		if (shift >= 0) {
+			frac.Numerator <<= shift;
+		} else {
+			frac.Denominator <<= -shift;
+		}
+		return frac;
+	}
 	public static explicit operator float(Frac self) => (float)self.Numerator / self.Denominator;
 }

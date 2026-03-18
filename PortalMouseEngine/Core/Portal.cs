@@ -11,8 +11,10 @@ public class Portal {
 		Exit = exit;
 	}
 
-	public Frac Map(Frac value) =>
-		MathX.Map(value, Desc.EdgeRange.Range, Exit.Desc.EdgeRange.Range);
+	public Frac Map(Frac value) => value.Map(
+		(R1Frac)Desc.EdgeRange.Range + Frac.Half,
+		(R1Frac)Exit.Desc.EdgeRange.Range + Frac.Half
+	);
 
 	public static void Bind(PortalDesc a, PortalDesc b) {
 		Portal aPortal = new(a, null!);

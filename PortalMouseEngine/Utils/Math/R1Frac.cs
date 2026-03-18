@@ -17,7 +17,7 @@ public struct R1Frac {
 	}
 
 	public readonly Frac Clamp(Frac value) =>
-		MathX.Clamp(value, Begin, MathX.Max(Begin, End - 1));
+		MathX.Clamp(value, new R1Frac(Begin, MathX.Max(Begin, End - 1)));
 
 	public readonly bool Contains(Frac point) =>
 		Begin <= point && point < End;
@@ -25,8 +25,8 @@ public struct R1Frac {
 	public static R1Frac InitBeginSize(Frac begin, Frac size) => new(begin, begin + size);
 
 	public readonly override string ToString() => $"[X:{Begin},W:{Size}]";
-	public readonly bool Equals(R1I other) => Begin == other.Begin && End == other.End;
-	public readonly override bool Equals(object? obj) => obj is R1I other && Equals(other);
+	public readonly bool Equals(R1Frac other) => Begin.Equals(other.Begin) && End.Equals(other.End);
+	public readonly override bool Equals(object? obj) => obj is R1Frac other && Equals(other);
 	public readonly override int GetHashCode() => HashCode.Combine(Begin, End);
 
 	public static R1Frac operator +(R1Frac lhs, Frac rhs) => new(lhs.Begin + rhs, lhs.End + rhs);

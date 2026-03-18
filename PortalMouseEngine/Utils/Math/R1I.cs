@@ -24,7 +24,7 @@ public struct R1I {
 	public static R1I InitBeginSize(int begin, int size) => new(begin, begin + size);
 
 	public readonly override string ToString() => $"[X:{Begin},W:{Size}]";
-	public readonly bool Equals(R1I other) => Begin == other.Begin && End == other.End;
+	public readonly bool Equals(R1I other) => Begin.Equals(other.Begin) && End.Equals(other.End);
 	public readonly override bool Equals(object? obj) => obj is R1I other && Equals(other);
 	public readonly override int GetHashCode() => HashCode.Combine(Begin, End);
 	

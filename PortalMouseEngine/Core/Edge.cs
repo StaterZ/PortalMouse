@@ -46,7 +46,7 @@ public class Edge {
 
 	public ScreenLineSeg? TryHandle(LineSeg2Frac mouseMove) {
 		AxisLineSeg2Frac entryEdgeCollider = new() {
-			Pos = Pos - V2Frac.Half,
+			Pos = Pos,
 			Size = ScreenRangeAlongEdgeAxis.Size,
 			Axis = Axis,
 		};
@@ -80,7 +80,7 @@ public class Edge {
 
 			V2Frac exitEdgeExitPos = new(
 				entry.portal.Map(entry.pos),
-				exitEdge.Pos[exitEdge.Axis.Opposite()] - Frac.Half
+				exitEdge.Pos[exitEdge.Axis.Opposite()]
 			);
 
 			V2Frac exitMove = new(inLine.End - entry.pos, outMove[Axis.Opposite()]); //this is what is left over of the move after crossing the portal boundary
@@ -104,22 +104,22 @@ public class Edge {
 	private (Frac pos, Portal? portal) SlideAlongEdgeIntoPortal(LineSeg1Frac line) {
 		(bool success, int beginIndex) = m_portals.BetterBinarySearch(
 			line.Begin,
-			portal => portal.Desc.EdgeRange.Range.Begin - Frac.Half
+			portal => portal.Desc.EdgeRange.Range.Begin
 		);
 
 		if (success) {
 			return (line.Begin, m_portals[beginIndex]);
 		} else {
 			beginIndex--;
-			if (m_portals.IsInRange(beginIndex) && line.Begin <= m_portals[beginIndex].Desc.EdgeRange.Range.End - Frac.Half) {
+			if (m_portals.IsInRange(beginIndex) && line.Begin <= m_portals[beginIndex].Desc.EdgeRange.Range.End) {
 				return (line.Begin, m_portals[beginIndex]);
 			}
 
 			//UGH!!! stupid C# not allowing struct constants in switch patterns >:(
-			if (line.Delta < 0 && m_portals.IsInRange(beginIndex) && line.End < m_portals[beginIndex].Desc.EdgeRange.Range.End - Frac.Half)
-				return (m_portals[beginIndex].Desc.EdgeRange.Range.End - Frac.Half, m_portals[beginIndex]);
-			if (line.Delta > 0 && m_portals.IsInRange(beginIndex + 1) && line.End >= m_portals[beginIndex + 1].Desc.EdgeRange.Range.Begin - Frac.Half)
-				return (m_portals[beginIndex + 1].Desc.EdgeRange.Range.Begin - Frac.Half, m_portals[beginIndex + 1]);
+			if (line.Delta < 0 && m_portals.IsInRange(beginIndex) && line.End < m_portals[beginIndex].Desc.EdgeRange.Range.End)
+				return (m_portals[beginIndex].Desc.EdgeRange.Range.End, m_portals[beginIndex]);
+			if (line.Delta > 0 && m_portals.IsInRange(beginIndex + 1) && line.End >= m_portals[beginIndex + 1].Desc.EdgeRange.Range.Begin)
+				return (m_portals[beginIndex + 1].Desc.EdgeRange.Range.Begin, m_portals[beginIndex + 1]);
 			return (line.End, null);
 		}
 	}

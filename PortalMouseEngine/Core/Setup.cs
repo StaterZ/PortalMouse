@@ -11,21 +11,22 @@ public sealed class Setup {
 	private ScreenPos? m_prevPos;
 
 	public V2I? Handle(V2I pos) {
+		V2Frac centerPos = pos + V2Frac.Half;
 		if (m_prevPos == null) {
 			Screen? screen = FindCursorScreen(pos);
 			if (screen == null) {
 				Terminal.Wrn("Failed to find screen for cursor. Unless the error repeats it can be safely ignored");
 				return null;
 			}
-			m_prevPos = new ScreenPos(pos, screen);
+			m_prevPos = new ScreenPos(centerPos, screen); //add half to be at center of pixel
 			return null;
 		}
 
-		if (pos == m_prevPos.Value.Pos) return null;
+		if (centerPos == m_prevPos.Value.Pos) return null;
 
-		ScreenLineSeg move = new(new LineSeg2Frac(m_prevPos.Value.Pos, pos), m_prevPos.Value.Screen);
+		ScreenLineSeg move = new(new LineSeg2Frac(m_prevPos.Value.Pos, centerPos), m_prevPos.Value.Screen);
 		List<ScreenLineSeg> moves = [move];
-		while (!((R2Frac)move.Screen.LogicalRect - V2Frac.Half).Contains(move.Line.End)) {
+		while (!((R2Frac)move.Screen.LogicalRect).Contains(move.Line.End)) {
 			ScreenLineSeg? nextMove = move.Screen.TryHandle(move.Line);
 			if (!nextMove.HasValue) throw new UnreachableException($"If we're outside the screen bounds (checked by the while) we should get a move adjustment. move was:\n{moves.Delimit(",\n")}");
 
@@ -34,7 +35,7 @@ public sealed class Setup {
 		}
 		m_prevPos = move.End;
 
-		V2I end = (V2I)move.Line.End.Clamp(move.Screen.LogicalRect);
+		V2I end = (V2I)(move.Line.End - V2Frac.Half).Clamp(move.Screen.LogicalRect);
 		
 		return end != pos ? end : null;
 	}

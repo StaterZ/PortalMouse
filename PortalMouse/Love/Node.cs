@@ -30,9 +30,6 @@ public class Node {
 	}
 
 	public void Update(float dt) {
-		Trs.LocalRect.Location += Vel * dt;
-		Trs.MarkDirty();
-
 		if (m_graph.Selected == this) {
 			if (Mouse.IsDown(0)) {
 				Selection.Consume();
@@ -50,10 +47,25 @@ public class Node {
 
 		if (m_graph.Selected == this) {
 			Trs.LocalRect.Location += m_graph.MouseWorldPos - m_graph.MouseWorldPrevPos;
+			Trs.MarkDirty();
 		}
 	}
 
 	public void Draw0() {
+		// RectangleF rect = Trs.GlobalRect;
+		// Graphics.SetColor(Color.Blue);
+		// RectangleF insetRect = Screen.PhysicalRect.ToLove();
+		// insetRect.Inflate(new SizeF(Graphics.GetLineWidth(), Graphics.GetLineWidth()) / -2);
+		// Graphics.Rectangle(DrawMode.Line, insetRect);
+		//
+		// void DrawLine(V2I t) => Graphics.Line(t.Lerp(Screen.PhysicalRect).ToLoveVector(), rect.Lerp(t.ToLoveVector()));
+		// DrawLine(new V2I(0, 0));
+		// DrawLine(new V2I(1, 0));
+		// DrawLine(new V2I(0, 1));
+		// DrawLine(new V2I(1, 1));
+	}
+	
+	public void Draw1() {
 		RectangleF rect = Trs.GlobalRect;
 		Graphics.SetColor(Color.FromARGB(0xff202020));
 		Graphics.Rectangle(DrawMode.Fill, rect);
@@ -64,7 +76,7 @@ public class Node {
 		Graphics.Rectangle(DrawMode.Line, insetRect);
 	}
 
-	public void Draw1() {
+	public void Draw2() {
 		Graphics.SetColor(Color.White);
 		RectangleF textRect = Trs.GlobalRect;
 		textRect.Inflate(-100, -100);

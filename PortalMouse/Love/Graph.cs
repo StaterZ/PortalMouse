@@ -54,7 +54,7 @@ public sealed class Graph {
 	}
 
 	public Vector2 GetPortalPos(EdgeRange edgeRange, float posAlongPortalNorm) {
-		float portalPosAlongEdge = MathX.Map(posAlongPortalNorm, R1I.One, edgeRange.LocalRange);
+		float portalPosAlongEdge = posAlongPortalNorm.Map(R1I.One, edgeRange.LocalRange);
 		Vector2 portalPos = edgeRange.Edge.Side.ToAxis() switch {
 			Axis.Horizontal => new Vector2(0, portalPosAlongEdge),
 			Axis.Vertical => new Vector2(portalPosAlongEdge, 0),
@@ -66,23 +66,29 @@ public sealed class Graph {
 	}
 
 	private void HandlePhysics(float dt) {
-		const float RepulsionStrength = 50000f;   // strength of node-node repulsion
+		const float RepulsionStrength = 100000f;   // strength of node-node repulsion
 		const float SpringStrength = 20f;         // strength of link springs
 		const float SpringRestLength = 2000f;     // desired link distance
 		const float Damping = 0.9f;               // motion damping per frame
-		const float MaxVelocity = 2000f;          // velocity cap to avoid explosion
+		const float MaxVelocity = 100000f;          // velocity cap to avoid explosion
 		const float RotationalForce = 50000f;     // how strongly nodes align spring direction
-
+		const float CenteringForce = 10000f;   // how strongly node want to be at it's physical position
+		
 		// 1 - Repulsion between all nodes
-		foreach (Node node in m_nodes) {
-			if (Selected == node) continue;
-
+		for (int i = 0; i < m_nodes.Count; i++) {
+			Node node = m_nodes[i];
 			RectangleF nodeRect = node.Trs.GlobalRect;
 			Vector2 nodeCenter = nodeRect.Center;
 
-			foreach (Node other in m_nodes) {
-				if (other == node) continue;
-
+			{
+				RectangleF otherRect = node.Screen.PhysicalRect.ToLove();
+				Vector2 delta = nodeCenter - otherRect.Center;
+				node.Acc -= CenteringForce * delta.Normalized();
+			}
+			
+			for (int j = i + 1; j < m_nodes.Count; j++) {
+				Node other = m_nodes[j];
+				
 				RectangleF otherRect = other.Trs.GlobalRect;
 				Vector2 delta = nodeCenter - otherRect.Center;
 				float distSqr = delta.LengthSquared();
@@ -141,6 +147,7 @@ public sealed class Graph {
 			}
 
 			node.Trs.LocalRect.Location += node.Vel * dt;
+			node.Trs.MarkDirty();
 		}
 	}
 
@@ -163,6 +170,9 @@ public sealed class Graph {
 		}
 		foreach (Node node in m_nodes) {
 			node.Draw1();
+		}
+		foreach (Node node in m_nodes) {
+			node.Draw2();
 		}
 
 		Vector2 GetRenderPos(V2I pos) {

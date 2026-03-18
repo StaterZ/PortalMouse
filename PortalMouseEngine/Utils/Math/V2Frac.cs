@@ -20,6 +20,11 @@ public struct V2Frac {
 		line.X.Clamp(x),
 		line.Y.Clamp(y) 
 	);
+	
+	public readonly V2Frac Lerp(R2Frac range) => new(
+		x.Lerp(range.X),
+		y.Lerp(range.Y)
+	);
 
 	public readonly Frac Dot(V2Frac other) => x * other.x + y * other.y;
 	public readonly Frac MagSqr => Dot(this);

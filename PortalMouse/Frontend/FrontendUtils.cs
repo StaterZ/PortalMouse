@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using PortalMouse.Engine.Core;
+using PortalMouse.Engine.Utils.Ext;
 using PortalMouse.Engine.Utils.Math;
 using PortalMouse.Engine.Utils.Misc;
 
@@ -107,7 +108,7 @@ public static class FrontendUtils {
 								return false;
 							}
 
-							anchor = MathX.Map(value, validPercentRange, validPixelRange);
+							anchor = value.Map(validPercentRange, validPixelRange);
 							return true;
 						}
 
